@@ -302,7 +302,7 @@ export default function AllStudents(){
         onPress={openCreateStudent}
         style={{
           position:"absolute",
-          bottom:20,
+          bottom:100,
           right:20,
           backgroundColor:"#2563eb",
           paddingHorizontal:20,

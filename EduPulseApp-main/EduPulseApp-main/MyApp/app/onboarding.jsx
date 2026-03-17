@@ -1,168 +1,152 @@
-import { useRouter } from 'expo-router';
+import { useRouter } from "expo-router";
 import {
 StyleSheet,
-Platform,
-ImageBackground,
 Text,
-ScrollView,
 View,
 Image,
 FlatList,
 TouchableOpacity,
 Modal,
-Dimensions
-} from 'react-native';
+Dimensions,
+Animated,
+ScrollView
+} from "react-native";
 
-import {Ionicons,AntDesign} from '@expo/vector-icons';
+import React,{useState,useRef,useEffect} from "react";
 
-import React,{useState,useEffect} from 'react';
+import {Ionicons,AntDesign} from "@expo/vector-icons";
 
-import {LinearGradient} from 'expo-linear-gradient';
-import Checkbox from 'expo-checkbox';
-import {useFonts} from 'expo-font';
+import {LinearGradient} from "expo-linear-gradient";
 
-const {width,height} = Dimensions.get('window');
+import Checkbox from "expo-checkbox";
+
+import {BlurView} from "expo-blur";
+
+import {useFonts} from "expo-font";
+
+const {width,height} = Dimensions.get("window");
 
 const OnboardingScreen = () => {
 
 const router = useRouter();
 
 let [fontsLoaded] = useFonts({
-'Bold': require('../assets/fonts/Poppins-Bold.ttf'),
-'Medium': require('../assets/fonts/Poppins-Medium.ttf'),
-'SemiBold': require('../assets/fonts/Poppins-SemiBold.ttf'),
-'Regular': require('../assets/fonts/Poppins-Regular.ttf'),
+Bold: require("../assets/fonts/Poppins-Bold.ttf"),
+Medium: require("../assets/fonts/Poppins-Medium.ttf"),
+SemiBold: require("../assets/fonts/Poppins-SemiBold.ttf"),
+Regular: require("../assets/fonts/Poppins-Regular.ttf"),
 });
 
-const [showImage,setShowImage] = useState(true);
-const [modalVisible,setModalVisible] = useState(false);
-const [isChecked,setChecked] = useState(false);
+const fadeAnim = useRef(new Animated.Value(0)).current;
+const gradientAnim = useRef(new Animated.Value(0)).current;
 
 useEffect(()=>{
-const interval = setInterval(()=>{
-setShowImage(prev=>!prev);
-},5000);
 
-return ()=>clearInterval(interval);
+Animated.timing(fadeAnim,{
+toValue:1,
+duration:1200,
+useNativeDriver:true
+}).start();
+
+Animated.loop(
+Animated.timing(gradientAnim,{
+toValue:1,
+duration:6000,
+useNativeDriver:true
+})
+).start();
 
 },[]);
 
-const [onboardings] = useState([
+const gradientTranslate = gradientAnim.interpolate({
+inputRange:[0,1],
+outputRange:[-200,200]
+});
+
+const [modalVisible,setModalVisible] = useState(false);
+const [isChecked,setChecked] = useState(false);
+
+const onboardings=[
 
 {
-Title:'Smart School Management',
-Description:'Manage your entire school operations from one powerful platform. Control students, teachers, classes, and academic records with ease. This system helps schools operate faster, smarter, and more efficiently in the digital age.',
-OnboardingImage:{uri:'https://images.unsplash.com/photo-1588072432836-e10032774350'},
-id:'1'
+title:"Smart School Management",
+description:"Manage students, teachers, classes and school operations from one intelligent platform built for modern schools.",
+image:"https://images.unsplash.com/photo-1588072432836-e10032774350"
 },
 
 {
-Title:'Student & Teacher Management',
-Description:'Register students and teachers easily, organize classes and streams, and keep accurate academic records. Everything is centralized so administrators and teachers can focus on delivering quality education.',
-OnboardingImage:{uri:'https://images.unsplash.com/photo-1509062522246-3755977927d7'},
-id:'2'
+title:"Student & Teacher Management",
+description:"Register students and teachers, organize classrooms and streams, and keep accurate academic records easily.",
+image:"https://images.unsplash.com/photo-1509062522246-3755977927d7"
 },
 
 {
-Title:'Results, Attendance & Reports',
-Description:'Track attendance, manage exams, generate rankings, and produce professional report cards automatically. Parents can also monitor their child’s progress through the system anytime.',
-OnboardingImage:{uri:'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f'},
-id:'3'
+title:"Results, Attendance & Reports",
+description:"Track attendance, manage exams, generate rankings and produce professional academic reports automatically.",
+image:"https://images.unsplash.com/photo-1524995997946-a1c2e315a42f"
 }
 
-]);
+];
 
-const Slide = ({item}) => {
+const [currentSlideIndex,setCurrentSlideIndex]=useState(0);
+const ref = useRef();
 
-return(
-
-<View style={styles.slideContainer}>
-
-<ImageBackground
-source={item?.OnboardingImage}
-style={styles.image}
-resizeMode="cover"
->
-
-<LinearGradient
-colors={['rgba(0,0,0,0.1)','rgba(0,0,0,0.4)','rgba(0,0,0,0.85)']}
-style={styles.gradient}
->
-
-<View style={styles.textCard}>
-
-<Text style={styles.title1}>{item?.Title}</Text>
-
-<Text style={styles.title}>
-{item?.Description}
-</Text>
-
-</View>
-
-</LinearGradient>
-
-</ImageBackground>
-
-</View>
-
-);
-
-};
-
-const [currentSlideIndex,setCurrentSlideIndex] = useState(0);
-const ref = React.useRef();
-
-const updateCurrentSlideIndex = e => {
+const updateCurrentSlideIndex = e =>{
 
 const contentOffsetX = e.nativeEvent.contentOffset.x;
 const currentIndex = Math.round(contentOffsetX / width);
 
 setCurrentSlideIndex(currentIndex);
 
-if(currentIndex === onboardings.length - 1){
-setTimeout(()=>setModalVisible(true),500);
-}
-
 };
 
-const Footer = () => {
+const Slide = ({item}) =>{
 
 return(
 
-<View style={styles.footer}>
+<View style={styles.slide}>
 
-<View style={styles.indicatorContainer}>
+<View style={styles.imageContainer}>
 
-{onboardings.map((_,index)=>(
-
-<View
-key={index}
-style={[
-styles.indicator,
-currentSlideIndex == index && styles.activeIndicator
-]}
+<Image
+source={{uri:item.image}}
+style={styles.image}
 />
-
-))}
 
 </View>
 
-{currentSlideIndex == onboardings.length - 1 && (
+<View style={styles.gradientArea}>
 
-<TouchableOpacity
-style={styles.getstarted2}
-onPress={()=>setModalVisible(true)}
+<Animated.View
+style={{
+transform:[{translateX:gradientTranslate}]
+}}
 >
 
-<Ionicons
-name="arrow-up-circle"
-size={60}
-color="#00e5ff"
+<LinearGradient
+colors={["#2563eb","#7c3aed","#06b6d4"]}
+start={{x:0,y:0}}
+end={{x:1,y:1}}
+style={styles.gradientBackground}
 />
 
-</TouchableOpacity>
+</Animated.View>
 
-)}
+<BlurView intensity={60} tint="dark" style={styles.glassOverlay}/>
+
+</View>
+
+<Animated.View style={[styles.card,{opacity:fadeAnim}]}>
+
+<Text style={styles.title}>
+{item.title}
+</Text>
+
+<Text style={styles.desc}>
+{item.description}
+</Text>
+
+</Animated.View>
 
 </View>
 
@@ -170,44 +154,88 @@ color="#00e5ff"
 
 };
 
+const nextSlide = ()=>{
+
+if(currentSlideIndex < onboardings.length-1){
+
+ref.current.scrollToOffset({
+offset:(currentSlideIndex+1)*width
+});
+
+}else{
+
+setModalVisible(true);
+
+}
+
+};
+
+if(!fontsLoaded) return null;
+
 return(
 
-<>
-
-{!fontsLoaded ? (<View/>) : (
-
-<LinearGradient
-colors={['#021B1F','#000']}
-style={{flex:1}}
->
+<View style={{flex:1,backgroundColor:"#020617"}}>
 
 <FlatList
-keyExtractor={item=>item.id}
 ref={ref}
-onMomentumScrollEnd={updateCurrentSlideIndex}
-showsHorizontalScrollIndicator={false}
-horizontal
 data={onboardings}
+horizontal
 pagingEnabled
+showsHorizontalScrollIndicator={false}
+onMomentumScrollEnd={updateCurrentSlideIndex}
 renderItem={({item})=><Slide item={item}/>}
 />
 
-<Footer/>
+<View style={styles.bottom}>
+
+<View style={styles.indicators}>
+
+{onboardings.map((_,index)=>{
+
+return(
+
+<View
+key={index}
+style={[
+styles.indicator,
+currentSlideIndex==index && styles.activeIndicator
+]}
+/>
+
+);
+
+})}
+
+</View>
+
+<TouchableOpacity
+onPress={nextSlide}
+style={styles.nextBtn}
+>
+
+<Ionicons
+name="arrow-forward"
+size={26}
+color="white"
+/>
+
+</TouchableOpacity>
+
+</View>
 
 <Modal
 visible={modalVisible}
 transparent
 animationType="slide"
-onRequestClose={()=>setModalVisible(false)}
 >
 
 <View style={styles.modalContainer}>
 
-<View style={styles.modalContent}>
+<View style={styles.modal}>
 
 <TouchableOpacity
 onPress={()=>setModalVisible(false)}
-style={{alignSelf:'flex-end'}}
+style={{alignSelf:"flex-end"}}
 >
 
 <AntDesign
@@ -219,70 +247,75 @@ color="#ff4d4d"
 </TouchableOpacity>
 
 <Text style={styles.modalTitle}>
-School Management System – Terms & Conditions
+Terms & Conditions
 </Text>
 
 <ScrollView>
 
-<Text style={styles.modalText2}>
+<Text style={styles.modalText}>
 
 Welcome to the School Management System platform.
 
-By using this application you agree to use it responsibly for educational and administrative purposes within your institution.
+This application is designed to help schools manage academic and administrative operations efficiently.
 
 </Text>
 
-<Text style={styles.modalText2}>
+<Text style={styles.modalText}>
 
-All information entered into the system including student records, exam results, attendance and school data must be accurate and used according to school policies.
-
-</Text>
-
-<Text style={styles.modalText2}>
-
-The system protects your data and ensures that each school can only access its own information. Unauthorized access or misuse of the system may lead to suspension of your account.
+All student records, exam results and school information must be entered accurately and used only for official educational purposes.
 
 </Text>
 
-<Text style={styles.modalText2}>
+<Text style={styles.modalText}>
 
-By continuing to use this application, you accept these terms and agree to follow the policies of your institution.
+Each school account can access only its own data and unauthorized use of the system may lead to account suspension.
+
+</Text>
+
+<Text style={styles.modalText}>
+
+By continuing to use this application you agree to follow your institution policies and system guidelines.
 
 </Text>
 
 </ScrollView>
 
-<View style={styles.checkboxContainer}>
+<View style={styles.checkRow}>
 
 <Checkbox
-style={styles.checkbox}
 value={isChecked}
 onValueChange={setChecked}
-color={isChecked ? '#00e5ff' : undefined}
+color={isChecked ? "#3b82f6" : undefined}
 />
 
-<Text style={{marginLeft:10,color:'white'}}>
-I understand and agree
+<Text style={styles.checkText}>
+I agree to the terms
 </Text>
 
 </View>
 
-{isChecked && (
+{isChecked &&(
 
 <TouchableOpacity
 onPress={()=>router.replace("/login")}
-style={styles.getstarted}
 >
 
-<Text style={{color:'white',fontSize:16}}>
+<LinearGradient
+colors={["#2563eb","#38bdf8"]}
+style={styles.startBtn}
+>
+
+<Text style={styles.startText}>
 GET STARTED
 </Text>
 
 <Ionicons
 name="arrow-forward-circle"
-size={24}
+size={26}
 color="white"
 />
+
+</LinearGradient>
 
 </TouchableOpacity>
 
@@ -294,11 +327,7 @@ color="white"
 
 </Modal>
 
-</LinearGradient>
-
-)}
-
-</>
+</View>
 
 );
 
@@ -308,125 +337,152 @@ export default OnboardingScreen;
 
 const styles = StyleSheet.create({
 
-slideContainer:{
+slide:{
 width:width,
 height:height,
+backgroundColor:"#020617"
+},
+
+imageContainer:{
+height:height*0.52,
+overflow:"hidden"
 },
 
 image:{
 width:width,
-height:height,
-justifyContent:'flex-end'
+height:"100%"
 },
 
-gradient:{
-flex:1,
-justifyContent:'flex-end'
+gradientArea:{
+position:"absolute",
+top:height*0.45,
+width:width,
+height:height
 },
 
-textCard:{
-padding:25,
-paddingBottom:60,
+gradientBackground:{
+width:width*2,
+height:height
 },
 
-title1:{
-color:'white',
-fontSize:28,
-fontFamily:'Bold',
-marginBottom:10
+glassOverlay:{
+position:"absolute",
+width:width,
+height:height
+},
+
+card:{
+position:"absolute",
+top:height*0.58,
+paddingHorizontal:30
 },
 
 title:{
-color:'#e0e0e0',
+fontSize:28,
+color:"white",
+fontFamily:"Bold",
+marginBottom:12
+},
+
+desc:{
 fontSize:16,
+color:"#e2e8f0",
 lineHeight:24,
-fontFamily:'Regular'
+fontFamily:"Regular"
 },
 
-footer:{
-position:'absolute',
-bottom:40,
-width:width
+bottom:{
+position:"absolute",
+bottom:60,
+width:width,
+flexDirection:"row",
+justifyContent:"space-between",
+alignItems:"center",
+paddingHorizontal:30
 },
 
-indicatorContainer:{
-flexDirection:'row',
-justifyContent:'center',
-alignItems:'center'
+indicators:{
+flexDirection:"row"
 },
 
 indicator:{
-height:10,
 width:10,
-backgroundColor:'#666',
-marginHorizontal:6,
-borderRadius:10
+height:10,
+borderRadius:10,
+backgroundColor:"#64748b",
+marginRight:8
 },
 
 activeIndicator:{
-backgroundColor:'#00e5ff',
-width:18,
-height:18
+width:22,
+backgroundColor:"#38bdf8"
 },
 
-getstarted2:{
-position:'absolute',
-right:25,
-bottom:-10
+nextBtn:{
+backgroundColor:"#2563eb",
+width:55,
+height:55,
+borderRadius:50,
+justifyContent:"center",
+alignItems:"center"
 },
 
 modalContainer:{
 flex:1,
-justifyContent:'flex-end'
+justifyContent:"flex-end",
+backgroundColor:"rgba(0,0,0,0.6)"
 },
 
-modalContent:{
-backgroundColor:'#021B1F',
-padding:20,
+modal:{
+backgroundColor:"#020617",
+padding:25,
 borderTopLeftRadius:30,
 borderTopRightRadius:30,
-height:height - 60
+height:height-120
 },
 
 modalTitle:{
-fontSize:20,
-fontFamily:'Bold',
-marginTop:10,
-textAlign:'center',
-color:'white'
+fontSize:22,
+fontFamily:"Bold",
+color:"white",
+textAlign:"center",
+marginBottom:20
 },
 
-modalText2:{
+modalText:{
 fontSize:15,
-marginTop:12,
-color:'#d6d6d6',
-fontFamily:'Regular',
-lineHeight:22
+color:"#cbd5f5",
+marginBottom:12,
+lineHeight:22,
+fontFamily:"Regular"
 },
 
-checkboxContainer:{
-flexDirection:'row',
-marginTop:25,
-alignItems:'center',
-alignSelf:'center'
+checkRow:{
+flexDirection:"row",
+alignItems:"center",
+marginTop:20
 },
 
-checkbox:{
-height:26,
-width:26,
-borderColor:'white'
+checkText:{
+color:"white",
+marginLeft:10,
+fontSize:15
 },
 
-getstarted:{
-marginTop:35,
-backgroundColor:'#00a8c5',
-flexDirection:'row',
-justifyContent:'space-between',
-alignItems:'center',
-alignSelf:'center',
-paddingHorizontal:30,
-paddingVertical:14,
-borderRadius:12
+startBtn:{
+marginTop:30,
+flexDirection:"row",
+alignItems:"center",
+justifyContent:"space-between",
+paddingVertical:15,
+paddingHorizontal:25,
+borderRadius:14
+},
+
+startText:{
+color:"white",
+fontSize:16,
+fontFamily:"SemiBold"
 }
 
 });

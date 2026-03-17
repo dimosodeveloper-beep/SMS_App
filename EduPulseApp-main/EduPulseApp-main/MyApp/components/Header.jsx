@@ -1,93 +1,92 @@
 import { useRouter } from 'expo-router';
-import { useNavigation, DrawerActions } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
-import { StyleSheet,Platform,TextInput,ActivityIndicator,
-  Pressable, Text,Animated,ScrollView, View,Image, 
-  Button, FlatList,TouchableOpacity,Modal,
-  TouchableWithoutFeedback, Keyboard,Dimensions,
-  
-   
-  KeyboardAvoidingView 
-   } from 'react-native';
-import React, {useState,useRef,useCallback, useEffect, useContext} from 'react';
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
-import {MaterialIcons,Entypo,MaterialCommunityIcons,FontAwesome5, Ionicons,Feather,AntDesign, FontAwesome} from '@expo/vector-icons';
-
-
-import { useFocusEffect } from '@react-navigation/native';
-import { LinearGradient } from 'expo-linear-gradient';
-
-import LottieView from 'lottie-react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Dimensions } from 'react-native';
+import React from 'react';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function Header({title, subtitle}){
 
- // const navigation = useNavigation();
-  const {width, height} = Dimensions.get('window');
-  
-
-
   const router = useRouter();
   const navigation = useNavigation();
+  const {width, height} = Dimensions.get('window');
 
-  const openMenu = () => navigation.dispatch(DrawerActions.openDrawer());
- const GoHome = () => router.push("/(main)/home");
+  // Go back to previous screen
+  const goBack = () => {
+    if(navigation.canGoBack()){
+      navigation.goBack();
+    }
+  };
 
+  // Go to Home screen
+  const goHome = () => router.push("/(main)/home");
 
-return(
+  return(
+    <View style={styles.header}>
 
-<View style={styles.header}>
+      {/* Left: Go Back Button */}
+      <TouchableOpacity 
+        onPress={goBack} 
+        style={styles.leftBtn}
+      >
+        <Ionicons name="arrow-back-circle" size={36} color="#38bdf8"/>
+      </TouchableOpacity>
 
-<TouchableOpacity 
- onPress={openMenu}
+      {/* Center: Title & Subtitle */}
+      <View style={styles.center}>
+        <Text style={styles.title}>{title}</Text>
+        {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+      </View>
 
->
-<Ionicons name="menu" size={28} color="#fff"/>
-</TouchableOpacity>
+      {/* Right: Go Home Button */}
+      <TouchableOpacity 
+        onPress={goHome} 
+        style={styles.rightBtn}
+      >
+        <Ionicons name="home" size={36} color="#38bdf8"/>
+      </TouchableOpacity>
 
-<View style={{alignItems:"center"}}>
-<Text style={styles.title}>{title}</Text>
-<Text style={styles.subtitle}>{subtitle}</Text>
-</View>
-
-<Image
-source={{uri:"https://i.pravatar.cc/100"}}
-style={styles.profile}
-/>
-
-</View>
-
-);
+    </View>
+  );
 
 }
 
 const styles = StyleSheet.create({
 
-header:{
-paddingTop:60,
-paddingBottom:20,
-paddingHorizontal:20,
-flexDirection:"row",
-alignItems:"center",
-justifyContent:"space-between"
-},
+  header:{
+    paddingTop:60,
+    paddingBottom:20,
+    paddingHorizontal:20,
+    flexDirection:"row",
+    alignItems:"center",
+    justifyContent:"space-between",
+    backgroundColor:"#020617", // dark professional background
+    borderBottomWidth:0.5,
+    borderBottomColor:"#333"
+  },
 
-title:{
-color:"#fff",
-fontSize:20,
-fontWeight:"bold"
-},
+  leftBtn:{
+    padding:5
+  },
 
-subtitle:{
-color:"#aaa",
-fontSize:12
-},
+  center:{
+    flex:1,
+    alignItems:"center"
+  },
 
-profile:{
-width:36,
-height:36,
-borderRadius:20
-}
+  title:{
+    color:"#fff",
+    fontSize:20,
+    fontWeight:"bold"
+  },
+
+  subtitle:{
+    color:"#aaa",
+    fontSize:12
+  },
+
+  rightBtn:{
+    padding:5
+  }
 
 });

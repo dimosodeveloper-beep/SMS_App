@@ -23,6 +23,7 @@ withTiming
 } from "react-native-reanimated";
 
 import Header from "../../components/Header";
+import MainHeader from "../../components/MainHeader";
 
 export default function Home(){
 
@@ -100,7 +101,7 @@ style={styles.container}
 
 <StatusBar barStyle="light-content"/>
 
-<Header
+<MainHeader
 title="School Dashboard"
 subtitle="Management System"
 />

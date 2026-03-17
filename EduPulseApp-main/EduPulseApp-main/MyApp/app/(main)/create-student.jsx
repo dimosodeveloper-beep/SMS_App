@@ -73,9 +73,7 @@ useNativeDriver:true
 }
 
 
-/* =========================
-LOAD TOKEN
-========================= */
+/* LOAD TOKEN */
 
 useEffect(()=>{
 
@@ -92,9 +90,7 @@ loadToken();
 },[]);
 
 
-/* =========================
-FETCH DATA AFTER TOKEN
-========================= */
+/* FETCH DATA */
 
 useEffect(()=>{
 
@@ -112,8 +108,6 @@ fetchParents(token);
 const fetchClassrooms = async(token)=>{
 
 try{
-
-console.log("TOKEN => ",token);
 
 const response = await axios.get(
 
@@ -184,7 +178,6 @@ Authorization:`Token ${token}`
 );
 
 setParents(response.data);
-setFilteredParents(response.data);
 
 }catch(error){
 
@@ -212,13 +205,23 @@ fetchStreams(value);
 
 
 
+/* SEARCH PARENT */
+
 const handleParentSearch = (text)=>{
 
 setParentSearch(text);
 
+if(text.trim() === ""){
+
+setFilteredParents([]);
+
+return;
+
+}
+
 const filtered = parents.filter((item)=>
 item.username.toLowerCase().includes(text.toLowerCase())
-);
+).slice(0,6);
 
 setFilteredParents(filtered);
 
@@ -268,8 +271,6 @@ setLoading(true);
 
 try{
 
-console.log("TOKEN => ",token);
-
 await axios.post(
 
 EndPoint + "/create-student/",
@@ -310,8 +311,6 @@ router.back();
 }catch(error){
 
 setLoading(false);
-
-console.log("CREATE STUDENT ERROR => ",error.response?.data);
 
 Toast.show({
 type:"error",
@@ -451,9 +450,21 @@ value={item.id}
 style={styles.input}
 value={parentSearch}
 onChangeText={handleParentSearch}
-placeholder="Search parent..."
+placeholder="Type parent username..."
 placeholderTextColor="#94a3b8"
 />
+
+
+{filteredParents.length > 0 &&(
+
+<View style={{
+backgroundColor:"#0f172a",
+borderWidth:1,
+borderColor:"#334155",
+borderRadius:10,
+marginTop:-10,
+marginBottom:20
+}}>
 
 {filteredParents.map((item)=>{
 
@@ -463,9 +474,9 @@ return(
 key={item.id}
 onPress={()=>selectParent(item)}
 style={{
-padding:10,
+padding:12,
 borderBottomWidth:1,
-borderBottomColor:"#334155"
+borderBottomColor:"#1e293b"
 }}
 >
 
@@ -478,6 +489,10 @@ borderBottomColor:"#334155"
 )
 
 })}
+
+</View>
+
+)}
 
 
 
