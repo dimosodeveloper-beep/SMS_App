@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React,{useState,useEffect} from "react";
 
 import{
 View,
@@ -23,12 +23,14 @@ import * as Haptics from "expo-haptics";
 
 import styles from "../../components/LoginStyles";
 import {EndPoint} from "../../components/links";
+import Header from "../../components/Header";
 
 export default function CreateClass(){
 
 const[name,setName] = useState("");
 
 const[loading,setLoading] = useState(false);
+const[token,setToken] = useState(null);
 
 const scaleAnim = new Animated.Value(1);
 
@@ -46,6 +48,30 @@ useNativeDriver:true
 }).start();
 }
 
+
+/* =========================
+LOAD TOKEN
+========================= */
+
+useEffect(()=>{
+
+const loadToken = async()=>{
+
+const savedToken = await AsyncStorage.getItem("userToken");
+
+setToken(savedToken);
+
+};
+
+loadToken();
+
+},[]);
+
+
+/* =========================
+CREATE CLASS
+========================= */
+
 const createClass = async()=>{
 
 if(!name){
@@ -59,12 +85,6 @@ text2:"Enter class name"
 return;
 }
 
-setLoading(true);
-
-try{
-
-const token = await AsyncStorage.getItem("token");
-
 if(!token){
 
 Toast.show({
@@ -73,10 +93,12 @@ text1:"Authentication Error",
 text2:"Login again"
 });
 
-setLoading(false);
 return;
-
 }
+
+setLoading(true);
+
+try{
 
 console.log("TOKEN => ",token);
 
@@ -143,6 +165,11 @@ uri:"https://images.unsplash.com/photo-1588072432836-e10032774350"
 style={styles.bg}
 />
 
+<Header
+title="School Dashboard"
+subtitle="Management System"
+/>
+
 <ScrollView
 contentContainerStyle={{
 padding:10,
@@ -151,7 +178,6 @@ paddingBottom:500
 showsVerticalScrollIndicator={false}
 keyboardShouldPersistTaps="handled"
 >
-
 
 <BlurView intensity={40} tint="dark" style={styles.blur}>
 

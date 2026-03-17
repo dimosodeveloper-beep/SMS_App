@@ -190,7 +190,7 @@ export default function MainLayout() {
                   <Text style={styles.modalTitle}>Logout</Text>
 
                   <Text style={styles.modalText}>
-                    {userData?.username}, unataka kutoka kwenye mfumo?
+                    {userData?.username}, Do you want to logout?
                   </Text>
 
                   <View style={styles.modalButtons}>
@@ -228,7 +228,7 @@ export default function MainLayout() {
         <Drawer.Screen
           name="register-user"
           options={{
-            drawerLabel: "Register",
+            drawerLabel: "Register User",
             drawerIcon: () => (
               <MaterialCommunityIcons name="account-group" size={24} color="#333" />
             ),
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
 
   logoutButton: {
     position: "absolute",
-    bottom: 25,
+    bottom: 100,
     left: 20,
     right: 20,
   },

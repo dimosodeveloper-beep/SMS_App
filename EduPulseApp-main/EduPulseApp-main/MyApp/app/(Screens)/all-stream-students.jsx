@@ -38,6 +38,7 @@ const[filteredStudents,setFilteredStudents] = useState([]);
 const[search,setSearch] = useState("");
 
 const[loading,setLoading] = useState(false);
+const[token,setToken] = useState(null);
 
 const scaleAnim = new Animated.Value(1);
 
@@ -56,26 +57,49 @@ useNativeDriver:true
 }
 
 
-const fetchStudents = async()=>{
+/* =========================
+1️⃣ LOAD TOKEN
+========================= */
+
+useEffect(()=>{
+
+const loadToken = async()=>{
+
+const savedToken = await AsyncStorage.getItem("userToken");
+
+setToken(savedToken);
+
+};
+
+loadToken();
+
+},[]);
+
+
+/* =========================
+2️⃣ FETCH STUDENTS AFTER TOKEN
+========================= */
+
+useEffect(()=>{
+
+if(token){
+fetchStudents(token);
+}
+
+},[token]);
+
+
+/* =========================
+FETCH STUDENTS
+========================= */
+
+const fetchStudents = async(token)=>{
 
 setLoading(true);
 
 try{
 
-const token = await AsyncStorage.getItem("token");
-
-if(!token){
-
-Toast.show({
-type:"error",
-text1:"Authentication Error",
-text2:"Login again"
-});
-
-setLoading(false);
-return;
-
-}
+console.log("TOKEN => ",token);
 
 const response = await axios.get(
 
@@ -118,11 +142,10 @@ text2:JSON.stringify(error.response?.data)
 }
 
 
-useEffect(()=>{
-fetchStudents();
-},[]);
 
-
+/* =========================
+SEARCH
+========================= */
 
 const handleSearch=(text)=>{
 
@@ -144,6 +167,10 @@ setFilteredStudents(filtered);
 }
 
 
+
+/* =========================
+UI
+========================= */
 
 return(
 
@@ -177,7 +204,7 @@ keyboardShouldPersistTaps="handled"
 <BlurView intensity={40} tint="dark" style={styles.blur}>
 
 <Text style={styles.title}>
-Students - {className} {streamName}
+{className} {streamName}
 </Text>
 
 <Text style={styles.subtitle}>

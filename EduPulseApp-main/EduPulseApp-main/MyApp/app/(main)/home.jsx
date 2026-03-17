@@ -29,7 +29,7 @@ export default function Home(){
 const router = useRouter();
 
 const stats = [
-{ id:1,title:"Students",value:"1,245",icon:"people",route:"/all-students"},
+{ id:1,title:"Students",value:"1,245",icon:"people",route:"/all-school-students"},
 { id:2,title:"Teachers",value:"86",icon:"school",route:"/all-teachers"},
 { id:3,title:"Classes",value:"32",icon:"class",route:"/all-classes"},
 { id:4,title:"Subjects",value:"18",icon:"menu-book",route:"/all-subjects"},

@@ -38,6 +38,7 @@ const[filteredStreams,setFilteredStreams] = useState([]);
 const[search,setSearch] = useState("");
 
 const[loading,setLoading] = useState(false);
+const[token,setToken] = useState(null);
 
 const scaleAnim = new Animated.Value(1);
 
@@ -55,27 +56,38 @@ useNativeDriver:true
 }).start();
 }
 
+useEffect(()=>{
 
-const fetchStreams = async()=>{
+const loadToken = async()=>{
+
+const savedToken = await AsyncStorage.getItem("userToken");
+
+setToken(savedToken);
+
+};
+
+loadToken();
+
+},[]);
+
+useEffect(()=>{
+
+if(token){
+
+fetchStreams(token);
+
+}
+
+},[token]);
+
+
+const fetchStreams = async(token)=>{
 
 setLoading(true);
 
 try{
 
-const token = await AsyncStorage.getItem("token");
-
-if(!token){
-
-Toast.show({
-type:"error",
-text1:"Authentication Error",
-text2:"Login again"
-});
-
-setLoading(false);
-return;
-
-}
+console.log("TOKEN => ",token);
 
 const response = await axios.get(
 
@@ -118,12 +130,6 @@ text2:JSON.stringify(error.response?.data)
 }
 
 
-useEffect(()=>{
-fetchStreams();
-},[]);
-
-
-
 const handleSearch=(text)=>{
 
 setSearch(text);
@@ -142,7 +148,6 @@ setFilteredStreams(filtered);
 }
 
 
-
 const openStudents=(item)=>{
 
 router.push({
@@ -156,7 +161,6 @@ className:className
 });
 
 }
-
 
 
 return(

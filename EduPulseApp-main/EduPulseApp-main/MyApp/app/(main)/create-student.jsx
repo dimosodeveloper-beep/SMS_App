@@ -52,6 +52,7 @@ const[parents,setParents] = useState([]);
 const[filteredParents,setFilteredParents] = useState([]);
 
 const[loading,setLoading] = useState(false);
+const[token,setToken] = useState(null);
 
 const scaleAnim = new Animated.Value(1);
 
@@ -72,12 +73,47 @@ useNativeDriver:true
 }
 
 
+/* =========================
+LOAD TOKEN
+========================= */
 
-const fetchClassrooms = async()=>{
+useEffect(()=>{
+
+const loadToken = async()=>{
+
+const savedToken = await AsyncStorage.getItem("userToken");
+
+setToken(savedToken);
+
+};
+
+loadToken();
+
+},[]);
+
+
+/* =========================
+FETCH DATA AFTER TOKEN
+========================= */
+
+useEffect(()=>{
+
+if(token){
+
+fetchClassrooms(token);
+fetchParents(token);
+
+}
+
+},[token]);
+
+
+
+const fetchClassrooms = async(token)=>{
 
 try{
 
-const token = await AsyncStorage.getItem("token");
+console.log("TOKEN => ",token);
 
 const response = await axios.get(
 
@@ -107,8 +143,6 @@ const fetchStreams = async(classId)=>{
 
 try{
 
-const token = await AsyncStorage.getItem("token");
-
 const response = await axios.get(
 
 EndPoint + "/streams/" + classId + "/",
@@ -133,11 +167,9 @@ console.log("STREAM ERROR",error.response?.data);
 
 
 
-const fetchParents = async()=>{
+const fetchParents = async(token)=>{
 
 try{
-
-const token = await AsyncStorage.getItem("token");
 
 const response = await axios.get(
 
@@ -161,15 +193,6 @@ console.log("PARENTS ERROR",error.response?.data);
 }
 
 }
-
-
-
-useEffect(()=>{
-
-fetchClassrooms();
-fetchParents();
-
-},[]);
 
 
 
@@ -229,11 +252,23 @@ return;
 
 }
 
+if(!token){
+
+Toast.show({
+type:"error",
+text1:"Authentication Error",
+text2:"Login again"
+});
+
+return;
+
+}
+
 setLoading(true);
 
 try{
 
-const token = await AsyncStorage.getItem("token");
+console.log("TOKEN => ",token);
 
 await axios.post(
 

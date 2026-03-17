@@ -36,24 +36,55 @@ const[selectedClass,setSelectedClass] = useState("");
 const[name,setName] = useState("");
 
 const[loading,setLoading] = useState(false);
+const[token,setToken] = useState(null);
 
 const scaleAnim = new Animated.Value(1);
 
 
 
+/* =========================
+LOAD TOKEN
+========================= */
+
 useEffect(()=>{
 
-fetchClasses();
+const loadToken = async()=>{
+
+const savedToken = await AsyncStorage.getItem("userToken");
+
+setToken(savedToken);
+
+};
+
+loadToken();
 
 },[]);
 
 
 
-const fetchClasses = async()=>{
+/* =========================
+FETCH CLASSES AFTER TOKEN
+========================= */
+
+useEffect(()=>{
+
+if(token){
+fetchClasses(token);
+}
+
+},[token]);
+
+
+
+/* =========================
+FETCH CLASSES
+========================= */
+
+const fetchClasses = async(token)=>{
 
 try{
 
-const token = await AsyncStorage.getItem("token");
+console.log("TOKEN => ",token);
 
 const response = await axios.get(
 
@@ -95,6 +126,10 @@ useNativeDriver:true
 
 
 
+/* =========================
+CREATE STREAM
+========================= */
+
 const createStream = async()=>{
 
 if(!selectedClass || !name){
@@ -108,11 +143,22 @@ text2:"Fill all fields"
 return;
 }
 
+if(!token){
+
+Toast.show({
+type:"error",
+text1:"Authentication Error",
+text2:"Login again"
+});
+
+return;
+}
+
 setLoading(true);
 
 try{
 
-const token = await AsyncStorage.getItem("token");
+console.log("TOKEN => ",token);
 
 await axios.post(
 
@@ -179,7 +225,10 @@ uri:"https://images.unsplash.com/photo-1588072432836-e10032774350"
 style={styles.bg}
 />
 
-<Header/>
+<Header
+title="School Dashboard"
+subtitle="Management System"
+/>
 
 <ScrollView
 contentContainerStyle={{
@@ -189,7 +238,7 @@ paddingBottom:500
 showsVerticalScrollIndicator={false}
 keyboardShouldPersistTaps="handled"
 >
-
+    
 <BlurView intensity={40} tint="dark" style={styles.blur}>
 
 <Text style={styles.title}>
