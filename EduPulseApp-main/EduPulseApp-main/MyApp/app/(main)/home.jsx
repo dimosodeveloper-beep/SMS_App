@@ -38,7 +38,7 @@ const stats = [
 
 const actions = [
 { id:1,title:"Add Student",icon:"user-plus",route:"/create-student"},
-{ id:2,title:"Add Teacher",icon:"chalkboard-teacher",route:"/create-teacher"},
+{ id:2,title:"Add Subject",icon:"chalkboard-teacher",route:"/create-subject"},
 { id:3,title:"Create Class",icon:"school",route:"/create-class"},
 { id:4,title:"View Reports",icon:"chart-bar",route:"/reports"},
 ];
