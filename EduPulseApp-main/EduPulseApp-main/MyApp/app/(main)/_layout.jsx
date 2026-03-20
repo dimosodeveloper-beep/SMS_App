@@ -265,6 +265,29 @@ export default function MainLayout() {
           }}
         />
 
+
+         <Drawer.Screen
+          name="all-exam-categories"
+          options={{
+            drawerLabel: "Exam Categories",
+            drawerIcon: () => (
+              <MaterialCommunityIcons name="chart-bar" size={24} color="#333" />
+            ),
+          }}
+        />
+
+
+         <Drawer.Screen
+          name="all-exams"
+          options={{
+            drawerLabel: "All Exams",
+            drawerIcon: () => (
+              <MaterialCommunityIcons name="chart-bar" size={24} color="#333" />
+            ),
+          }}
+        />
+
+
       </Drawer>
 
       <StatusBar style="light" />
