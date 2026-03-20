@@ -18,7 +18,7 @@ export default function Index() {
         // 1️⃣ Kama ni mara ya kwanza kabisa kufungua app
         if (appData == null) {
           await AsyncStorage.setItem("isAppFirstLaunched", "false");
-          router.replace("/onboarding");
+          router.replace("/login");
           return;
         }
 
