@@ -162,6 +162,10 @@ paddingBottom:300
 
 <Text style={styles.title}>All Exams</Text>
 
+<Text style={styles.subtitle}>
+Manage all exams in your school
+</Text>
+
 <TextInput
 value={search}
 onChangeText={handleSearch}
@@ -178,6 +182,16 @@ marginBottom:20
 }}
 />
 
+{filteredExams.length === 0 && !loading &&(
+<Text style={{
+color:"#94a3b8",
+textAlign:"center",
+marginTop:30
+}}>
+No exams found
+</Text>
+)}
+
 {filteredExams.map(item=>(
 
 <Animated.View
@@ -191,6 +205,7 @@ marginBottom:15
 <TouchableOpacity
 onPressIn={pressIn}
 onPressOut={pressOut}
+activeOpacity={0.9}
 >
 
 <LinearGradient
@@ -203,13 +218,62 @@ borderColor:"#334155"
 }}
 >
 
-<Text style={{color:"#fff",fontSize:18,fontWeight:"bold"}}>
-{item.name}
+{/* HEADER */}
+<View style={{
+flexDirection:"row",
+justifyContent:"space-between",
+alignItems:"center",
+marginBottom:10
+}}>
+
+<Text style={{
+color:"#ffffff",
+fontSize:18,
+fontWeight:"bold"
+}}>
+{item.name} {item.classroom?.name || item.classroom}
 </Text>
 
-<Text style={{color:"#94a3b8"}}>
-Date: {item.date}
+<View style={{
+backgroundColor:"#2563eb",
+paddingHorizontal:10,
+paddingVertical:4,
+borderRadius:8
+}}>
+<Text style={{
+color:"#fff",
+fontWeight:"bold"
+}}>
+ID {item.id}
 </Text>
+</View>
+
+</View>
+
+{/* DETAILS */}
+<View style={{marginTop:5}}>
+
+<Text style={{
+color:"#94a3b8",
+marginBottom:4
+}}>
+📅 Date: {item.date}
+</Text>
+
+<Text style={{
+color:"#94a3b8",
+marginBottom:4
+}}>
+🏫 Class: {item.classroom?.name || item.classroom}
+</Text>
+
+<Text style={{
+color:"#94a3b8"
+}}>
+📚 Category: {item.category?.name || item.category}
+</Text>
+
+</View>
 
 </LinearGradient>
 
@@ -240,7 +304,11 @@ width:65,
 height:65,
 borderRadius:35,
 justifyContent:"center",
-alignItems:"center"
+alignItems:"center",
+elevation:10,
+shadowColor:"#000",
+shadowOpacity:0.3,
+shadowRadius:10
 }}
 >
 
@@ -252,7 +320,12 @@ alignItems:"center"
 
 {loading &&(
 <View style={styles.loader}>
+<View style={styles.loaderCard}>
 <ActivityIndicator size="large" color="#2563eb"/>
+<Text style={styles.loadingText}>
+Fetching exams...
+</Text>
+</View>
 </View>
 )}
 
