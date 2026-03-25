@@ -308,6 +308,27 @@ export default function MainLayout() {
           }}
         />
 
+          <Drawer.Screen
+          name="take-single-attendance"
+          options={{
+            drawerLabel: "Take Single Attendance",
+            drawerIcon: () => (
+              <MaterialCommunityIcons name="account-tie" size={24} color="#333" />
+            ),
+          }}
+        />
+
+            <Drawer.Screen
+          name="take-bulk-attendance"
+          options={{
+            drawerLabel: "Take Bulk Attendance",
+            drawerIcon: () => (
+              <MaterialCommunityIcons name="account-tie" size={24} color="#333" />
+            ),
+          }}
+        />
+
+
 
 
       </Drawer>

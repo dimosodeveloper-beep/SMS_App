@@ -46,7 +46,6 @@ const pressOut=()=>{Animated.spring(scaleAnim,{toValue:1,useNativeDriver:true}).
 useEffect(()=>{
 const loadToken = async()=>{
 const savedToken = await AsyncStorage.getItem("userToken");
-console.log("TOKEN => ",savedToken);
 setToken(savedToken);
 };
 loadToken();
@@ -83,7 +82,7 @@ console.log("FETCH ERROR => ",e.response?.data || e.message);
 }
 };
 
-/* FILTER FUNCTIONS */
+/* FILTER */
 const filterStudents = (text)=>{
 return students.filter(x =>
 (`${x.first_name} ${x.last_name}`).toLowerCase().includes(text.toLowerCase())
@@ -102,7 +101,7 @@ x.name.toLowerCase().includes(text.toLowerCase())
 );
 };
 
-/* UPDATE FIELD */
+/* UPDATE */
 const updateField = (index,key,value)=>{
 const data = [...results];
 data[index][key] = value;
@@ -117,11 +116,74 @@ setResults([
 ]);
 };
 
+/* VALIDATION */
+const validateForm = ()=>{
+
+for(let i=0;i<results.length;i++){
+
+const row = results[i];
+
+if(!row.student){
+Toast.show({
+type:"error",
+text1:`Row ${i+1}`,
+text2:"Select student"
+});
+return false;
+}
+
+if(!row.subject){
+Toast.show({
+type:"error",
+text1:`Row ${i+1}`,
+text2:"Select subject"
+});
+return false;
+}
+
+if(!row.exam){
+Toast.show({
+type:"error",
+text1:`Row ${i+1}`,
+text2:"Select exam"
+});
+return false;
+}
+
+if(!row.marks){
+Toast.show({
+type:"error",
+text1:`Row ${i+1}`,
+text2:"Enter marks"
+});
+return false;
+}
+
+if(isNaN(row.marks)){
+Toast.show({
+type:"error",
+text1:`Row ${i+1}`,
+text2:"Marks must be number"
+});
+return false;
+}
+
+}
+
+return true;
+};
+
 /* SUBMIT */
 const uploadResults = async()=>{
 
 if(!token){
 Toast.show({type:"error",text1:"Login required"});
+return;
+}
+
+/* 🔥 VALIDATION FIRST */
+const isValid = validateForm();
+if(!isValid){
 return;
 }
 
@@ -198,8 +260,10 @@ return(
 <View key={index} style={{
 backgroundColor:"#1e293b",
 padding:10,
-borderRadius:10,
-marginBottom:15
+borderRadius:12,
+marginBottom:15,
+borderWidth:1,
+borderColor:"#334155"
 }}>
 
 <Text style={{color:"#38bdf8",marginBottom:5}}>Student</Text>
@@ -215,10 +279,10 @@ updateField(index,"showStudent",true);
 }}
 />
 
-{item.showStudent && filterStudents(item.searchStudent).map(st=>(
+{item.showStudent && filterStudents(item.searchStudent).slice(0,5).map(st=>(
 <TouchableOpacity
 key={st.id}
-style={{backgroundColor:"#0f172a",padding:8,marginVertical:2,borderRadius:6}}
+style={{backgroundColor:"#020617",padding:10,marginVertical:3,borderRadius:8}}
 onPress={()=>{
 updateField(index,"student",st.id);
 updateField(index,"searchStudent",st.first_name+" "+st.last_name);
@@ -242,10 +306,10 @@ updateField(index,"showSubject",true);
 }}
 />
 
-{item.showSubject && filterSubjects(item.searchSubject).map(sub=>(
+{item.showSubject && filterSubjects(item.searchSubject).slice(0,5).map(sub=>(
 <TouchableOpacity
 key={sub.id}
-style={{backgroundColor:"#0f172a",padding:8,marginVertical:2,borderRadius:6}}
+style={{backgroundColor:"#020617",padding:10,marginVertical:3,borderRadius:8}}
 onPress={()=>{
 updateField(index,"subject",sub.id);
 updateField(index,"searchSubject",sub.name);
@@ -269,10 +333,10 @@ updateField(index,"showExam",true);
 }}
 />
 
-{item.showExam && filterExams(item.searchExam).map(ex=>(
+{item.showExam && filterExams(item.searchExam).slice(0,5).map(ex=>(
 <TouchableOpacity
 key={ex.id}
-style={{backgroundColor:"#0f172a",padding:8,marginVertical:2,borderRadius:6}}
+style={{backgroundColor:"#020617",padding:10,marginVertical:3,borderRadius:8}}
 onPress={()=>{
 updateField(index,"exam",ex.id);
 updateField(index,"searchExam",ex.name);
