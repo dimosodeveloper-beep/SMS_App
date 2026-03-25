@@ -288,6 +288,28 @@ export default function MainLayout() {
         />
 
 
+          <Drawer.Screen
+          name="add-single-results"
+          options={{
+            drawerLabel: "Add Single Results",
+            drawerIcon: () => (
+              <MaterialCommunityIcons name="account-tie" size={24} color="#333" />
+            ),
+          }}
+        />
+
+          <Drawer.Screen
+          name="add-multiple-results"
+          options={{
+            drawerLabel: "Add Multiple Results",
+            drawerIcon: () => (
+              <MaterialCommunityIcons name="account-tie" size={24} color="#333" />
+            ),
+          }}
+        />
+
+
+
       </Drawer>
 
       <StatusBar style="light" />

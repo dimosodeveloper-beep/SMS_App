@@ -8,8 +8,11 @@ TouchableOpacity,
 Image,
 ActivityIndicator,
 Animated,
-ScrollView
+ScrollView,
+Platform
 } from "react-native";
+
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -28,6 +31,7 @@ export default function CreateExam(){
 
 const[name,setName] = useState("");
 const[date,setDate] = useState("");
+const[showDatePicker,setShowDatePicker] = useState(false);
 
 const[classrooms,setClassrooms] = useState([]);
 const[categories,setCategories] = useState([]);
@@ -49,7 +53,27 @@ Animated.spring(scaleAnim,{toValue:0.95,useNativeDriver:true}).start();
 const pressOut=()=>{
 Animated.spring(scaleAnim,{toValue:1,useNativeDriver:true}).start();
 }
-//scaleAnim
+
+/* FORMAT DATE */
+const formatDate = (selectedDate)=>{
+const d = new Date(selectedDate);
+const year = d.getFullYear();
+const month = ("0" + (d.getMonth()+1)).slice(-2);
+const day = ("0" + d.getDate()).slice(-2);
+
+return `${year}-${month}-${day}`;
+}
+
+/* DATE CHANGE */
+const onChangeDate = (event, selectedDate)=>{
+setShowDatePicker(false);
+
+if(selectedDate){
+const formatted = formatDate(selectedDate);
+setDate(formatted);
+}
+}
+
 /* LOAD TOKEN */
 useEffect(()=>{
 const loadToken = async()=>{
@@ -196,13 +220,26 @@ placeholderTextColor="#94a3b8"
 />
 
 <Text style={styles.label}>Date</Text>
+
+<TouchableOpacity onPress={()=>setShowDatePicker(true)}>
 <TextInput
 style={styles.input}
 value={date}
-onChangeText={setDate}
-placeholder="2026-03-20"
+placeholder="Select Date"
 placeholderTextColor="#94a3b8"
+editable={false}
 />
+</TouchableOpacity>
+
+{showDatePicker && (
+<DateTimePicker
+value={date ? new Date(date) : new Date()}
+mode="date"
+display="default"
+minimumDate={new Date()}   // 🔥 hairuhusu past dates
+onChange={onChangeDate}
+/>
+)}
 
 <TouchableOpacity onPress={()=>setShowClasses(!showClasses)}>
 <Text style={{
