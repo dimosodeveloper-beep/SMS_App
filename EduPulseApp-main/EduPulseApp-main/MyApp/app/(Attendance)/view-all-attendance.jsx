@@ -43,31 +43,56 @@ const[showPicker,setShowPicker] = useState(false);
 const[activeTab,setActiveTab] = useState("present");
 const[modalVisible,setModalVisible] = useState(false);
 
-/* FORMAT DATE */
-const formatDate = (date)=> date.toISOString().split("T")[0];
 
-/* TOKEN */
+/* FORMAT DATE */
+const formatDate = (date)=>{
+const d = new Date(date);
+return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+};
+
+
+/* LOAD TOKEN */
 useEffect(()=>{
 const loadToken = async()=>{
+try{
 const t = await AsyncStorage.getItem("userToken");
+
 if(!t){
 Toast.show({type:"error",text1:"Login required"});
 return;
 }
+
 setToken(t);
+
+}catch(e){
+console.log("TOKEN ERROR => ",e);
+}
 };
 loadToken();
 },[]);
 
-/* FETCH */
+
+/* FETCH DEFAULT */
 useEffect(()=>{
 if(token){
-fetchAttendance("present");
+fetchAttendance(activeTab);
 }
 },[token]);
 
+
+/* FETCH WHEN DATE CHANGES */
+useEffect(()=>{
+if(token){
+fetchAttendance(activeTab);
+}
+},[selectedDate]);
+
+
+/* FETCH ATTENDANCE */
 const fetchAttendance = async(status)=>{
+
 setLoading(true);
+
 try{
 
 const res = await axios.get(
@@ -84,20 +109,36 @@ headers:{Authorization:`Token ${token}`}
 setData(res.data);
 
 }catch(e){
-Toast.show({type:"error",text1:"Error",text2:JSON.stringify(e.response?.data)});
+
+console.log("ERROR => ",e.response?.data);
+
+Toast.show({
+type:"error",
+text1:"Error",
+text2:JSON.stringify(e.response?.data)
+});
+
 }
+
 setLoading(false);
 };
 
+
+/* HANDLE TAB */
 const handleTab=(t)=>{
 setActiveTab(t);
 fetchAttendance(t);
 };
 
+
+/* DATE CHANGE */
 const onChangeDate=(e,d)=>{
 setShowPicker(false);
-if(d) setSelectedDate(d);
+if(d){
+setSelectedDate(d);
+}
 };
+
 
 return(
 
@@ -117,18 +158,27 @@ return(
 Date: {formatDate(selectedDate)}
 </Text>
 
+
+{/* TABS */}
 <View style={{flexDirection:"row",marginBottom:15}}>
 
-<TouchableOpacity onPress={()=>handleTab("present")} style={{
-flex:1,padding:12,
+<TouchableOpacity
+onPress={()=>handleTab("present")}
+style={{
+flex:1,
+padding:12,
 backgroundColor:activeTab==="present"?"#16a34a":"#0f172a",
-borderRadius:10,marginRight:5
+borderRadius:10,
+marginRight:5
 }}>
 <Text style={{color:"#fff",textAlign:"center",fontWeight:"bold"}}>Present</Text>
 </TouchableOpacity>
 
-<TouchableOpacity onPress={()=>handleTab("absent")} style={{
-flex:1,padding:12,
+<TouchableOpacity
+onPress={()=>handleTab("absent")}
+style={{
+flex:1,
+padding:12,
 backgroundColor:activeTab==="absent"?"#dc2626":"#0f172a",
 borderRadius:10
 }}>
@@ -137,10 +187,16 @@ borderRadius:10
 
 </View>
 
-<TouchableOpacity onPress={()=>setShowPicker(true)} style={{
+
+{/* DATE PICKER */}
+<TouchableOpacity
+onPress={()=>setShowPicker(true)}
+style={{
 backgroundColor:"#0f172a",
-padding:14,borderRadius:10,
-borderWidth:1,borderColor:"#334155",
+padding:14,
+borderRadius:10,
+borderWidth:1,
+borderColor:"#334155",
 marginBottom:10
 }}>
 <Text style={{color:"#fff"}}>
@@ -149,20 +205,45 @@ Select Date: {formatDate(selectedDate)}
 </TouchableOpacity>
 
 {showPicker &&(
-<DateTimePicker value={selectedDate} mode="date" display="default" onChange={onChangeDate}/>
+<DateTimePicker
+value={selectedDate}
+mode="date"
+display="default"
+onChange={onChangeDate}
+/>
 )}
 
+
+{/* SEARCH BUTTON */}
 <TouchableOpacity onPress={()=>fetchAttendance(activeTab)}>
 
 <LinearGradient colors={["#2563eb","#38bdf8"]} style={{
-padding:14,borderRadius:10,alignItems:"center",marginBottom:10
+padding:14,
+borderRadius:10,
+alignItems:"center",
+marginBottom:10
 }}>
 <Text style={{color:"#fff",fontWeight:"bold"}}>Search Attendance</Text>
 </LinearGradient>
 
 </TouchableOpacity>
 
-{data.map(item=>(
+
+{/* DISPLAY GROUPED DATA */}
+{data.map((session,index)=>(
+
+<View key={index} style={{marginTop:15}}>
+
+<Text style={{
+color:"#38bdf8",
+fontWeight:"bold",
+fontSize:16,
+marginBottom:5
+}}>
+Session Time: {session.session_time}
+</Text>
+
+{session.students.map(item=>(
 
 <View key={item.id} style={{
 backgroundColor:"#1e293b",
@@ -177,6 +258,7 @@ alignItems:"center"
 }}>
 
 <View>
+
 <Text style={{color:"#fff",fontWeight:"bold",fontSize:16}}>
 {item.name}
 </Text>
@@ -187,16 +269,22 @@ Adm: {item.admission_number}
 
 <Text style={{
 color:item.status==="present"?"#22c55e":"#ef4444",
-marginTop:5,fontWeight:"bold"
+marginTop:5,
+fontWeight:"bold"
 }}>
 {item.status.toUpperCase()}
 </Text>
+
 </View>
 
 <Image
 source={{uri:"https://cdn-icons-png.flaticon.com/512/3135/3135715.png"}}
 style={{width:50,height:50,borderRadius:50}}
 />
+
+</View>
+
+))}
 
 </View>
 
@@ -214,8 +302,7 @@ style={{
 position:"absolute",
 bottom:100,
 right:20
-}}
->
+}}>
 
 <LinearGradient
 colors={["#9333ea","#6366f1"]}
@@ -224,10 +311,8 @@ width:60,
 height:60,
 borderRadius:30,
 justifyContent:"center",
-alignItems:"center",
-elevation:5
-}}
->
+alignItems:"center"
+}}>
 <Text style={{color:"#fff",fontSize:24}}>≡</Text>
 </LinearGradient>
 
@@ -268,11 +353,12 @@ router.push({
 pathname:"/(Attendance)/view-attendance-history",
 params:{classId,streamId,className,streamName}
 });
-}}
->
+}}>
 
 <LinearGradient colors={["#2563eb","#38bdf8"]} style={{
-padding:12,borderRadius:10,marginBottom:10
+padding:12,
+borderRadius:10,
+marginBottom:10
 }}>
 <Text style={{color:"#fff",textAlign:"center"}}>
 📊 Attendance History
@@ -285,11 +371,12 @@ padding:12,borderRadius:10,marginBottom:10
 onPress={()=>{
 setModalVisible(false);
 router.push("/home");
-}}
->
+}}>
 
 <LinearGradient colors={["#22c55e","#16a34a"]} style={{
-padding:12,borderRadius:10,marginBottom:10
+padding:12,
+borderRadius:10,
+marginBottom:10
 }}>
 <Text style={{color:"#fff",textAlign:"center"}}>
 🏠 Go Home
@@ -310,6 +397,8 @@ Close
 
 </Modal>
 
+
+{/* LOADING */}
 {loading &&(
 <View style={styles.loader}>
 <View style={styles.loaderCard}>
