@@ -31,7 +31,7 @@ const router = useRouter();
 
 const stats = [
 { id:1,title:"Students",value:"1,245",icon:"people",route:"/all-school-students"},
-{ id:2,title:"Attendance",value:"86",icon:"school",route:"/(Attendance)/attendance-all-classes"},
+{ id:2,title:"Attendance",value:"86",icon:"school",route:"/(Attendance)/view-attendance-classes"},
 { id:3,title:"Classes",value:"32",icon:"class",route:"/all-classes"},
 { id:4,title:"Subjects",value:"18",icon:"menu-book",route:"/all-subjects"},
 ];
@@ -40,7 +40,7 @@ const actions = [
 { id:1,title:"Add Student",icon:"user-plus",route:"/create-student"},
 { id:2,title:"Add Subject",icon:"chalkboard-teacher",route:"/create-subject"},
 { id:3,title:"Create Class",icon:"school",route:"/create-class"},
-{ id:4,title:"View Attendance",icon:"chart-bar",route:"/(Attendance)/view-attendance-classes"},
+{ id:4,title:"Take Attendance",icon:"chart-bar",route:"/(Attendance)/attendance-all-classes"},
 ];
 
 

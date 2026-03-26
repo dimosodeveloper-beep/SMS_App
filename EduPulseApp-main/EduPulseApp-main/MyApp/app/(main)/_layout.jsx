@@ -32,11 +32,9 @@ import { useFonts } from "expo-font";
 
 import { useRouter } from "expo-router";
 
-import { DrawerItemList } from "@react-navigation/drawer";
-
 import { LinearGradient } from "expo-linear-gradient";
 
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 
 export default function MainLayout() {
   const router = useRouter();
@@ -115,6 +113,19 @@ export default function MainLayout() {
 
   if (!fontsLoaded) return null;
 
+  const drawerItems = [
+    { name: "home", label: "Home", icon: "view-dashboard" },
+    { name: "register-user", label: "Register User", icon: "account-group" },
+    { name: "create-class", label: "Create Class", icon: "account-tie" },
+    { name: "create-stream", label: "Create Stream", icon: "file-document-edit" },
+    { name: "create-student", label: "Create Student", icon: "chart-bar" },
+    { name: "all-exam-categories", label: "Exam Categories", icon: "chart-bar" },
+    { name: "all-exams", label: "All Exams", icon: "chart-bar" },
+    { name: "add-single-results", label: "Add Single Results", icon: "account-tie" },
+    { name: "add-multiple-results", label: "Add Multiple Results", icon: "chart-bar" },
+   
+  ];
+
   return (
     <View style={{ flex: 1 }}>
       <Drawer
@@ -123,214 +134,114 @@ export default function MainLayout() {
           swipeEnabled: true,
           drawerStyle: {
             width: width - 60,
-            backgroundColor: "#f5f7fb",
+            backgroundColor: "transparent",
           },
         }}
         drawerContent={(props) => (
-          <View style={{ flex: 1 }}>
-            
-            {/* HEADER IMAGE */}
-            <ImageBackground
-              source={{
-                uri: "https://images.unsplash.com/photo-1523240795612-9a054b0db644",
-              }}
-              style={styles.headerImage}
-            >
-              <LinearGradient
-                colors={["rgba(0,0,0,0.7)", "rgba(0,0,0,0.4)"]}
-                style={styles.headerOverlay}
+          <LinearGradient
+            colors={["#000000", "#141414"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{ flex: 1 }}
+          >
+            <View style={{ flex: 1 }}>
+              {/* HEADER IMAGE */}
+              <ImageBackground
+                source={{
+                  uri: "https://images.unsplash.com/photo-1523240795612-9a054b0db644",
+                }}
+                style={styles.headerImage}
               >
-                <View style={styles.profileCard}>
-                  <Image
-                    source={{
-                      uri: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
-                    }}
-                    style={styles.avatar}
-                  />
+                <LinearGradient
+                  colors={["rgba(0,0,0,0.8)", "rgba(255,255,255,0.2)"]}
+                  style={styles.headerOverlay}
+                >
+                  <View style={styles.profileCard}>
+                    <Image
+                      source={{
+                        uri: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+                      }}
+                      style={styles.avatar}
+                    />
+                    <Text style={styles.welcome}>Karibu</Text>
+                    <Text style={styles.username}>
+                      {userData ? userData.username : ""}
+                    </Text>
+                    <Text style={styles.systemText}>School Management System</Text>
+                  </View>
+                </LinearGradient>
+              </ImageBackground>
 
-                  <Text style={styles.welcome}>Karibu</Text>
+              {/* MENU SCROLL */}
+              <ScrollView
+                style={{ flex: 1 }}
+                contentContainerStyle={{
+                  paddingHorizontal: 15,
+                  paddingTop: 20,
+                  paddingBottom: 100, // ensures last item is not cut
+                }}
+              >
+                {drawerItems.map((item, index) => (
+                  <TouchableOpacity
+                    key={item.name}
+                    style={styles.drawerItem}
+                    onPress={() => props.navigation.navigate(item.name)}
+                  >
+                    <MaterialCommunityIcons
+                      name={item.icon}
+                      size={24}
+                      color="#fff"
+                    />
+                    <Text style={styles.drawerLabel}>{item.label}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
 
-                  <Text style={styles.username}>
-                    {userData ? userData.username : ""}
-                  </Text>
-
-                  <Text style={styles.systemText}>
-                    School Management System
-                  </Text>
-                </View>
-              </LinearGradient>
-            </ImageBackground>
-
-            {/* MENU */}
-            <ScrollView style={{ marginTop: 10 }}>
-              <View style={styles.menuContainer}>
-                <DrawerItemList {...props} />
+              {/* LOGOUT BUTTON FIXED */}
+              <View style={styles.logoutContainer}>
+                <TouchableOpacity
+                  style={styles.logoutButton}
+                  onPress={() => setModalVisible(true)}
+                >
+                  <LinearGradient
+                    colors={["#000000", "#2a0ea8"]}
+                    style={styles.logoutIcon}
+                  >
+                    <FontAwesome name="sign-out" size={24} color="white" />
+                  </LinearGradient>
+                </TouchableOpacity>
               </View>
-            </ScrollView>
 
-            {/* LOGOUT BUTTON */}
-            <TouchableOpacity
-              style={styles.logoutButton}
-              onPress={() => setModalVisible(true)}
-            >
-              <LinearGradient
-                colors={["#ff512f", "#dd2476"]}
-                style={styles.logoutGradient}
-              >
-                <FontAwesome name="sign-out" size={18} color="white" />
-
-                <Text style={styles.logoutText}>Logout</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-
-            {/* MODAL */}
-            <Modal visible={modalVisible} transparent animationType="fade">
-              <View style={styles.modalOverlay}>
-                <View style={styles.modalBox}>
-                  <Text style={styles.modalTitle}>Logout</Text>
-
-                  <Text style={styles.modalText}>
-                    {userData?.username}, Do you want to logout?
-                  </Text>
-
-                  <View style={styles.modalButtons}>
-                    <TouchableOpacity
-                      onPress={() => setModalVisible(false)}
-                    >
-                      <Text style={{ color: "red", fontFamily: "Bold" }}>
-                        NO
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={handleLogout}>
-                      <Text style={{ color: "green", fontFamily: "Bold" }}>
-                        YES
-                      </Text>
-                    </TouchableOpacity>
+              {/* MODAL */}
+              <Modal visible={modalVisible} transparent animationType="fade">
+                <View style={styles.modalOverlay}>
+                  <View style={styles.modalBox}>
+                    <Text style={styles.modalTitle}>Logout</Text>
+                    <Text style={styles.modalText}>
+                      {userData?.username}, Do you want to logout?
+                    </Text>
+                    <View style={styles.modalButtons}>
+                      <TouchableOpacity onPress={() => setModalVisible(false)}>
+                        <Text style={{ color: "red", fontFamily: "Bold" }}>NO</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={handleLogout}>
+                        <Text style={{ color: "green", fontFamily: "Bold" }}>YES</Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 </View>
-              </View>
-            </Modal>
-          </View>
+              </Modal>
+            </View>
+          </LinearGradient>
         )}
       >
-
-        <Drawer.Screen
-          name="home"
-          options={{
-            drawerLabel: "Home",
-            drawerIcon: () => (
-              <MaterialCommunityIcons name="view-dashboard" size={24} color="#333" />
-            ),
-          }}
-        />
-
-        <Drawer.Screen
-          name="register-user"
-          options={{
-            drawerLabel: "Register User",
-            drawerIcon: () => (
-              <MaterialCommunityIcons name="account-group" size={24} color="#333" />
-            ),
-          }}
-        />
-
-        <Drawer.Screen
-          name="create-class"
-          options={{
-            drawerLabel: "Create Class",
-            drawerIcon: () => (
-              <MaterialCommunityIcons name="account-tie" size={24} color="#333" />
-            ),
-          }}
-        />
-
-        <Drawer.Screen
-          name="create-stream"
-          options={{
-            drawerLabel: "Create Stream",
-            drawerIcon: () => (
-              <MaterialCommunityIcons name="file-document-edit" size={24} color="#333" />
-            ),
-          }}
-        />
-
-        <Drawer.Screen
-          name="create-student"
-          options={{
-            drawerLabel: "Create Student",
-            drawerIcon: () => (
-              <MaterialCommunityIcons name="chart-bar" size={24} color="#333" />
-            ),
-          }}
-        />
-
-
-         <Drawer.Screen
-          name="all-exam-categories"
-          options={{
-            drawerLabel: "Exam Categories",
-            drawerIcon: () => (
-              <MaterialCommunityIcons name="chart-bar" size={24} color="#333" />
-            ),
-          }}
-        />
-
-
-         <Drawer.Screen
-          name="all-exams"
-          options={{
-            drawerLabel: "All Exams",
-            drawerIcon: () => (
-              <MaterialCommunityIcons name="chart-bar" size={24} color="#333" />
-            ),
-          }}
-        />
-
-
+        {drawerItems.map((item) => (
           <Drawer.Screen
-          name="add-single-results"
-          options={{
-            drawerLabel: "Add Single Results",
-            drawerIcon: () => (
-              <MaterialCommunityIcons name="account-tie" size={24} color="#333" />
-            ),
-          }}
-        />
-
-          <Drawer.Screen
-          name="add-multiple-results"
-          options={{
-            drawerLabel: "Add Multiple Results",
-            drawerIcon: () => (
-              <MaterialCommunityIcons name="account-tie" size={24} color="#333" />
-            ),
-          }}
-        />
-
-          <Drawer.Screen
-          name="take-single-attendance"
-          options={{
-            drawerLabel: "Take Single Attendance",
-            drawerIcon: () => (
-              <MaterialCommunityIcons name="account-tie" size={24} color="#333" />
-            ),
-          }}
-        />
-
-            <Drawer.Screen
-          name="take-bulk-attendance"
-          options={{
-            drawerLabel: "Take Bulk Attendance",
-            drawerIcon: () => (
-              <MaterialCommunityIcons name="account-tie" size={24} color="#333" />
-            ),
-          }}
-        />
-
-
-
-
+            key={item.name}
+            name={item.name}
+            options={{ drawerLabel: item.label }}
+          />
+        ))}
       </Drawer>
 
       <StatusBar style="light" />
@@ -339,97 +250,98 @@ export default function MainLayout() {
 }
 
 const styles = StyleSheet.create({
-
   headerImage: {
     height: 230,
     width: "100%",
   },
-
   headerOverlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
-
   profileCard: {
     alignItems: "center",
   },
-
   avatar: {
     width: 70,
     height: 70,
     borderRadius: 40,
     marginBottom: 8,
   },
-
   welcome: {
     color: "white",
     fontSize: 16,
     fontFamily: "Medium",
   },
-
   username: {
     color: "white",
     fontSize: 20,
     fontFamily: "Bold",
   },
-
   systemText: {
     color: "#ddd",
     fontSize: 12,
     fontFamily: "Regular",
   },
-
-  menuContainer: {
-    paddingHorizontal: 15,
-  },
-
-  logoutButton: {
-    position: "absolute",
-    bottom: 100,
-    left: 20,
-    right: 20,
-  },
-
-  logoutGradient: {
+  drawerItem: {
     flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.6)",
+    padding: 15,
+    borderRadius: 6,
+    marginVertical: 6,
+    shadowColor: "black",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.9,
+    shadowRadius: 5,
+    elevation: 1,
+  },
+  drawerLabel: {
+    color: "#fff",
+    fontFamily: "Medium",
+    fontSize: 16,
+    marginLeft: 15,
+  },
+  logoutContainer: {
+    position: "absolute",
+    bottom: 40,
+    width: "100%",
+    alignItems: "center",
+    right:10,
+  },
+  logoutButton: {},
+  logoutIcon: {
+    padding: 15,
+    borderRadius: 50,
     justifyContent: "center",
     alignItems: "center",
-    padding: 14,
-    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 6,
+    elevation: 6,
   },
-
-  logoutText: {
-    color: "white",
-    marginLeft: 10,
-    fontFamily: "Bold",
-  },
-
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.5)",
   },
-
   modalBox: {
     width: "80%",
     backgroundColor: "white",
     padding: 25,
     borderRadius: 12,
   },
-
   modalTitle: {
     fontSize: 18,
     fontFamily: "Bold",
     marginBottom: 10,
   },
-
   modalText: {
     fontFamily: "Regular",
     marginBottom: 20,
   },
-
   modalButtons: {
     flexDirection: "row",
     justifyContent: "space-between",
