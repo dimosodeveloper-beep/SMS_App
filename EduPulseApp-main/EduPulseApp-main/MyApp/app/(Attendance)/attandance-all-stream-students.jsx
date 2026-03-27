@@ -1,5 +1,4 @@
 import React,{useState,useEffect} from "react";
-
 import{
 View,
 Text,
@@ -7,7 +6,9 @@ TouchableOpacity,
 Image,
 ActivityIndicator,
 Animated,
-ScrollView
+ScrollView,
+Modal,
+TextInput
 } from "react-native";
 
 import axios from "axios";
@@ -31,9 +32,12 @@ const {streamId,streamName,classId,className} = useLocalSearchParams();
 
 const[students,setStudents] = useState([]);
 const[attendance,setAttendance] = useState([]);
-
 const[loading,setLoading] = useState(false);
 const[token,setToken] = useState(null);
+
+const[modalVisible,setModalVisible] = useState(false);
+const[selectedIndex,setSelectedIndex] = useState(null);
+const[noteText,setNoteText] = useState("");
 
 const scaleAnim = new Animated.Value(1);
 
@@ -41,152 +45,104 @@ const scaleAnim = new Animated.Value(1);
 const pressIn=()=>{Animated.spring(scaleAnim,{toValue:0.95,useNativeDriver:true}).start();}
 const pressOut=()=>{Animated.spring(scaleAnim,{toValue:1,useNativeDriver:true}).start();}
 
-/* =========================
-LOAD TOKEN (STRICT)
-========================= */
+/* LOAD TOKEN */
 useEffect(()=>{
-
 const loadToken = async()=>{
-
 try{
-
 const savedToken = await AsyncStorage.getItem("userToken");
-
 if(!savedToken){
-Toast.show({
-type:"error",
-text1:"Authentication Error",
-text2:"Login again"
-});
+Toast.show({type:"error",text1:"Authentication Error",text2:"Login again"});
 return;
 }
-
 console.log("TOKEN => ",savedToken);
-
 setToken(savedToken);
-
 }catch(e){
 console.log("TOKEN ERROR => ",e);
 }
-
 };
-
 loadToken();
-
 },[]);
 
-
-/* =========================
-FETCH STUDENTS (ONLY IF TOKEN EXISTS)
-========================= */
+/* FETCH STUDENTS */
 useEffect(()=>{
-
-if(token){
-fetchStudents();
-}
-
+if(token) fetchStudents();
 },[token]);
 
-
-/* =========================
-FETCH STUDENTS
-========================= */
 const fetchStudents = async()=>{
-
 setLoading(true);
-
 try{
-
 const res = await axios.get(
 EndPoint + "/students/stream/" + streamId + "/",
 {
-headers:{
-Authorization:`Token ${token}`,
-"Content-Type":"application/json"
-}
+headers:{Authorization:`Token ${token}`,"Content-Type":"application/json"}
 }
 );
-
 console.log("STUDENTS => ",res.data);
-
 setStudents(res.data);
 
-/* DEFAULT = PRESENT */
+/* DEFAULT ATTENDANCE */
 const defaultAttendance = res.data.map(st=>({
 student:st.id,
 classroom:parseInt(classId),
 stream:parseInt(streamId),
-status:"present"
+status:"present",
+reason:""   // <=== default empty reason
 }));
-
 setAttendance(defaultAttendance);
 
 setLoading(false);
-
 }catch(e){
-
 setLoading(false);
-
 console.log("FETCH ERROR => ",e.response?.data);
-
-Toast.show({
-type:"error",
-text1:"Error fetching students",
-text2:JSON.stringify(e.response?.data)
-});
-
+Toast.show({type:"error",text1:"Error fetching students",text2:JSON.stringify(e.response?.data)});
 }
 };
 
-
-/* =========================
-TOGGLE STATUS
-========================= */
+/* TOGGLE STATUS */
 const toggleStatus = (index,status)=>{
-
 const data = [...attendance];
-
 data[index].status = status;
-
 setAttendance(data);
-
 };
 
+/* OPEN NOTE MODAL */
+const openNoteModal = (index)=>{
+setSelectedIndex(index);
+setNoteText(attendance[index].reason || "");
+setModalVisible(true);
+};
 
-/* =========================
-SUBMIT ATTENDANCE
-========================= */
+/* SAVE NOTE */
+const saveNote = ()=>{
+if(selectedIndex !== null){
+const data = [...attendance];
+data[selectedIndex].reason = noteText;
+setAttendance(data);
+}
+setModalVisible(false);
+};
+
+/* SUBMIT ATTENDANCE */
 const submitAttendance = async()=>{
-
 if(!token){
-Toast.show({
-type:"error",
-text1:"Authentication Error",
-text2:"Login again"
-});
+Toast.show({type:"error",text1:"Authentication Error",text2:"Login again"});
 return;
 }
-
 if(attendance.length === 0){
-Toast.show({
-type:"error",
-text1:"No students found"
-});
+Toast.show({type:"error",text1:"No students found"});
 return;
 }
-
 setLoading(true);
-
 try{
-
 const todayDate = new Date();
-const today = `${todayDate.getFullYear()}-${String(todayDate.getMonth() + 1).padStart(2, '0')}-${String(todayDate.getDate()).padStart(2, '0')}`;
+const today = `${todayDate.getFullYear()}-${String(todayDate.getMonth()+1).padStart(2,'0')}-${String(todayDate.getDate()).padStart(2,'0')}`;
 
 const payload = attendance.map(item=>({
 student:item.student,
 classroom:item.classroom,
 stream:item.stream,
 status:item.status,
+reason:item.reason,
 date:today
 }));
 
@@ -196,37 +152,18 @@ const res = await axios.post(
 EndPoint + "/bulk-attendance/",
 payload,
 {
-headers:{
-Authorization:`Token ${token}`,
-"Content-Type":"application/json"
-}
+headers:{Authorization:`Token ${token}`,"Content-Type":"application/json"}
 }
 );
 
 console.log("SUCCESS => ",res.data);
-
 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-
-Toast.show({
-type:"success",
-text1:"Success",
-text2:"Attendance saved successfully"
-});
-
+Toast.show({type:"success",text1:"Success",text2:"Attendance saved successfully"});
 setLoading(false);
-
 }catch(e){
-
 setLoading(false);
-
 console.log("ERROR => ",e.response?.data);
-
-Toast.show({
-type:"error",
-text1:"Error",
-text2:JSON.stringify(e.response?.data)
-});
-
+Toast.show({type:"error",text1:"Error",text2:JSON.stringify(e.response?.data)});
 }
 };
 
@@ -252,7 +189,6 @@ return(
 const isPresent = attendance[index]?.status === "present";
 
 return(
-
 <View key={st.id} style={{
 backgroundColor:"#1e293b",
 padding:15,
@@ -302,31 +238,77 @@ alignItems:"center"
 
 </View>
 
+{/* ======== NOTE ICON ======== */}
+<TouchableOpacity
+onPress={()=>openNoteModal(index)}
+style={{
+marginTop:10,
+padding:6,
+backgroundColor:"#2563eb",
+borderRadius:8,
+alignSelf:"flex-start"
+}}
+>
+<Text style={{color:"#fff"}}>Add Reason / Note</Text>
+</TouchableOpacity>
+
 </View>
-
 )
-
 })}
 
 <Animated.View style={{transform:[{scale:scaleAnim}]}}>
-
 <TouchableOpacity
 onPressIn={pressIn}
 onPressOut={pressOut}
 onPress={submitAttendance}
 >
-
 <LinearGradient colors={["#2563eb","#38bdf8"]} style={styles.button}>
 <Text style={styles.buttonText}>Submit Attendance</Text>
 </LinearGradient>
-
 </TouchableOpacity>
-
 </Animated.View>
 
 </BlurView>
-
 </ScrollView>
+
+{/* ======== NOTE MODAL ======== */}
+<Modal visible={modalVisible} transparent animationType="fade">
+<View style={{flex:1,backgroundColor:"rgba(0,0,0,0.7)",justifyContent:"center",alignItems:"center"}}>
+<View style={{width:"85%",backgroundColor:"#1e293b",borderRadius:15,padding:20}}>
+
+<Text style={{color:"#fff",fontSize:18,fontWeight:"bold",marginBottom:15,textAlign:"center"}}>
+Add Reason / Note
+</Text>
+
+<TextInput
+value={noteText}
+onChangeText={setNoteText}
+placeholder="Type reason here..."
+placeholderTextColor="#94a3b8"
+style={{
+backgroundColor:"#0f172a",
+color:"#fff",
+padding:12,
+borderRadius:10,
+height:120,
+textAlignVertical:"top"
+}}
+multiline
+/>
+
+<TouchableOpacity onPress={saveNote} style={{marginTop:15}}>
+<LinearGradient colors={["#22c55e","#16a34a"]} style={{padding:12,borderRadius:10}}>
+<Text style={{color:"#fff",textAlign:"center"}}>Save Reason</Text>
+</LinearGradient>
+</TouchableOpacity>
+
+<TouchableOpacity onPress={()=>setModalVisible(false)} style={{marginTop:10}}>
+<Text style={{color:"#ef4444",textAlign:"center"}}>Cancel</Text>
+</TouchableOpacity>
+
+</View>
+</View>
+</Modal>
 
 {loading &&(
 <View style={styles.loader}>
@@ -338,9 +320,6 @@ onPress={submitAttendance}
 )}
 
 <Toast/>
-
 </LinearGradient>
-
 )
-
 }

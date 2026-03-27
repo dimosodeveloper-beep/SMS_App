@@ -282,30 +282,7 @@ fontWeight:"bold"
 
 </ScrollView>
 
-{/* FLOAT BUTTON */}
-<TouchableOpacity
-onPress={()=>setModalVisible(true)}
-style={{
-position:"absolute",
-bottom:100,
-right:20
-}}
->
 
-<LinearGradient
-colors={["#9333ea","#6366f1"]}
-style={{
-width:60,
-height:60,
-borderRadius:30,
-justifyContent:"center",
-alignItems:"center"
-}}
->
-<Text style={{color:"#fff",fontSize:24}}>≡</Text>
-</LinearGradient>
-
-</TouchableOpacity>
 
 {/* MODAL */}
 <Modal visible={modalVisible} transparent animationType="fade">
