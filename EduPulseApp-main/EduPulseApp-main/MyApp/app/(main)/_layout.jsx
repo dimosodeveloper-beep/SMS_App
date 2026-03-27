@@ -123,6 +123,8 @@ export default function MainLayout() {
     { name: "all-exams", label: "All Exams", icon: "chart-bar" },
     { name: "add-single-results", label: "Add Single Results", icon: "account-tie" },
     { name: "add-multiple-results", label: "Add Multiple Results", icon: "chart-bar" },
+
+     { name: "(Results)/get-exams-categories", label: "Get Results", icon: "chart-bar" },
    
   ];
 

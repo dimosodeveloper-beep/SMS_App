@@ -27,7 +27,7 @@ import Header from "../../components/Header";
 import {useRouter} from "expo-router";
 import {Ionicons} from "@expo/vector-icons";
 
-export default function AllExamCategories(){
+export default function ResultsAllExamCategories(){
 
 const router = useRouter();
 
@@ -213,6 +213,13 @@ marginBottom:15
 onPressIn={pressIn}
 onPressOut={pressOut}
 activeOpacity={0.9}
+onPress={() => router.push({
+  pathname: "/(Results)/get-all-exams",
+  params: {
+    categoryId: item.id,
+    categoryName: item.name
+  }
+})}
 >
 
 <LinearGradient

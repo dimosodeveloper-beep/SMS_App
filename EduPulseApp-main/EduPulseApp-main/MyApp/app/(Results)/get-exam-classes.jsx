@@ -24,15 +24,16 @@ import styles from "../../components/LoginStyles";
 import {EndPoint} from "../../components/links";
 import Header from "../../components/Header";
 
-import {useRouter} from "expo-router";
+import {useRouter,useLocalSearchParams} from "expo-router";
 import {Ionicons} from "@expo/vector-icons";
 
-export default function AllExamCategories(){
+export default function GetExamClasses(){
 
 const router = useRouter();
+const {examId,categoryId,categoryName} = useLocalSearchParams();
 
-const [categories,setCategories] = useState([]);
-const [filteredCategories,setFilteredCategories] = useState([]);
+const [classes,setClasses] = useState([]);
+const [filteredClasses,setFilteredClasses] = useState([]);
 const [search,setSearch] = useState("");
 const [loading,setLoading] = useState(false);
 const [token,setToken] = useState(null);
@@ -63,20 +64,21 @@ setToken(savedToken);
 loadToken();
 },[]);
 
-/* FETCH DATA */
+/* FETCH CLASSES */
 useEffect(()=>{
 if(token){
-fetchCategories(token);
+fetchClasses(token);
 }
 },[token]);
 
-const fetchCategories = async(token)=>{
+const fetchClasses = async(token)=>{
+
 setLoading(true);
 
 try{
 
 const response = await axios.get(
-EndPoint + "/exam-categories/",
+EndPoint + `/exam_classes/${examId}/`,
 {
 headers:{
 Authorization:`Token ${token}`,
@@ -85,8 +87,8 @@ Authorization:`Token ${token}`,
 }
 );
 
-setCategories(response.data);
-setFilteredCategories(response.data);
+setClasses(response.data);
+setFilteredClasses(response.data);
 
 Haptics.notificationAsync(
 Haptics.NotificationFeedbackType.Success
@@ -98,11 +100,9 @@ setLoading(false);
 
 setLoading(false);
 
-console.log("ERROR => ",error.response?.data);
-
 Toast.show({
 type:"error",
-text1:"Error fetching categories",
+text1:"Error fetching classes",
 text2:JSON.stringify(error.response?.data)
 });
 
@@ -116,22 +116,29 @@ const handleSearch=(text)=>{
 setSearch(text);
 
 if(text === ""){
-setFilteredCategories(categories);
+setFilteredClasses(classes);
 return;
 }
 
-const filtered = categories.filter((item)=>
+const filtered = classes.filter((item)=>
 item.name.toLowerCase().includes(text.toLowerCase())
 );
 
-setFilteredCategories(filtered);
+setFilteredClasses(filtered);
 
 };
 
 /* NAVIGATE */
-const goToCreate = ()=>{
-router.push("/(Screens)/create-exam-category");
+const goToResults=(item)=>{
+router.push({
+pathname:"/(Results)/all-students-results",
+params:{
+classId:item.id,
+categoryId:categoryId,
+categoryName:categoryName
 }
+});
+};
 
 return(
 
@@ -148,8 +155,8 @@ style={styles.bg}
 />
 
 <Header
-title="School Dashboard"
-subtitle="Management System"
+title="Choose Class"
+subtitle={categoryName || "Exam Classes"}
 />
 
 <ScrollView
@@ -164,11 +171,11 @@ keyboardShouldPersistTaps="handled"
 <BlurView intensity={40} tint="dark" style={styles.blur}>
 
 <Text style={styles.title}>
-Exam Categories
+Select Class
 </Text>
 
 <Text style={styles.subtitle}>
-Available exam categories
+Classes that did this exam
 </Text>
 
 <View style={{marginTop:20}}>
@@ -176,7 +183,7 @@ Available exam categories
 <TextInput
 value={search}
 onChangeText={handleSearch}
-placeholder="Search category..."
+placeholder="Search class..."
 placeholderTextColor="#94a3b8"
 style={{
 backgroundColor:"#0f172a",
@@ -189,17 +196,17 @@ marginBottom:20
 }}
 />
 
-{filteredCategories.length === 0 && !loading &&(
+{filteredClasses.length === 0 && !loading &&(
 <Text style={{
 color:"#94a3b8",
 textAlign:"center",
 marginTop:30
 }}>
-No categories found
+No classes found
 </Text>
 )}
 
-{filteredCategories.map((item,index)=>(
+{filteredClasses.map((item,index)=>(
 
 <Animated.View
 key={item.id}
@@ -212,6 +219,7 @@ marginBottom:15
 <TouchableOpacity
 onPressIn={pressIn}
 onPressOut={pressOut}
+onPress={()=>goToResults(item)}
 activeOpacity={0.9}
 >
 
@@ -245,7 +253,7 @@ fontWeight:"bold"
 color:"#94a3b8",
 marginTop:4
 }}>
-Exam Category
+Classroom
 </Text>
 
 </View>
@@ -282,45 +290,13 @@ ID {item.id}
 
 </ScrollView>
 
-{/* FLOATING BUTTON */}
-<TouchableOpacity
-onPress={goToCreate}
-activeOpacity={0.9}
-style={{
-position:"absolute",
-bottom:100,
-right:20
-}}
->
-
-<LinearGradient
-colors={["#2563eb","#38bdf8"]}
-style={{
-width:65,
-height:65,
-borderRadius:35,
-justifyContent:"center",
-alignItems:"center",
-elevation:10,
-shadowColor:"#000",
-shadowOpacity:0.3,
-shadowRadius:10
-}}
->
-
-<Ionicons name="add" size={30} color="#fff"/>
-
-</LinearGradient>
-
-</TouchableOpacity>
-
 {loading &&(
 
 <View style={styles.loader}>
 <View style={styles.loaderCard}>
 <ActivityIndicator size="large" color="#2563eb"/>
 <Text style={styles.loadingText}>
-Fetching categories...
+Fetching classes...
 </Text>
 </View>
 </View>

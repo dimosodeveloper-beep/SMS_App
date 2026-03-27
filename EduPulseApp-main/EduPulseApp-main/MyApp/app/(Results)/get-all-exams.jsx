@@ -1,4 +1,5 @@
 import React,{useState,useEffect} from "react";
+
 import{
 View,
 Text,
@@ -24,15 +25,16 @@ import styles from "../../components/LoginStyles";
 import {EndPoint} from "../../components/links";
 import Header from "../../components/Header";
 
-import {useRouter} from "expo-router";
+import {useRouter,useLocalSearchParams} from "expo-router";
 import {Ionicons} from "@expo/vector-icons";
 
-export default function AllExamCategories(){
+export default function ResultsAllExams(){
 
 const router = useRouter();
+const {categoryId,categoryName} = useLocalSearchParams();
 
-const [categories,setCategories] = useState([]);
-const [filteredCategories,setFilteredCategories] = useState([]);
+const [exams,setExams] = useState([]);
+const [filteredExams,setFilteredExams] = useState([]);
 const [search,setSearch] = useState("");
 const [loading,setLoading] = useState(false);
 const [token,setToken] = useState(null);
@@ -63,20 +65,20 @@ setToken(savedToken);
 loadToken();
 },[]);
 
-/* FETCH DATA */
+/* FETCH EXAMS */
 useEffect(()=>{
 if(token){
-fetchCategories(token);
+fetchExams(token);
 }
 },[token]);
 
-const fetchCategories = async(token)=>{
+const fetchExams = async(token)=>{
 setLoading(true);
 
 try{
 
 const response = await axios.get(
-EndPoint + "/exam-categories/",
+EndPoint + `/exams_results/?category_id=${categoryId}`,
 {
 headers:{
 Authorization:`Token ${token}`,
@@ -85,8 +87,8 @@ Authorization:`Token ${token}`,
 }
 );
 
-setCategories(response.data);
-setFilteredCategories(response.data);
+setExams(response.data);
+setFilteredExams(response.data);
 
 Haptics.notificationAsync(
 Haptics.NotificationFeedbackType.Success
@@ -98,11 +100,9 @@ setLoading(false);
 
 setLoading(false);
 
-console.log("ERROR => ",error.response?.data);
-
 Toast.show({
 type:"error",
-text1:"Error fetching categories",
+text1:"Error fetching exams",
 text2:JSON.stringify(error.response?.data)
 });
 
@@ -116,22 +116,22 @@ const handleSearch=(text)=>{
 setSearch(text);
 
 if(text === ""){
-setFilteredCategories(categories);
+setFilteredExams(exams);
 return;
 }
 
-const filtered = categories.filter((item)=>
+const filtered = exams.filter((item)=>
 item.name.toLowerCase().includes(text.toLowerCase())
 );
 
-setFilteredCategories(filtered);
+setFilteredExams(filtered);
 
 };
 
 /* NAVIGATE */
 const goToCreate = ()=>{
-router.push("/(Screens)/create-exam-category");
-}
+router.push("/(Screens)/create-exam");
+};
 
 return(
 
@@ -148,8 +148,8 @@ style={styles.bg}
 />
 
 <Header
-title="School Dashboard"
-subtitle="Management System"
+title={categoryName || "Exams"}
+subtitle="Filtered by category"
 />
 
 <ScrollView
@@ -157,26 +157,20 @@ contentContainerStyle={{
 padding:10,
 paddingBottom:300
 }}
-showsVerticalScrollIndicator={false}
-keyboardShouldPersistTaps="handled"
 >
 
 <BlurView intensity={40} tint="dark" style={styles.blur}>
 
-<Text style={styles.title}>
-Exam Categories
-</Text>
+<Text style={styles.title}>All Exams</Text>
 
 <Text style={styles.subtitle}>
-Available exam categories
+Showing exams for: {categoryName}
 </Text>
-
-<View style={{marginTop:20}}>
 
 <TextInput
 value={search}
 onChangeText={handleSearch}
-placeholder="Search category..."
+placeholder="Search exam..."
 placeholderTextColor="#94a3b8"
 style={{
 backgroundColor:"#0f172a",
@@ -189,17 +183,17 @@ marginBottom:20
 }}
 />
 
-{filteredCategories.length === 0 && !loading &&(
+{filteredExams.length === 0 && !loading &&(
 <Text style={{
 color:"#94a3b8",
 textAlign:"center",
 marginTop:30
 }}>
-No categories found
+No exams found
 </Text>
 )}
 
-{filteredCategories.map((item,index)=>(
+{filteredExams.map(item=>(
 
 <Animated.View
 key={item.id}
@@ -210,9 +204,16 @@ marginBottom:15
 >
 
 <TouchableOpacity
-onPressIn={pressIn}
-onPressOut={pressOut}
-activeOpacity={0.9}
+onPress={()=>{
+router.push({
+pathname:"/(Results)/get-exam-classes",
+params:{
+examId:item.id,
+categoryId:categoryId,
+categoryName:categoryName
+}
+})
+}}
 >
 
 <LinearGradient
@@ -228,10 +229,9 @@ borderColor:"#334155"
 <View style={{
 flexDirection:"row",
 justifyContent:"space-between",
-alignItems:"center"
+alignItems:"center",
+marginBottom:10
 }}>
-
-<View>
 
 <Text style={{
 color:"#ffffff",
@@ -241,30 +241,35 @@ fontWeight:"bold"
 {item.name}
 </Text>
 
-<Text style={{
-color:"#94a3b8",
-marginTop:4
-}}>
-Exam Category
-</Text>
-
-</View>
-
 <View style={{
 backgroundColor:"#2563eb",
-paddingHorizontal:12,
-paddingVertical:6,
+paddingHorizontal:10,
+paddingVertical:4,
 borderRadius:8
 }}>
-
 <Text style={{
-color:"#ffffff",
+color:"#fff",
 fontWeight:"bold"
 }}>
 ID {item.id}
 </Text>
+</View>
 
 </View>
+
+<View style={{marginTop:5}}>
+
+<Text style={{color:"#94a3b8"}}>
+📅 Date: {item.date}
+</Text>
+
+<Text style={{color:"#94a3b8"}}>
+🏫 Class: {item.classroom?.name || item.classroom}
+</Text>
+
+<Text style={{color:"#94a3b8"}}>
+📚 Category: {item.category?.name || item.category}
+</Text>
 
 </View>
 
@@ -276,19 +281,15 @@ ID {item.id}
 
 ))}
 
-</View>
-
 </BlurView>
 
 </ScrollView>
 
-{/* FLOATING BUTTON */}
 <TouchableOpacity
 onPress={goToCreate}
-activeOpacity={0.9}
 style={{
 position:"absolute",
-bottom:100,
+bottom:30,
 right:20
 }}
 >
@@ -300,11 +301,7 @@ width:65,
 height:65,
 borderRadius:35,
 justifyContent:"center",
-alignItems:"center",
-elevation:10,
-shadowColor:"#000",
-shadowOpacity:0.3,
-shadowRadius:10
+alignItems:"center"
 }}
 >
 
@@ -315,16 +312,14 @@ shadowRadius:10
 </TouchableOpacity>
 
 {loading &&(
-
 <View style={styles.loader}>
 <View style={styles.loaderCard}>
 <ActivityIndicator size="large" color="#2563eb"/>
 <Text style={styles.loadingText}>
-Fetching categories...
+Fetching exams...
 </Text>
 </View>
 </View>
-
 )}
 
 <Toast/>
