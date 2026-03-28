@@ -125,6 +125,7 @@ export default function MainLayout() {
     { name: "add-multiple-results", label: "Add Multiple Results", icon: "chart-bar" },
 
      { name: "(Results)/get-exams-categories", label: "Get Results", icon: "chart-bar" },
+      { name: "(Parents)/parents-exam-categories", label: "Parent Results", icon: "chart-bar" },
    
   ];
 

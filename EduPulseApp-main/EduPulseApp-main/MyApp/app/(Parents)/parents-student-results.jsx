@@ -23,9 +23,9 @@ import Header from "../../components/Header";
 
 import {useLocalSearchParams} from "expo-router";
 
-export default function StudentResults(){
+export default function ChildResults(){
 
-const {studentId,examId} = useLocalSearchParams();
+const {examId,categoryName} = useLocalSearchParams();
 
 const[token,setToken] = useState(null);
 const[loading,setLoading] = useState(false);
@@ -57,25 +57,55 @@ default: return "#ef4444";
 /* ================= TOKEN ================= */
 useEffect(()=>{
 const loadToken = async()=>{
-const t = await AsyncStorage.getItem("userToken");
-setToken(t);
+const savedToken = await AsyncStorage.getItem("userToken");
+
+if(!savedToken){
+Toast.show({
+type:"error",
+text1:"Login required"
+});
+return;
+}
+
+setToken(savedToken);
 };
+
 loadToken();
 },[]);
 
 /* ================= FETCH ================= */
 useEffect(()=>{
-if(token) fetchResults();
+if(token) fetchResults(token);
 },[token]);
 
-const fetchResults = async()=>{
+const fetchResults = async(token)=>{
 
 setLoading(true);
 
 try{
 
+/* GET CHILD */
+const childRes = await axios.get(
+EndPoint + "/parent-children/",
+{
+headers:{Authorization:`Token ${token}`}
+}
+);
+
+const studentId = childRes.data[0]?.id;
+
+if(!studentId){
+Toast.show({
+type:"error",
+text1:"No child found"
+});
+setLoading(false);
+return;
+}
+
+/* GET RESULTS */
 const res = await axios.get(
-EndPoint + `/student_results/${studentId}/?exam_id=${examId}`,
+EndPoint + `/parent-child-results/${studentId}/${examId}/`,
 {
 headers:{Authorization:`Token ${token}`}
 }
@@ -88,6 +118,8 @@ Haptics.NotificationFeedbackType.Success
 );
 
 }catch(e){
+
+console.log("ERROR => ",e.response?.data);
 
 Toast.show({
 type:"error",
@@ -105,7 +137,9 @@ if(loading || !data){
 return(
 <View style={[styles.container,{justifyContent:"center",alignItems:"center"}]}>
 <ActivityIndicator size="large" color="#2563eb"/>
-<Text style={{color:"#fff",marginTop:10}}>Loading results...</Text>
+<Text style={{color:"#fff",marginTop:10}}>
+Loading results...
+</Text>
 </View>
 );
 }
@@ -119,14 +153,16 @@ source={{uri:"https://images.unsplash.com/photo-1588072432836-e10032774350"}}
 style={styles.bg}
 />
 
-<Header title="Student Results" subtitle="Performance Overview"/>
+<Header title="Child Results" subtitle={categoryName}/>
 
 <ScrollView contentContainerStyle={{padding:15,paddingBottom:200}}>
 
 {/* ================= SUMMARY ================= */}
 <BlurView intensity={40} tint="dark" style={[styles.blur,{padding:20}]}>
 
-<Text style={styles.title}>Summary</Text>
+<Text style={styles.title}>
+{data.name}
+</Text>
 
 <View style={{flexDirection:"row",justifyContent:"space-between",marginTop:15}}>
 
@@ -287,6 +323,13 @@ fontSize:22,
 fontWeight:"bold"
 }}>
 {item.marks} Marks
+</Text>
+
+<Text style={{
+color:"#64748b",
+marginTop:4
+}}>
+📅 {item.exam_date}
 </Text>
 
 </View>
