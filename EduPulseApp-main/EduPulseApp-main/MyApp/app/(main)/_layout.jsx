@@ -10,6 +10,7 @@ import {
   Alert,
   Linking,
   ImageBackground,
+  Pressable,
 } from "react-native";
 
 import React, { useState, useContext, useEffect } from "react";
@@ -30,19 +31,35 @@ import { EndPoint } from "../../components/links";
 
 import { useFonts } from "expo-font";
 
-import { useRouter } from "expo-router";
+import { useRouter, usePathname } from "expo-router";
 
 import { LinearGradient } from "expo-linear-gradient";
 
-const { width, height } = Dimensions.get("window");
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withRepeat,
+  withTiming,
+  FadeInDown,
+} from "react-native-reanimated";
+
+const { width } = Dimensions.get("window");
 
 export default function MainLayout() {
   const router = useRouter();
+  const pathname = usePathname();
 
   const { userData, userToken, setUserData, setUserToken } =
     useContext(UserContext);
 
   const [modalVisible, setModalVisible] = useState(false);
+
+  // 🔥 Notification badges (example)
+  const [notifications, setNotifications] = useState({
+    results: 3,
+    parents: 2,
+  });
 
   let [fontsLoaded] = useFonts({
     Bold: require("../../assets/fonts/Poppins-Bold.ttf"),
@@ -61,7 +78,6 @@ export default function MainLayout() {
       const data = await response.json();
 
       const latestVersion = data.latest_version;
-
       const currentVersion = "1";
 
       if (currentVersion < latestVersion) {
@@ -85,27 +101,19 @@ export default function MainLayout() {
 
   const handleLogout = async () => {
     try {
-      const response = await axios.post(
-        EndPoint + `/Account/logout_user/`,
-        null,
-        {
-          headers: {
-            Authorization: `Token ${userToken}`,
-          },
-        }
-      );
+      await axios.post(EndPoint + `/Account/logout_user/`, null, {
+        headers: { Authorization: `Token ${userToken}` },
+      });
 
-      if (response.status === 200) {
-        await AsyncStorage.removeItem("userToken");
-        await AsyncStorage.removeItem("userData");
+      await AsyncStorage.removeItem("userToken");
+      await AsyncStorage.removeItem("userData");
 
-        setUserData(null);
-        setUserToken(null);
+      setUserData(null);
+      setUserToken(null);
 
-        setModalVisible(false);
+      setModalVisible(false);
 
-        router.replace("/login");
-      }
+      router.replace("/login");
     } catch (error) {
       router.replace("/login");
     }
@@ -123,18 +131,73 @@ export default function MainLayout() {
     { name: "all-exams", label: "All Exams", icon: "chart-bar" },
     { name: "add-single-results", label: "Add Single Results", icon: "account-tie" },
     { name: "add-multiple-results", label: "Add Multiple Results", icon: "chart-bar" },
-
-     { name: "(Results)/get-exams-categories", label: "Get Results", icon: "chart-bar" },
-      { name: "(Parents)/parents-exam-categories", label: "Parent Results", icon: "chart-bar" },
-   
+    { name: "(Results)/get-exams-categories", label: "Get Results", icon: "chart-bar", badge: "results" },
+    { name: "(Parents)/parents-exam-categories", label: "Parent Results", icon: "chart-bar", badge: "parents" },
   ];
+
+  const AnimatedItem = ({ item, index, onPress }) => {
+    const scale = useSharedValue(1);
+    const float = useSharedValue(0);
+
+    useEffect(() => {
+      float.value = withRepeat(withTiming(-4, { duration: 2000 }), -1, true);
+    }, []);
+
+    const isActive = pathname.includes(item.name);
+
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: scale.value }, { translateY: float.value }],
+    }));
+
+    return (
+      <Animated.View entering={FadeInDown.delay(index * 100)} style={animatedStyle}>
+        <Pressable
+          android_ripple={{ color: "rgba(255,255,255,0.2)" }}
+          onPress={onPress}
+          onPressIn={() => (scale.value = withSpring(0.95))}
+          onPressOut={() => (scale.value = withSpring(1))}
+          style={[
+            styles.drawerItem,
+            isActive && styles.activeItem
+          ]}
+        >
+          <LinearGradient
+            colors={isActive ? ["#22c55e", "#4ade80"] : ["#36d1dc", "#5b86e5"]}
+            style={styles.iconBox}
+          >
+            <MaterialCommunityIcons
+              name={item.icon}
+              size={20}
+              color="#fff"
+            />
+          </LinearGradient>
+
+          <Text style={[
+            styles.drawerLabel,
+            isActive && { color: "#22c55e" }
+          ]}>
+            {item.label}
+          </Text>
+
+          {/* 🔥 BADGE */}
+          {item.badge && notifications[item.badge] > 0 && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>
+                {notifications[item.badge]}
+              </Text>
+            </View>
+          )}
+
+        </Pressable>
+      </Animated.View>
+    );
+  };
 
   return (
     <View style={{ flex: 1 }}>
       <Drawer
         screenOptions={{
           headerShown: false,
-          swipeEnabled: true,
           drawerStyle: {
             width: width - 60,
             backgroundColor: "transparent",
@@ -142,99 +205,90 @@ export default function MainLayout() {
         }}
         drawerContent={(props) => (
           <LinearGradient
-            colors={["#000000", "#141414"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
+            colors={["#0f2027", "#203a43", "#2c5364"]}
             style={{ flex: 1 }}
           >
-            <View style={{ flex: 1 }}>
-              {/* HEADER IMAGE */}
-              <ImageBackground
-                source={{
-                  uri: "https://images.unsplash.com/photo-1523240795612-9a054b0db644",
-                }}
-                style={styles.headerImage}
+            {/* HEADER */}
+            <ImageBackground
+              source={{
+                uri: "https://images.unsplash.com/photo-1523240795612-9a054b0db644",
+              }}
+              style={styles.headerImage}
+            >
+              <LinearGradient
+                colors={["rgba(0,0,0,0.7)", "rgba(0,0,0,0.2)"]}
+                style={styles.headerOverlay}
+              >
+                <View style={styles.profileCard}>
+                  <Image
+                    source={{
+                      uri: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+                    }}
+                    style={styles.avatar}
+                  />
+                  <Text style={styles.welcome}>Karibu</Text>
+                  <Text style={styles.username}>
+                    {userData?.username}
+                  </Text>
+                </View>
+              </LinearGradient>
+            </ImageBackground>
+
+            {/* MENU */}
+            <ScrollView contentContainerStyle={{ padding: 15 }}>
+              {drawerItems.map((item, index) => (
+                <AnimatedItem
+                  key={item.name}
+                  item={item}
+                  index={index}
+                  onPress={() => props.navigation.navigate(item.name)}
+                />
+              ))}
+            </ScrollView>
+
+            {/* LOGOUT */}
+            <View style={styles.logoutContainer}>
+              <Pressable
+                onPress={() => setModalVisible(true)}
+                style={({ pressed }) => [
+                  styles.logoutButton,
+                  pressed && { transform: [{ scale: 0.9 }] },
+                ]}
               >
                 <LinearGradient
-                  colors={["rgba(0,0,0,0.8)", "rgba(255,255,255,0.2)"]}
-                  style={styles.headerOverlay}
+                  colors={["#ff416c", "#ff4b2b"]}
+                  style={styles.logoutIcon}
                 >
-                  <View style={styles.profileCard}>
-                    <Image
-                      source={{
-                        uri: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
-                      }}
-                      style={styles.avatar}
-                    />
-                    <Text style={styles.welcome}>Karibu</Text>
-                    <Text style={styles.username}>
-                      {userData ? userData.username : ""}
-                    </Text>
-                    <Text style={styles.systemText}>School Management System</Text>
-                  </View>
+                  <FontAwesome name="sign-out" size={22} color="#fff" />
                 </LinearGradient>
-              </ImageBackground>
+              </Pressable>
+            </View>
 
-              {/* MENU SCROLL */}
-              <ScrollView
-                style={{ flex: 1 }}
-                contentContainerStyle={{
-                  paddingHorizontal: 15,
-                  paddingTop: 20,
-                  paddingBottom: 100, // ensures last item is not cut
-                }}
-              >
-                {drawerItems.map((item, index) => (
-                  <TouchableOpacity
-                    key={item.name}
-                    style={styles.drawerItem}
-                    onPress={() => props.navigation.navigate(item.name)}
-                  >
-                    <MaterialCommunityIcons
-                      name={item.icon}
-                      size={24}
-                      color="#fff"
-                    />
-                    <Text style={styles.drawerLabel}>{item.label}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
+            {/* MODAL */}
+            <Modal visible={modalVisible} transparent animationType="fade">
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalBox}>
+                  <Text style={styles.modalTitle}>Logout</Text>
+                  <Text style={styles.modalText}>
+                    {userData?.username}, do you want to logout?
+                  </Text>
 
-              {/* LOGOUT BUTTON FIXED */}
-              <View style={styles.logoutContainer}>
-                <TouchableOpacity
-                  style={styles.logoutButton}
-                  onPress={() => setModalVisible(true)}
-                >
-                  <LinearGradient
-                    colors={["#000000", "#2a0ea8"]}
-                    style={styles.logoutIcon}
-                  >
-                    <FontAwesome name="sign-out" size={24} color="white" />
-                  </LinearGradient>
-                </TouchableOpacity>
-              </View>
+                  <View style={styles.modalButtons}>
+                    <TouchableOpacity onPress={() => setModalVisible(false)}>
+                      <Text style={{ color: "#ef4444", fontFamily: "Bold" }}>
+                        NO
+                      </Text>
+                    </TouchableOpacity>
 
-              {/* MODAL */}
-              <Modal visible={modalVisible} transparent animationType="fade">
-                <View style={styles.modalOverlay}>
-                  <View style={styles.modalBox}>
-                    <Text style={styles.modalTitle}>Logout</Text>
-                    <Text style={styles.modalText}>
-                      {userData?.username}, Do you want to logout?
-                    </Text>
-                    <View style={styles.modalButtons}>
-                      <TouchableOpacity onPress={() => setModalVisible(false)}>
-                        <Text style={{ color: "red", fontFamily: "Bold" }}>NO</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity onPress={handleLogout}>
-                        <Text style={{ color: "green", fontFamily: "Bold" }}>YES</Text>
-                      </TouchableOpacity>
-                    </View>
+                    <TouchableOpacity onPress={handleLogout}>
+                      <Text style={{ color: "#22c55e", fontFamily: "Bold" }}>
+                        YES
+                      </Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
-              </Modal>
-            </View>
+              </View>
+            </Modal>
           </LinearGradient>
         )}
       >
@@ -253,98 +307,121 @@ export default function MainLayout() {
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    height: 230,
-    width: "100%",
-  },
+  headerImage: { height: 220, width: "100%" },
+
   headerOverlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
-  profileCard: {
-    alignItems: "center",
-  },
+
+  profileCard: { alignItems: "center" },
+
   avatar: {
     width: 70,
     height: 70,
     borderRadius: 40,
     marginBottom: 8,
   },
+
   welcome: {
-    color: "white",
-    fontSize: 16,
+    color: "#ccc",
+    fontSize: 14,
     fontFamily: "Medium",
   },
+
   username: {
-    color: "white",
+    color: "#fff",
     fontSize: 20,
     fontFamily: "Bold",
   },
-  systemText: {
-    color: "#ddd",
-    fontSize: 12,
-    fontFamily: "Regular",
-  },
+
   drawerItem: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.6)",
-    padding: 15,
-    borderRadius: 6,
-    marginVertical: 6,
-    shadowColor: "black",
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.9,
-    shadowRadius: 5,
-    elevation: 1,
+    backgroundColor: "rgba(255,255,255,0.05)",
+    padding: 14,
+    borderRadius: 14,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
   },
+
+  activeItem: {
+    backgroundColor: "rgba(34,197,94,0.15)",
+    borderColor: "#22c55e",
+  },
+
+  iconBox: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+
   drawerLabel: {
     color: "#fff",
     fontFamily: "Medium",
-    fontSize: 16,
-    marginLeft: 15,
+    fontSize: 15,
+    flex: 1,
   },
+
+  badge: {
+    backgroundColor: "#ef4444",
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+
+  badgeText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+
   logoutContainer: {
-    position: "absolute",
-    bottom: 40,
-    width: "100%",
     alignItems: "center",
+    // marginBottom: 10,
+    // paddingBottom:100,
+    position:'absolute',
+    bottom:100,
     right:10,
   },
-  logoutButton: {},
+
   logoutIcon: {
     padding: 15,
     borderRadius: 50,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 6,
-    elevation: 6,
   },
+
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0,0,0,0.6)",
   },
+
   modalBox: {
     width: "80%",
-    backgroundColor: "white",
+    backgroundColor: "#1e293b",
     padding: 25,
-    borderRadius: 12,
+    borderRadius: 15,
   },
+
   modalTitle: {
     fontSize: 18,
+    color: "#fff",
     fontFamily: "Bold",
     marginBottom: 10,
   },
+
   modalText: {
-    fontFamily: "Regular",
+    color: "#ccc",
     marginBottom: 20,
+    fontFamily: "Regular",
   },
+
   modalButtons: {
     flexDirection: "row",
     justifyContent: "space-between",
