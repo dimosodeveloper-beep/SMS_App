@@ -36,7 +36,8 @@ export default function Home() {
   const scrollY = useSharedValue(0);
 
   const stats = [
-    { id: 1, title: "Students", value: 1245, icon: "people", route: "/all-school-students", percentage: 75 },
+    { id: 1, title: "Results", value: 1245, icon: "people", route: "/(Screens)/results-homepage", percentage: 75 },
+    // { id: 1, title: "Students", value: 1245, icon: "people", route: "/all-school-students", percentage: 75 },
     { id: 2, title: "Attendance", value: 86, icon: "school", route: "/(Attendance)/view-attendance-classes", percentage: 86 },
     { id: 3, title: "Classes", value: 32, icon: "class", route: "/all-classes", percentage: 60 },
     { id: 4, title: "Subjects", value: 18, icon: "menu-book", route: "/all-subjects", percentage: 45 },

@@ -124,6 +124,91 @@ export default StyleSheet.create({
   loadingText:{
     marginTop:12,
     fontWeight:"600"
+  },
+
+  /* ================= DASHBOARD NEW STYLES ================= */
+
+  scrollContent:{
+    padding:15,
+    paddingBottom:100
+  },
+
+  greetingCard:{
+    padding:18,
+    borderRadius:18,
+    marginBottom:20,
+    borderWidth:1,
+    borderColor:"rgba(255,255,255,0.1)"
+  },
+
+  greetingTitle:{
+    color:"#fff",
+    fontSize:20,
+    fontWeight:"bold"
+  },
+
+  greetingSubtitle:{
+    color:"#94a3b8",
+    marginTop:6
+  },
+
+  optionsContainer:{
+    flexDirection:"row",
+    flexWrap:"wrap",
+    justifyContent:"space-between"
+  },
+
+  cardWrapper:{
+    width:"48%",
+    marginBottom:15
+  },
+
+  card:{
+    borderRadius:18,
+    padding:15,
+    height:110,
+    justifyContent:"center",
+    shadowColor:"#000",
+    shadowOpacity:0.3,
+    shadowRadius:10,
+    elevation:8
+  },
+
+  cardContent:{
+    flexDirection:"row",
+    alignItems:"center",
+    justifyContent:"space-between"
+  },
+
+  leftContent:{
+    flexDirection:"row",
+    alignItems:"center",
+    flex:1
+  },
+
+  iconBox:{
+    backgroundColor:"rgba(255,255,255,0.25)",
+    padding:10,
+    borderRadius:14,
+    marginRight:10
+  },
+
+  cardText:{
+    color:"#fff",
+    fontWeight:"bold",
+    fontSize:14,
+    flexShrink:1
+  },
+
+  footer:{
+    marginTop:10,
+    padding:15,
+    borderRadius:15
+  },
+
+  footerText:{
+    color:"#94a3b8",
+    textAlign:"center"
   }
 
 });
