@@ -127,12 +127,7 @@ export default function MainLayout() {
     { name: "create-class", label: "Create Class", icon: "account-tie" },
     { name: "create-stream", label: "Create Stream", icon: "file-document-edit" },
     { name: "create-student", label: "Create Student", icon: "chart-bar" },
-    { name: "all-exam-categories", label: "Exam Categories", icon: "chart-bar" },
-    { name: "all-exams", label: "All Exams", icon: "chart-bar" },
-    { name: "add-single-results", label: "Add Single Results", icon: "account-tie" },
-    { name: "add-multiple-results", label: "Add Multiple Results", icon: "chart-bar" },
-    { name: "(Results)/get-exams-categories", label: "Get Results", icon: "chart-bar", badge: "results" },
-    { name: "(Parents)/parents-exam-categories", label: "Parent Results", icon: "chart-bar", badge: "parents" },
+    
   ];
 
   const AnimatedItem = ({ item, index, onPress }) => {

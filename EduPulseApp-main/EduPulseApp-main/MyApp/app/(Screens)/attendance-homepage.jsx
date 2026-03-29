@@ -53,30 +53,18 @@ export default function DashboardOptions() {
 
   const options = [
     {
-      title:"Get Results",
+      title:"All Class Attendances",
       icon:<Ionicons name="checkmark-done" size={24} color="#fff" />,
-      route:"(Results)/get-exams-categories",
+      route:"(Attendance)/view-attendance-classes",
       colors:["#22c55e","#4ade80","#16a34a"]
     },
     {
-      title:"Add Single Results",
+      title:"Take Attendance",
       icon:<MaterialIcons name="history" size={24} color="#fff" />,
-      route:"(Results)/add-single-results",
+      route:"(Attendance)/attendance-all-classes",
       colors:["#3b82f6","#60a5fa","#2563eb"]
     },
-    {
-      title:"Add Multiple Results",
-      icon:<Ionicons name="people" size={24} color="#fff" />,
-      route:"(Results)/add-multiple-results",
-      colors:["#9333ea","#c084fc","#7e22ce"]
-    },
-    {
-      title:"Parents",
-      icon:<FontAwesome5 name="file-alt" size={22} color="#fff" />,
-      route:"(Parents)/parents-exam-categories",
-      colors:["#f59e0b","#fbbf24","#d97706"]
-    },
-    
+   
   ];
 
   return(

@@ -53,30 +53,32 @@ export default function DashboardOptions() {
 
   const options = [
     {
-      title:"Get Results",
+      title:"Exams Categories",
       icon:<Ionicons name="checkmark-done" size={24} color="#fff" />,
-      route:"(Results)/get-exams-categories",
+      route:"/(Exams)/all-exam-categories",
       colors:["#22c55e","#4ade80","#16a34a"]
     },
     {
-      title:"Add Single Results",
+      title:"Add New Category",
       icon:<MaterialIcons name="history" size={24} color="#fff" />,
-      route:"(Results)/add-single-results",
+      route:"/(Exams)/create-exam-category",
       colors:["#3b82f6","#60a5fa","#2563eb"]
     },
+
     {
-      title:"Add Multiple Results",
-      icon:<Ionicons name="people" size={24} color="#fff" />,
-      route:"(Results)/add-multiple-results",
-      colors:["#9333ea","#c084fc","#7e22ce"]
+      title:"All Exams",
+      icon:<MaterialIcons name="history" size={24} color="#fff" />,
+      route:"(Exams)/all-exams",
+      colors:["#3b82f6","#60a5fa","#2563eb"]
     },
+
     {
-      title:"Parents",
-      icon:<FontAwesome5 name="file-alt" size={22} color="#fff" />,
-      route:"(Parents)/parents-exam-categories",
-      colors:["#f59e0b","#fbbf24","#d97706"]
+      title:"Add New Exam",
+      icon:<MaterialIcons name="history" size={24} color="#fff" />,
+      route:"(Exams)/create-exam",
+      colors:["#3b82f6","#60a5fa","#2563eb"]
     },
-    
+   
   ];
 
   return(

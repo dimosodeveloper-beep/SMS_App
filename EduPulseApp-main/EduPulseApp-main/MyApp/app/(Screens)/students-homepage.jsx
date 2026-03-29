@@ -53,27 +53,27 @@ export default function DashboardOptions() {
 
   const options = [
     {
-      title:"Get Results",
+      title:"Students in School",
       icon:<Ionicons name="checkmark-done" size={24} color="#fff" />,
-      route:"(Results)/get-exams-categories",
+      route:"/all-school-students",
       colors:["#22c55e","#4ade80","#16a34a"]
     },
     {
-      title:"Add Single Results",
+      title:"Students in classes",
       icon:<MaterialIcons name="history" size={24} color="#fff" />,
-      route:"(Results)/add-single-results",
+      route:"(Screens)/all-classes",
       colors:["#3b82f6","#60a5fa","#2563eb"]
     },
     {
-      title:"Add Multiple Results",
+      title:"Add New Students",
       icon:<Ionicons name="people" size={24} color="#fff" />,
-      route:"(Results)/add-multiple-results",
+      route:"create-student",
       colors:["#9333ea","#c084fc","#7e22ce"]
     },
     {
-      title:"Parents",
+      title:"Classes & Streams",
       icon:<FontAwesome5 name="file-alt" size={22} color="#fff" />,
-      route:"(Parents)/parents-exam-categories",
+      route:"(Screens)/all-classes",
       colors:["#f59e0b","#fbbf24","#d97706"]
     },
     
