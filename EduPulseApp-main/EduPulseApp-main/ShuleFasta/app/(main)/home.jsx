@@ -93,8 +93,8 @@ export default function Home() {
   const actions = [
     { id: 1, title: "All Subjects", icon: "book-open", route: "/(Screens)/all-subjects" },
     { id: 2, title: "Add Subject", icon: "book", route: "/create-subject" },
-    { id: 3, title: "Create Class", icon: "school", route: "/create-class" },
-    { id: 4, title: "Take Attendance", icon: "check-circle", route: "/(Attendance)/attendance-all-classes" },
+    { id: 3, title: "Teachers", icon: "school", route: "/(Teachers)/all-teachers" },
+    { id: 4, title: "Time Table", icon: "check-circle", route: "/(Timetable)/timetable-class" },
   ];
 
   const AnimatedCard = ({ children, onPress, index, percentage, isLoading }) => {

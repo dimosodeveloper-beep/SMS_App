@@ -127,6 +127,8 @@ export default function MainLayout() {
     { name: "create-class", label: "Create Class", icon: "account-tie" },
     { name: "create-stream", label: "Create Stream", icon: "file-document-edit" },
     { name: "create-student", label: "Create Student", icon: "chart-bar" },
+    { name: "create-teacher", label: "Create Teacher", icon: "chart-bar" },
+     { name: "create-timetable", label: "Create Timetable", icon: "chart-bar" },
     
   ];
 

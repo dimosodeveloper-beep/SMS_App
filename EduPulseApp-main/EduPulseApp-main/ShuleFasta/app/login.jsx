@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   Image,
-  ActivityIndicator,
-  Animated
+  Animated,
+  ActivityIndicator
 } from "react-native";
 import { EventRegister } from 'react-native-event-listeners';
 
@@ -23,7 +23,7 @@ import * as Haptics from "expo-haptics";
 
 import { Ionicons } from "@expo/vector-icons";
 
-import styles from "../components/LoginStyles"; // imported styles
+import styles from "../components/LoginStyles";
 import { EndPoint } from "../components/links";
 
 export default function Login() {
@@ -34,154 +34,70 @@ export default function Login() {
   const [password,setPassword] = useState("");
   const [loading,setLoading] = useState(false);
   const [showPassword,setShowPassword] = useState(false);
+  const [remember,setRemember] = useState(false);
 
-  const scaleAnim = new Animated.Value(1);
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const shakeAnim = useRef(new Animated.Value(0)).current;
+  const floatAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
-   const [showAlert, setShowAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
+  useEffect(()=>{
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(floatAnim,{toValue:1,duration:3000,useNativeDriver:true}),
+        Animated.timing(floatAnim,{toValue:0,duration:3000,useNativeDriver:true})
+      ])
+    ).start();
 
- const showAlertFunction = (message) => {
-    setAlertMessage(message);
-    setShowAlert(true);
-  };
-
-  const hideAlert = () => {
-    setShowAlert(false);
-  };
-
-
-  // BUTTON ANIMATION
-  const pressIn = ()=>{
-    Animated.spring(scaleAnim,{
-      toValue:0.95,
+    Animated.timing(fadeAnim,{
+      toValue:1,
+      duration:1000,
       useNativeDriver:true
     }).start();
+
+    checkLoggedIn();
+  },[]);
+
+  const floatInterpolate = floatAnim.interpolate({
+    inputRange:[0,1],
+    outputRange:[0,-10]
+  });
+
+  const shake = ()=>{
+    Animated.sequence([
+      Animated.timing(shakeAnim,{toValue:10,duration:50,useNativeDriver:true}),
+      Animated.timing(shakeAnim,{toValue:-10,duration:50,useNativeDriver:true}),
+      Animated.timing(shakeAnim,{toValue:6,duration:50,useNativeDriver:true}),
+      Animated.timing(shakeAnim,{toValue:0,duration:50,useNativeDriver:true})
+    ]).start();
+  }
+
+  const pressIn = ()=>{
+    Animated.spring(scaleAnim,{toValue:0.95,useNativeDriver:true}).start();
   }
 
   const pressOut = ()=>{
-    Animated.spring(scaleAnim,{
-      toValue:1,
-      useNativeDriver:true
-    }).start();
+    Animated.spring(scaleAnim,{toValue:1,useNativeDriver:true}).start();
   }
-
-
-
-
-//showAlert
-
-  
- 
-  const [error, setError] = useState('');
-  //TO MAKE A LOADING MESSAGE ON A BUTTON
-  const [isPending, setPending] = useState(false);
-    const [secureText, setSecureText] = useState(true);
-   
-    const fadeAnim = useState(new Animated.Value(1))[0];
-
-  //const navigation = useNavigation();
-
-  useEffect(() => {
-    checkLoggedIn();
-  }, []);
 
   const checkLoggedIn = async () => {
     const token = await AsyncStorage.getItem('userToken');
-
-
-    if (token) {
-      try {
-        const userResponse = await axios.get(
-          EndPoint + '/Account/user_data/',
-          {
-            headers: {
-              Authorization: `Token ${token}`,
-            },
-          }
-        );
-
-        const userData = userResponse.data;
-       
-
-      } catch (error) {
-        
-      }
-    }
-  };
-
-
-
-
-// const [error, setError] = useState(null);
-const [errorMessage, setErrorMessage] = useState('');
-const emailRegex = /\S+@\S+\.\S+/;
-
-const handleErrorMessage = (error) => {
-    if (error.response) {
-     
-    }  if (error.message === 'Network Error') {
-      setLoading(false);
-      setPending(false);
-      Toast.show({
-              type:"error",
-              text1:"Missing Fields",
-              text2:"Network error"
-            });
-    } else {
-      setLoading(false);
-      setPending(false);
-      Toast.show({
-              type:"error",
-              text1:"Missing Fields",
-              text2:"An error occurred, please try again."
-            });
-      
-    }
   };
 
   const loginUser = async () => {
-   
-    
 
-    if (!username && !password) {
-      //setError('Please fill in all fields correctly');
-      
-       Toast.show({
-        type:"error",
-        text1:"Missing Fields",
-        text2:"Please fill in all the information accurately"
-      });
-       setLoading(false);
-      return;
-    }
-
-    if (!username) {
-     // setError('Please enter your registration username correctly');
-      
+    if (!username || !password) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      shake();
       Toast.show({
         type:"error",
         text1:"Missing Fields",
-        text2:"Please fill in your username accurately"
+        text2:"Fill all fields"
       });
-      setLoading(false);
       return;
     }
 
- 
-
-    if (!password) {
-      //setError('Please enter your registration password correctly');
-      
-       Toast.show({
-        type:"error",
-        text1:"Missing Fields",
-        text2:"Please fill in your password accurately"
-      });
-      setLoading(false);
-      return;
-    }
-    setPending(true);
-     setLoading(true);
+    setLoading(true);
 
     try {
       const response = await axios.post(EndPoint + '/Account/login_user/', {
@@ -191,73 +107,46 @@ const handleErrorMessage = (error) => {
 
       const token = response.data.token;
       await AsyncStorage.setItem('userToken', token);
-      //navigation.emit('updateUserToken', token);
 
-      console.log("ENDPOINT", EndPoint);
+      if(remember){
+        await AsyncStorage.setItem("rememberUser", username);
+      }
 
-      // Now, make another request to get user data
       const userResponse = await axios.get(EndPoint + '/Account/user_data/', {
-        headers: {
-          Authorization: `Token ${token}`,
-        },
+        headers: { Authorization: `Token ${token}` },
       });
 
-      const userData = userResponse.data;
-      // Save user data to AsyncStorage
-      await AsyncStorage.setItem('userData', JSON.stringify(userData));
+      await AsyncStorage.setItem('userData', JSON.stringify(userResponse.data));
 
-      // Emit the 'updateUserToken' event
-      // hii inasaidia kupata a login user token automatically without
-      // page refreshing
       EventRegister.emit('updateUserToken', token);
 
-        // Confirm AsyncStorage writes are complete before navigating
-    await Promise.all([
-      AsyncStorage.getItem('userToken'),
-      AsyncStorage.getItem('userData'),
-    ]);
-   
+      Toast.show({
+        type:"success",
+        text1:"Login Successful"
+      });
 
-   console.log("Token Saved:", token);
-console.log("UserData Saved:", userData);
-
-
-       Toast.show({
-               type:"success",
-               text1:"Login Successful",
-               text2:"Welcome to EduPulse"
-             });
       router.replace("/(main)/home");
 
       setLoading(false);
-      setPending(false);
-
 
     } catch (error) {
-      
-      
+      shake();
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+
       Toast.show({
-      type:"error",
-      text1:"Login Failed",
-      text2:"Invalid username or password"
-    });
-      setPending(false);
-      console.log("Error", error);
-       setLoading(false);
+        type:"error",
+        text1:"Login Failed",
+        text2:"Invalid credentials"
+      });
+
+      setLoading(false);
     }
   };
 
-
-
-  
-  // BIOMETRIC LOGIN
   const biometricLogin = async()=>{
     const compatible = await LocalAuthentication.hasHardwareAsync();
     if(!compatible){
-      Toast.show({
-        type:"error",
-        text1:"Biometric Not Supported"
-      });
+      Toast.show({ type:"error", text1:"Not Supported" });
       return;
     }
 
@@ -266,99 +155,155 @@ console.log("UserData Saved:", userData);
     });
 
     if(result.success){
-      const token = await AsyncStorage.getItem("token");
-      if(token){
-        router.replace("/");
-      } else {
-        Toast.show({
-          type:"info",
-          text1:"Please login once first"
-        });
-      }
+      router.replace("/(main)/home");
     }
   }
 
-
-
   return(
     <LinearGradient
-      colors={["#020617","#0f172a","#1e293b"]}
-      style={styles.container}
+      colors={["#020617","#0f172a","#1e3a8a"]}
+      style={{flex:1,justifyContent:"center"}}
     >
 
       <Image
         source={{
           uri:"https://images.unsplash.com/photo-1588072432836-e10032774350"
         }}
-        style={styles.bg}
+        style={{position:"absolute",width:"100%",height:"100%"}}
+        blurRadius={3}
       />
 
-      <BlurView intensity={40} tint="dark" style={styles.blur}>
+      <View style={{
+        position:"absolute",
+        width:"100%",
+        height:"100%",
+        backgroundColor:"rgba(0,0,0,0.65)"
+      }}/>
 
-        <Text style={styles.title}>SHULE FASTA</Text>
-        <Text style={styles.subtitle}>School Management System</Text>
+      <Animated.View style={{
+        margin:20,
+        transform:[{translateY:floatInterpolate},{translateX:shakeAnim}],
+        opacity:fadeAnim
+      }}>
 
-        <View style={styles.form}>
+        <BlurView intensity={60} tint="dark" style={{
+          borderRadius:25,
+          padding:25,
+          backgroundColor:"rgba(255,255,255,0.05)"
+        }}>
 
-          <Text style={styles.label}>Username</Text>
+          <Text style={{
+            fontSize:30,
+            color:"#fff",
+            textAlign:"center",
+            fontWeight:"bold"
+          }}>SHULE FASTA</Text>
+
+          <Text style={{
+            textAlign:"center",
+            color:"#cbd5f5",
+            marginBottom:20
+          }}>Smart School System</Text>
+
           <TextInput
-            style={styles.input}
+            style={{
+              backgroundColor:"rgba(255,255,255,0.08)",
+              padding:15,
+              borderRadius:12,
+              color:"#fff",
+              marginBottom:15
+            }}
+            placeholder="Username"
+            placeholderTextColor="#94a3b8"
             value={username}
             onChangeText={setUsername}
-            placeholder="Enter username"
-            placeholderTextColor="#94a3b8"
           />
 
-          <Text style={styles.label}>Password</Text>
-          <View style={styles.passwordBox}>
-            <TextInput
-              style={styles.passwordInput}
-              secureTextEntry={!showPassword}
-              value={password}
-              onChangeText={setPassword}
-              placeholder="Enter password"
-              placeholderTextColor="#94a3b8"
-            />
-            <TouchableOpacity onPress={()=>setShowPassword(!showPassword)}>
-              <Ionicons
-                name={showPassword?"eye-off":"eye"}
-                size={22}
-                color="#94a3b8"
-              />
+          <TextInput
+            style={{
+              backgroundColor:"rgba(255,255,255,0.08)",
+              padding:15,
+              borderRadius:12,
+              color:"#fff"
+            }}
+            secureTextEntry={!showPassword}
+            placeholder="Password"
+            placeholderTextColor="#94a3b8"
+            value={password}
+            onChangeText={setPassword}
+          />
+
+          <TouchableOpacity onPress={()=>setShowPassword(!showPassword)}>
+            <Text style={{color:"#38bdf8",marginTop:5}}>
+              {showPassword?"Hide Password":"Show Password"}
+            </Text>
+          </TouchableOpacity>
+
+          <View style={{flexDirection:"row",justifyContent:"space-between",marginTop:15}}>
+            <TouchableOpacity onPress={()=>setRemember(!remember)}>
+              <Text style={{color:"#fff"}}>
+                {remember?"☑":"☐"} Remember Me
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity>
+              <Text style={{color:"#38bdf8"}}>Forgot?</Text>
             </TouchableOpacity>
           </View>
 
-          <Animated.View style={{transform:[{scale:scaleAnim}]}}>
+          <Animated.View style={{transform:[{scale:scaleAnim}],marginTop:20}}>
             <TouchableOpacity
               onPressIn={pressIn}
               onPressOut={pressOut}
-              onPress={loginUser}
+              onPress={()=>{
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                loginUser();
+              }}
             >
               <LinearGradient
                 colors={["#2563eb","#38bdf8"]}
-                style={styles.button}
+                style={{
+                  padding:15,
+                  borderRadius:15,
+                  alignItems:"center"
+                }}
               >
-                <Text style={styles.buttonText}>Login</Text>
+                <Text style={{color:"#fff",fontWeight:"bold"}}>
+                  Login
+                </Text>
               </LinearGradient>
             </TouchableOpacity>
           </Animated.View>
 
-          <TouchableOpacity style={styles.bioButton} onPress={biometricLogin}>
-            <Ionicons name="finger-print" size={26} color="#38bdf8" />
-            <Text style={styles.bioText}>Login with Fingerprint</Text>
+          <TouchableOpacity onPress={biometricLogin} style={{marginTop:20,alignItems:"center"}}>
+            <Ionicons name="finger-print" size={28} color="#38bdf8"/>
           </TouchableOpacity>
 
-       
-
-        </View>
-
-      </BlurView>
+        </BlurView>
+      </Animated.View>
 
       {loading && (
-        <View style={styles.loader}>
-          <View style={styles.loaderCard}>
-            <ActivityIndicator size="large" color="#2563eb" />
-            <Text style={styles.loadingText}>Signing you in...</Text>
+        <View style={{
+          position:"absolute",
+          width:"100%",
+          height:"100%",
+          justifyContent:"center",
+          alignItems:"center",
+          backgroundColor:"rgba(0,0,0,0.6)"
+        }}>
+          <View style={{
+            backgroundColor:"#fff",
+            padding:25,
+            borderRadius:20,
+            alignItems:"center"
+          }}>
+            <ActivityIndicator size="large" color="#2563eb"/>
+            <Text style={{
+              marginTop:10,
+              fontWeight:"600"
+            }}>
+              Signing you in...
+            </Text>
           </View>
         </View>
       )}
