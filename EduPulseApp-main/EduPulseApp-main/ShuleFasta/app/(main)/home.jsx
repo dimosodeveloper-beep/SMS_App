@@ -95,6 +95,10 @@ export default function Home() {
     { id: 2, title: "Add Subject", icon: "book", route: "/create-subject" },
     { id: 3, title: "Teachers", icon: "school", route: "/(Teachers)/all-teachers" },
     { id: 4, title: "Time Table", icon: "check-circle", route: "/(Timetable)/timetable-class" },
+ 
+    { id: 5, title: "All Events", icon: "book-open", route: "/(Calender)/events-calender" },
+     { id: 6, title: "All Grades", icon: "book", route: "/(Grading)/all-grades" },
+ 
   ];
 
   const AnimatedCard = ({ children, onPress, index, percentage, isLoading }) => {

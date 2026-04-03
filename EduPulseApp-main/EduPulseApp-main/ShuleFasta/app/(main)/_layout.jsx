@@ -131,7 +131,10 @@ export default function MainLayout() {
      { name: "create-timetable", label: "Create Timetable", icon: "chart-bar" },
     
     { name: "create-event", label: "Create Events", icon: "view-dashboard" },
-    { name: "events-calender", label: "View Events", icon: "view-dashboard" },
+    
+
+    { name: "create-grade", label: "Create Grade", icon: "account-tie" },
+    
 
 
 
