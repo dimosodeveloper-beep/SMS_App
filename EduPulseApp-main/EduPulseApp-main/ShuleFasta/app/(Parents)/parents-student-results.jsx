@@ -33,16 +33,7 @@ const[data,setData] = useState(null);
 
 const scaleAnim = new Animated.Value(1);
 
-/* ================= GRADE ================= */
-const getGrade = (marks)=>{
-if(marks >= 80) return "A";
-if(marks >= 70) return "B";
-if(marks >= 50) return "C";
-if(marks >= 40) return "D";
-if(marks >= 30) return "E";
-return "F";
-};
-
+/* ================= GRADE COLOR ================= */
 const getGradeColor = (grade)=>{
 switch(grade){
 case "A": return "#22c55e";
@@ -255,8 +246,7 @@ No results found
 
 {data.details.map((item,index)=>{
 
-const grade = getGrade(item.marks);
-const gradeColor = getGradeColor(grade);
+const gradeColor = getGradeColor(item.grade);
 
 return(
 
@@ -308,7 +298,7 @@ borderRadius:8
 color:"#000",
 fontWeight:"bold"
 }}>
-{grade}
+{item.grade}
 </Text>
 </View>
 

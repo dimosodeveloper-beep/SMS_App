@@ -240,7 +240,7 @@ export default function MainLayout() {
             </ImageBackground>
 
             {/* MENU */}
-            <ScrollView contentContainerStyle={{ padding: 15 }}>
+            <ScrollView contentContainerStyle={{ padding: 15, paddingBottom:100 }}>
               {drawerItems.map((item, index) => (
                 <AnimatedItem
                   key={item.name}
@@ -353,7 +353,7 @@ const styles = StyleSheet.create({
   },
 
   activeItem: {
-    backgroundColor: "rgba(34,197,94,0.15)",
+    backgroundColor: "rgba(2, 20, 18, 0.86)",
     borderColor: "#22c55e",
   },
 
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
     // marginBottom: 10,
     // paddingBottom:100,
     position:'absolute',
-    bottom:100,
+    bottom:150,
     right:10,
   },
 

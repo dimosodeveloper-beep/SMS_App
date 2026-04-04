@@ -3,7 +3,7 @@ import { StyleSheet, Dimensions } from "react-native";
 const { height } = Dimensions.get("window");
 
 export default StyleSheet.create({
-
+//logoutButton
   container:{
     flex:1,
     justifyContent:"center"

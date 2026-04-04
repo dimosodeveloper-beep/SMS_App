@@ -39,16 +39,6 @@ const[search,setSearch] = useState("");
 const[modalVisible,setModalVisible] = useState(false);
 const scaleAnim = new Animated.Value(1);
 
-/* ================= GRADE FUNCTION ================= */
-const getGrade = (avg)=>{
-  if(avg >= 80) return "A";
-  if(avg >= 70) return "B";
-  if(avg >= 50) return "C";
-  if(avg >= 40) return "D";
-  if(avg >= 30) return "E";
-  return "F";
-}
-
 /* Animation */
 const pressIn=()=>{
   Animated.spring(scaleAnim,{toValue:0.95,useNativeDriver:true}).start();
@@ -120,7 +110,6 @@ style={styles.bg}
 <Text style={styles.title}>Class Results Ranking</Text>
 <Text style={{color:"#94a3b8",marginBottom:10}}>Top to lowest performance</Text>
 
-{/* SEARCH */}
 <TextInput
 value={search}
 onChangeText={handleSearch}
@@ -137,25 +126,17 @@ marginBottom:20
 }}
 />
 
-{filteredStudents.length === 0 && !loading &&(
-<Text style={{color:"#94a3b8",textAlign:"center",marginTop:30}}>
-No results found
-</Text>
-)}
-
 {filteredStudents.map((item,index)=>{
   let rankColor = "#334155";
   if(index === 0) rankColor = "#facc15";
   if(index === 1) rankColor = "#94a3b8";
   if(index === 2) rankColor = "#f97316";
-  const grade = getGrade(item.average);
 
   return(
   <Animated.View key={index} style={{transform:[{scale:scaleAnim}],marginTop:15}}>
   <TouchableOpacity onPressIn={pressIn} onPressOut={pressOut} activeOpacity={0.9}>
   <LinearGradient colors={["#1e293b","#0f172a"]} style={{padding:18,borderRadius:14,borderWidth:1,borderColor:"#334155"}}>
   
-  {/* HEADER */}
   <View style={{flexDirection:"row",justifyContent:"space-between",alignItems:"center"}}>
   <View style={{flexDirection:"row",alignItems:"center"}}>
   <View style={{backgroundColor:rankColor,width:35,height:35,borderRadius:20,justifyContent:"center",alignItems:"center",marginRight:10}}>
@@ -172,15 +153,13 @@ No results found
   </View>
   </View>
 
-  {/* DETAILS */}
   <View style={{marginTop:10}}>
     <Text style={{color:"#94a3b8"}}>📊 Total Marks: {item.total_marks}</Text>
     <Text style={{color:"#94a3b8"}}>📝 Exams Done: {item.exams_count}</Text>
     <Text style={{color:"#22c55e",marginTop:5,fontWeight:"bold"}}>Average: {item.average.toFixed(2)}</Text>
-    <Text style={{color:"#facc15",marginTop:5,fontWeight:"bold"}}>🎓 Grade: {grade}</Text>
+    <Text style={{color:"#facc15",marginTop:5,fontWeight:"bold"}}>🎓 Grade: {item.grade}</Text>
   </View>
 
-  {/* BUTTON */}
   <TouchableOpacity onPress={()=>router.push({pathname:"/(Results)/student-results",params:{studentId:item.student_id,examId:examId}})} style={{marginTop:10}}>
     <LinearGradient colors={["#2563eb","#38bdf8"]} style={{padding:10,borderRadius:8,alignItems:"center"}}>
       <Text style={{color:"#fff",fontWeight:"bold"}}>View Results</Text>
