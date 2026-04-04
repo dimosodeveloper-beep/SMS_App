@@ -98,6 +98,9 @@ export default function Home() {
  
     { id: 5, title: "All Events", icon: "book-open", route: "/(Calender)/events-calender" },
      { id: 6, title: "All Grades", icon: "book", route: "/(Grading)/all-grades" },
+
+       { id: 7, title: "View Reports", icon: "book-open", route: "/(Reports)/report-exam-categories" },
+     { id: 8, title: "View Reports", icon: "book", route: "/(Reports)/report-exam-categories" },
  
   ];
 

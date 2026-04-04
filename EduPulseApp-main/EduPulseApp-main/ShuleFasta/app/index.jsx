@@ -1,8 +1,16 @@
 import { useEffect, useState } from "react";
-import { View, ActivityIndicator, Text } from "react-native";
+import {
+  View,
+  ActivityIndicator,
+  Text,
+  ImageBackground,
+  Image,
+  StyleSheet,
+} from "react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { LinearGradient } from "expo-linear-gradient";
 import { EndPoint } from "../components/links";
 
 export default function Index() {
@@ -26,40 +34,41 @@ export default function Index() {
         const token = await AsyncStorage.getItem("userToken");
 
         if (!token) {
-          // Haina token → mpeleke kwa /all-products
           router.replace("/login");
           return;
         }
 
         // 3️⃣ Token ipo → confirm kama ni valid
         try {
-          const response = await axios.get(`${EndPoint}/Account/user_data/`, {
+          await axios.get(`${EndPoint}/Account/user_data/`, {
             headers: { Authorization: `Token ${token}` },
             timeout: 8000,
           });
 
-          // Token ni valid → mpeleke Home
           router.replace("/(main)/home");
-
         } catch (error) {
-          // Token haifanyi kazi au ime-expire → toa ujumbe na mpeleke all-products
           if (error.response) {
             if (error.response.status === 401) {
-              setErrorMessage("Token yako imeisha muda wake. Tafadhali login tena.");
+              setErrorMessage(
+                "Token yako imeisha muda wake. Tafadhali login tena."
+              );
             } else if (error.response.status === 404) {
               setErrorMessage("Taarifa hazijapatikana. Tafadhali jaribu tena.");
             } else {
-              setErrorMessage("Hitilafu isiyotegemewa imejitokeza. Jaribu tena baadae.");
+              setErrorMessage(
+                "Hitilafu isiyotegemewa imejitokeza. Jaribu tena baadae."
+              );
             }
           } else if (error.message === "Network Error") {
             setErrorMessage("Tatizo la mtandao. Hakikisha unayo internet.");
           } else if (error.code === "ECONNABORTED") {
-            setErrorMessage("Ombi limechukua muda mrefu mno. Tafadhali jaribu tena.");
+            setErrorMessage(
+              "Ombi limechukua muda mrefu mno. Tafadhali jaribu tena."
+            );
           } else {
             setErrorMessage("Kuna tatizo lisilojulikana limejitokeza.");
           }
 
-          // Peleka user kwenye all-products hata kama error ipo
           router.replace("/login");
         }
       } catch (err) {
@@ -74,43 +83,94 @@ export default function Index() {
     initializeApp();
   }, []);
 
+  // ======================= LOADING SCREEN =======================
   if (loading) {
     return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "#015d68",
+      <ImageBackground
+        source={{
+          uri: "https://images.unsplash.com/photo-1588072432836-e10032774350",
         }}
+        style={styles.background}
+        blurRadius={3}
       >
-        <ActivityIndicator size="large" color="white" />
-        <Text style={{ color: "white", marginTop: 10 }}>Please wait...</Text>
-      </View>
+        <LinearGradient
+          colors={["rgba(0,0,0,0.4)", "rgba(0,0,0,0.2)"]}
+          style={styles.gradientOverlay}
+        >
+          <Image
+            source={{
+              uri: "https://images.unsplash.com/photo-1588072432836-e10032774350",
+            }}
+            style={styles.logo}
+          />
+          <ActivityIndicator size="large" color="#22c55e" style={{ marginTop: 20 }} />
+          <Text style={styles.loadingText}>Karibu ShuleFasta...</Text>
+        </LinearGradient>
+      </ImageBackground>
     );
   }
 
+  // ======================= ERROR SCREEN =======================
   if (errorMessage) {
     return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          padding: 20,
-          backgroundColor: "#004d40",
+      <ImageBackground
+        source={{
+          uri: "https://images.unsplash.com/photo-1596496050323-77c7e605f0f6",
         }}
+        style={styles.background}
+        blurRadius={3}
       >
-        <Text style={{ color: "red", fontSize: 16, textAlign: "center", marginBottom: 10 }}>
-          {errorMessage}
-        </Text>
-        <Text style={{ color: "white", fontSize: 16, textAlign: "center" }}>
-          Unapelekwa kwenye ukurasa wa bidhaa...
-        </Text>
-        <ActivityIndicator size="small" color="white" style={{ marginTop: 15 }} />
-      </View>
+        <LinearGradient
+          colors={["rgba(0,0,0,0.7)", "rgba(0,0,0,0.3)"]}
+          style={styles.gradientOverlay}
+        >
+          <Text style={styles.errorText}>{errorMessage}</Text>
+          <Text style={styles.infoText}>Utapelekwa kwenye ukurasa wa login...</Text>
+          <ActivityIndicator size="large" color="#fbbf24" style={{ marginTop: 20 }} />
+        </LinearGradient>
+      </ImageBackground>
     );
   }
 
   return null;
 }
+
+const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  gradientOverlay: {
+    flex: 1,
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 25,
+  },
+  logo: {
+    width: 180,
+    height: 180,
+    borderRadius: 20,
+    marginBottom: 25,
+  },
+  loadingText: {
+    color: "#fff",
+    fontSize: 18,
+    marginTop: 15,
+    fontWeight: "700",
+    textAlign: "center",
+  },
+  errorText: {
+    color: "#f87171",
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 15,
+  },
+  infoText: {
+    color: "#fff",
+    fontSize: 16,
+    textAlign: "center",
+  },
+});
