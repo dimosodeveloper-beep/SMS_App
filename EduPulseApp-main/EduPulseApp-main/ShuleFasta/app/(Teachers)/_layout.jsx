@@ -128,16 +128,17 @@ export default function MainLayout() {
     { name: "create-stream", label: "Create Stream", icon: "file-document-edit" },
     { name: "create-student", label: "Create Student", icon: "chart-bar" },
     { name: "create-teacher", label: "Create Teacher", icon: "chart-bar" },
-    { name: "create-timetable", label: "Create Timetable", icon: "chart-bar" },
+     { name: "create-timetable", label: "Create Timetable", icon: "chart-bar" },
+    
     { name: "create-event", label: "Create Events", icon: "view-dashboard" },
-    { name: "create-grade", label: "Create Grade", icon: "account-tie" },
-  ];
+    
 
-  // 🔥 FILTER BASED ON ROLE
-  const filteredDrawerItems =
-    userData?.role === "admin"
-      ? drawerItems
-      : drawerItems.filter((item) => item.name === "home");
+    { name: "create-grade", label: "Create Grade", icon: "account-tie" },
+    
+
+
+
+  ];
 
   const AnimatedItem = ({ item, index, onPress }) => {
     const scale = useSharedValue(1);
@@ -240,7 +241,7 @@ export default function MainLayout() {
 
             {/* MENU */}
             <ScrollView contentContainerStyle={{ padding: 15, paddingBottom:100 }}>
-              {filteredDrawerItems.map((item, index) => (
+              {drawerItems.map((item, index) => (
                 <AnimatedItem
                   key={item.name}
                   item={item}
@@ -296,7 +297,7 @@ export default function MainLayout() {
           </LinearGradient>
         )}
       >
-        {filteredDrawerItems.map((item) => (
+        {drawerItems.map((item) => (
           <Drawer.Screen
             key={item.name}
             name={item.name}
@@ -387,6 +388,8 @@ const styles = StyleSheet.create({
 
   logoutContainer: {
     alignItems: "center",
+    // marginBottom: 10,
+    // paddingBottom:100,
     position:'absolute',
     bottom:150,
     right:10,

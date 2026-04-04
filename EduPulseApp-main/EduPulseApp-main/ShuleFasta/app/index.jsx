@@ -38,14 +38,28 @@ export default function Index() {
           return;
         }
 
-        // 3️⃣ Token ipo → confirm kama ni valid
+        // 3️⃣ Token ipo → confirm kama ni valid + pata user data
         try {
-          await axios.get(`${EndPoint}/Account/user_data/`, {
+          const response = await axios.get(`${EndPoint}/Account/user_data/`, {
             headers: { Authorization: `Token ${token}` },
             timeout: 8000,
           });
 
-          router.replace("/(main)/home");
+          const userData = response.data;
+
+          // 🔥 CHECK ROLE
+          if (userData.role === "admin") {
+            router.replace("/(main)/home");
+          } else if (userData.role === "teacher") {
+            router.replace("/(main)/home");
+          } else if (userData.role === "parent") {
+            router.replace("/(main)/home");
+          } else {
+            setErrorMessage(
+              "The system failed to recognize your role. Please contact support."
+            );
+          }
+
         } catch (error) {
           if (error.response) {
             if (error.response.status === 401) {
@@ -66,7 +80,7 @@ export default function Index() {
               "Ombi limechukua muda mrefu mno. Tafadhali jaribu tena."
             );
           } else {
-            setErrorMessage("Kuna tatizo lisilojulikana limejitokeza.");
+            setErrorMessage("Kuna tatizo  limejitokeza.");
           }
 
           router.replace("/login");

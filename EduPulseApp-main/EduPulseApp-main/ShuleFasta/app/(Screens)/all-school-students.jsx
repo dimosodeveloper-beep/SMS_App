@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useRef} from "react";
 import{
   View,
   Text,
@@ -7,7 +7,8 @@ import{
   Image,
   ActivityIndicator,
   Animated,
-  ScrollView
+  ScrollView,
+  Modal
 } from "react-native";
 
 import axios from "axios";
@@ -25,6 +26,7 @@ import {EndPoint} from "../../components/links";
 import Header from "../../components/Header";
 
 import {useRouter,useLocalSearchParams} from "expo-router";
+import {Ionicons} from "@expo/vector-icons";
 
 export default function AllStudents(){
 
@@ -37,9 +39,11 @@ export default function AllStudents(){
   const [loading,setLoading] = useState(false);
   const [token,setToken] = useState(null);
 
-  const scaleAnim = new Animated.Value(1);
+  const [deleteModal,setDeleteModal] = useState(false);
+  const [selectedId,setSelectedId] = useState(null);
 
-  // Animation functions
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
   const pressIn=()=>{
     Animated.spring(scaleAnim,{
       toValue:0.95,
@@ -54,16 +58,14 @@ export default function AllStudents(){
     }).start();
   }
 
-  // 1️⃣ Load token from AsyncStorage on mount
   useEffect(()=>{
     const loadToken = async()=>{
-      const savedToken = await AsyncStorage.getItem("userToken"); // make sure key matches login save
+      const savedToken = await AsyncStorage.getItem("userToken");
       setToken(savedToken);
     };
     loadToken();
   },[]);
 
-  // 2️⃣ Fetch students only after token is loaded
   useEffect(()=>{
     if(token){
       fetchStudents(token);
@@ -75,8 +77,6 @@ export default function AllStudents(){
     setLoading(true);
 
     try{
-      console.log("TOKEN => ", token);
-
       const response = await axios.get(
         EndPoint + "/students/", 
         {
@@ -87,8 +87,6 @@ export default function AllStudents(){
         }
       );
 
-      console.log("STUDENTS => ",response.data);
-
       setStudents(response.data);
       setFilteredStudents(response.data);
 
@@ -97,7 +95,6 @@ export default function AllStudents(){
       setLoading(false);
     }catch(error){
       setLoading(false);
-      console.log("ERROR => ",error.response?.data);
       Toast.show({
         type:"error",
         text1:"Error fetching students",
@@ -106,10 +103,9 @@ export default function AllStudents(){
     }
   }
 
-  // Optional: fetch user data
   const checkLoggedIn = async(token)=>{
     try {
-      const userResponse = await axios.get(
+      await axios.get(
         EndPoint + '/Account/user_data/',
         {
           headers:{
@@ -117,12 +113,7 @@ export default function AllStudents(){
           }
         }
       );
-
-      const userData = userResponse.data;
-      console.log("USER DATA => ", userData);
-    } catch (error) {
-      console.log("Error fetching user data =>", error.response?.data || error.message);
-    }
+    } catch (error) {}
   }
 
   const handleSearch=(text)=>{
@@ -145,6 +136,39 @@ export default function AllStudents(){
   const openCreateStudent=()=>{
     router.push("/create-student");
   }
+
+  /* DELETE */
+  const confirmDelete = (id)=>{
+    setSelectedId(id);
+    setDeleteModal(true);
+  };
+
+  const deleteStudent = async()=>{
+    try{
+      await axios.delete(
+        EndPoint+`/update-delete-student/${selectedId}/`,
+        {headers:{Authorization:`Token ${token}`}}
+      );
+
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+      Toast.show({type:"success",text1:"Deleted"});
+
+      setDeleteModal(false);
+      fetchStudents(token);
+
+    }catch(e){
+      Toast.show({type:"error",text1:"Delete failed"});
+    }
+  };
+
+  /* EDIT */
+  const goToEdit = (item)=>{
+    router.push({
+      pathname:"/(Screens)/edit-student",
+      params:item
+    });
+  };
 
   return(
     <LinearGradient
@@ -261,19 +285,22 @@ export default function AllStudents(){
                       </Text>
                     </View>
 
-                    <View style={{
-                      backgroundColor:"#2563eb",
-                      paddingHorizontal:12,
-                      paddingVertical:6,
-                      borderRadius:8
-                    }}>
-                      <Text style={{
-                        color:"#ffffff",
-                        fontWeight:"bold"
-                      }}>
-                        ID {item.id}
-                      </Text>
+                    {/* ACTIONS */}
+                    <View style={{flexDirection:"row",alignItems:"center"}}>
+
+                      <TouchableOpacity onPress={()=>goToEdit(item)}>
+                        <Ionicons name="create" size={22} color="#38bdf8"/>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity 
+                        onPress={()=>confirmDelete(item.id)} 
+                        style={{marginLeft:15}}
+                      >
+                        <Ionicons name="trash" size={22} color="#ef4444"/>
+                      </TouchableOpacity>
+
                     </View>
+
                   </View>
                 </LinearGradient>
               </TouchableOpacity>
@@ -297,6 +324,39 @@ export default function AllStudents(){
           </View>
         </View>
       )}
+
+      {/* DELETE MODAL */}
+      <Modal visible={deleteModal} transparent animationType="fade">
+        <View style={{
+          flex:1,
+          backgroundColor:"rgba(0,0,0,0.7)",
+          justifyContent:"center",
+          padding:20
+        }}>
+          <View style={{
+            backgroundColor:"#020617",
+            padding:20,
+            borderRadius:15
+          }}>
+            <Text style={{color:"#fff",marginBottom:20}}>
+              Are you sure you want to delete this student?
+            </Text>
+
+            <View style={{flexDirection:"row",justifyContent:"space-between"}}>
+
+              <TouchableOpacity onPress={()=>setDeleteModal(false)}>
+                <Text style={{color:"#94a3b8"}}>Cancel</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={deleteStudent}>
+                <Text style={{color:"#ef4444",fontWeight:"bold"}}>Delete</Text>
+              </TouchableOpacity>
+
+            </View>
+
+          </View>
+        </View>
+      </Modal>
 
       <TouchableOpacity
         onPress={openCreateStudent}
