@@ -13,6 +13,8 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
+import * as Print from "expo-print";
+import * as Sharing from "expo-sharing";
 import { EndPoint } from "../../components/links";
 import Header from "../../components/Header";
 import { useLocalSearchParams } from "expo-router";
@@ -26,6 +28,10 @@ const[loading,setLoading] = useState(false);
 const[students,setStudents] = useState([]);
 const[summary,setSummary] = useState({});
 const[modalVisible,setModalVisible] = useState(false);
+
+/* NEW STATES */
+const[sending,setSending] = useState(false);
+const[progress,setProgress] = useState(0);
 
 /* ================= TOKEN ================= */
 useEffect(()=>{
@@ -59,11 +65,68 @@ Alert.alert("Error","Failed to load reports");
 setLoading(false);
 };
 
+/* ================= GENERATE PDF ================= */
+const downloadAllPDF = async()=>{
+
+try{
+
+let html = `
+<h1 style="text-align:center;">Report Cards</h1>
+<h3>Class: ${categoryName}</h3>
+<table border="1" style="width:100%;border-collapse:collapse;">
+<tr>
+<th>#</th>
+<th>Name</th>
+<th>Class</th>
+<th>Stream</th>
+<th>Average</th>
+<th>Grade</th>
+<th>Total Marks</th>
+</tr>
+`;
+
+students.forEach((item,index)=>{
+html += `
+<tr>
+<td>${index+1}</td>
+<td>${item.name}</td>
+<td>${item.class}</td>
+<td>${item.stream}</td>
+<td>${item.average}</td>
+<td>${item.grade}</td>
+<td>${item.total_marks}</td>
+</tr>
+`;
+});
+
+html += `</table>`;
+
+const {uri} = await Print.printToFileAsync({html});
+await Sharing.shareAsync(uri);
+
+}catch(e){
+console.log(e);
+Alert.alert("Error generating PDF");
+}
+};
+
 /* ================= SEND REPORTS ================= */
 const sendReports = async()=>{
 setModalVisible(false);
+setSending(true);
+setProgress(0);
+
 try{
 const studentIds = students.map(s=>s.student_id);
+
+/* fake progress */
+let current = 0;
+const interval = setInterval(()=>{
+current += 5;
+if(current <= 90){
+setProgress(current);
+}
+},200);
 
 const res = await axios.post(
 `${EndPoint}/send_report_cards/`,
@@ -71,10 +134,17 @@ const res = await axios.post(
 {headers:{Authorization:`Token ${token}`}}
 );
 
+clearInterval(interval);
+setProgress(100);
+
+setTimeout(()=>{
+setSending(false);
 Alert.alert("Success",res.data.message);
+},500);
 
 }catch(e){
 console.log(e);
+setSending(false);
 Alert.alert("Error sending reports");
 }
 };
@@ -103,6 +173,29 @@ style={{flex:1}}
 >
 
 <Header title="Report Cards" subtitle={categoryName}/>
+
+{/* ================= DOWNLOAD BUTTON ================= */}
+<TouchableOpacity
+onPress={downloadAllPDF}
+style={{
+position:"absolute",
+top:100,
+right:20,
+zIndex:10
+}}
+>
+<LinearGradient
+colors={["#9333ea","#6366f1"]}
+style={{
+padding:12,
+borderRadius:10
+}}
+>
+<Text style={{color:"#fff",fontWeight:"bold"}}>
+Download PDF
+</Text>
+</LinearGradient>
+</TouchableOpacity>
 
 {/* ================= SUMMARY ================= */}
 <BlurView intensity={40} tint="dark" style={{margin:15,padding:15,borderRadius:15}}>
@@ -138,7 +231,7 @@ Class Performance Summary
 </BlurView>
 
 {/* ================= REPORT CARDS ================= */}
-<ScrollView contentContainerStyle={{padding:10,paddingBottom:120}}>
+<ScrollView contentContainerStyle={{padding:10,paddingBottom:120,opacity:sending?0.3:1}}>
 
 {students.map((item,index)=>{
 
@@ -161,7 +254,6 @@ borderColor:"#334155"
 }}
 >
 
-{/* HEADER */}
 <View style={{flexDirection:"row",justifyContent:"space-between"}}>
 
 <View style={{flexDirection:"row",alignItems:"center"}}>
@@ -200,10 +292,8 @@ Grade {item.grade}
 
 </View>
 
-{/* DIVIDER */}
 <View style={{height:1,backgroundColor:"#334155",marginVertical:10}}/>
 
-{/* BODY */}
 <View style={{flexDirection:"row",justifyContent:"space-between"}}>
 
 <View>
@@ -313,9 +403,64 @@ Cancel
 
 </Modal>
 
+{/* ================= LOADER ================= */}
+{sending &&(
+<View style={{
+position:"absolute",
+top:0,
+left:0,
+right:0,
+bottom:0,
+justifyContent:"center",
+alignItems:"center"
+}}>
+
+<BlurView intensity={80} tint="dark" style={{
+position:"absolute",
+width:"100%",
+height:"100%"
+}}/>
+
+<View style={{
+backgroundColor:"#020617",
+padding:25,
+borderRadius:20,
+alignItems:"center",
+width:200
+}}>
+
+<ActivityIndicator size="large" color="#22c55e"/>
+
+<Text style={{color:"#fff",marginTop:10}}>
+Sending Reports...
+</Text>
+
+<View style={{
+width:"100%",
+height:8,
+backgroundColor:"#334155",
+borderRadius:10,
+marginTop:10
+}}>
+<View style={{
+width:`${progress}%`,
+height:"100%",
+backgroundColor:"#22c55e",
+borderRadius:10
+}}/>
+</View>
+
+<Text style={{color:"#22c55e",marginTop:5}}>
+{progress}%
+</Text>
+
+</View>
+
+</View>
+)}
+
 </LinearGradient>
 </ImageBackground>
 
 );
-
 }
