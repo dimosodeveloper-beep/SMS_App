@@ -8,7 +8,8 @@ ActivityIndicator,
 ScrollView,
 Animated,
 Modal,
-TextInput
+TextInput,
+Alert
 } from "react-native";
 
 import axios from "axios";
@@ -83,6 +84,42 @@ const fetchResults = async()=>{
     });
   }
   setLoading(false);
+};
+
+/* ================= DELETE RESULT ================= */
+const deleteResult = async(resultId)=>{
+Alert.alert(
+"Delete Result",
+"Are you sure you want to delete this result?",
+[
+{ text:"Cancel" },
+{
+text:"Delete",
+onPress: async()=>{
+try{
+await axios.delete(
+EndPoint + `/update-delete-result/${resultId}/`,
+{headers:{Authorization:`Token ${token}`}}
+);
+
+Toast.show({
+type:"success",
+text1:"Result Deleted"
+});
+
+fetchResults();
+
+}catch(e){
+Toast.show({
+type:"error",
+text1:"Error",
+text2:JSON.stringify(e.response?.data)
+});
+}
+}
+}
+]
+);
 };
 
 /* ================= SEARCH ================= */
@@ -160,11 +197,43 @@ marginBottom:20
     <Text style={{color:"#facc15",marginTop:5,fontWeight:"bold"}}>🎓 Grade: {item.grade}</Text>
   </View>
 
-  <TouchableOpacity onPress={()=>router.push({pathname:"/(Results)/student-results",params:{studentId:item.student_id,examId:examId}})} style={{marginTop:10}}>
-    <LinearGradient colors={["#2563eb","#38bdf8"]} style={{padding:10,borderRadius:8,alignItems:"center"}}>
-      <Text style={{color:"#fff",fontWeight:"bold"}}>View Results</Text>
+  {/* ================= ACTION BUTTONS ================= */}
+  <View style={{flexDirection:"row",justifyContent:"space-between",marginTop:10}}>
+
+  {/* VIEW */}
+  <TouchableOpacity onPress={()=>router.push({pathname:"/(Results)/student-results",params:{studentId:item.student_id,examId:examId}})}>
+    <LinearGradient colors={["#2563eb","#38bdf8"]} style={{padding:10,borderRadius:8}}>
+      <Text style={{color:"#fff",fontWeight:"bold"}}>View</Text>
     </LinearGradient>
   </TouchableOpacity>
+
+  {/* EDIT */}
+ <TouchableOpacity onPress={()=>router.push({
+  pathname:"/(Results)/choose-subject-to-edit",
+  params:{
+    studentId:item.student_id,
+    examId:examId
+  }
+})}>
+    <LinearGradient colors={["#22c55e","#16a34a"]} style={{padding:10,borderRadius:8}}>
+      <Text style={{color:"#fff",fontWeight:"bold"}}>✏️ Edit</Text>
+    </LinearGradient>
+  </TouchableOpacity>
+
+  {/* DELETE */}
+   <TouchableOpacity onPress={()=>router.push({
+  pathname:"/(Results)/choose-subject-to-edit",
+  params:{
+    studentId:item.student_id,
+    examId:examId
+  }
+})}>
+    <LinearGradient colors={["#ef4444","#dc2626"]} style={{padding:10,borderRadius:8}}>
+      <Text style={{color:"#fff",fontWeight:"bold"}}>🗑️ Delete</Text>
+    </LinearGradient>
+  </TouchableOpacity>
+
+  </View>
 
   </LinearGradient>
   </TouchableOpacity>
