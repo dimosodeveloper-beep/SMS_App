@@ -1,93 +1,110 @@
 import { useRouter } from 'expo-router';
-import { useNavigation, DrawerActions } from '@react-navigation/native';
+import {
+  useNavigation,
+  DrawerActions
+} from '@react-navigation/native';
 
-import { StyleSheet,Platform,TextInput,ActivityIndicator,
-  Pressable, Text,Animated,ScrollView, View,Image, 
-  Button, FlatList,TouchableOpacity,Modal,
-  TouchableWithoutFeedback, Keyboard,Dimensions,
-  
-   
-  KeyboardAvoidingView 
-   } from 'react-native';
-import React, {useState,useRef,useCallback, useEffect, useContext} from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  Dimensions
+} from 'react-native';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
-import {MaterialIcons,Entypo,MaterialCommunityIcons,FontAwesome5, Ionicons,Feather,AntDesign, FontAwesome} from '@expo/vector-icons';
+import React, { useContext } from 'react';
 
+import {
+  Ionicons
+} from '@expo/vector-icons';
 
-import { useFocusEffect } from '@react-navigation/native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { UserContext } from './UserContext';
 
-import LottieView from 'lottie-react-native';
+export default function MainHeader({ title, subtitle }) {
 
-export default function MainHeader({title, subtitle}){
-
- // const navigation = useNavigation();
-  const {width, height} = Dimensions.get('window');
-  
-
+  const { width, height } = Dimensions.get('window');
 
   const router = useRouter();
   const navigation = useNavigation();
 
-  const openMenu = () => navigation.dispatch(DrawerActions.openDrawer());
- const GoHome = () => router.push("/(main)/home");
+  const { userData } = useContext(UserContext);
 
+  const openMenu = () =>
+    navigation.dispatch(DrawerActions.openDrawer());
 
-return(
+  const GoHome = () =>
+    router.push("/(main)/home");
 
-<View style={styles.header}>
+  const roleTitle = userData?.role
+    ? `${userData.role.charAt(0).toUpperCase()}${userData.role.slice(1)} Dashboard`
+    : title;
 
-<TouchableOpacity 
- onPress={openMenu}
+  return (
 
->
-<Ionicons name="menu" size={28} color="#fff"/>
-</TouchableOpacity>
+    <View style={styles.header}>
 
-<View style={{alignItems:"center"}}>
-<Text style={styles.title}>{title}</Text>
-<Text style={styles.subtitle}>{subtitle}</Text>
-</View>
+      {/* Menu */}
+      <TouchableOpacity onPress={openMenu}>
+        <Ionicons
+          name="menu"
+          size={28}
+          color="#fff"
+        />
+      </TouchableOpacity>
 
-<Image
-source={{uri:"https://i.pravatar.cc/100"}}
-style={styles.profile}
-/>
+      {/* Center */}
+      <View style={{ alignItems: "center" }}>
+        <Text style={styles.title}>
+          {roleTitle}
+        </Text>
 
-</View>
+        <Text style={styles.subtitle}>
+          {subtitle}
+        </Text>
+      </View>
 
-);
+      {/* Profile */}
+      <Image
+        source={{
+          uri: "https://i.pravatar.cc/100"
+        }}
+        style={styles.profile}
+      />
+
+    </View>
+
+  );
 
 }
 
 const styles = StyleSheet.create({
 
-header:{
-paddingTop:60,
-paddingBottom:20,
-paddingHorizontal:20,
-flexDirection:"row",
-alignItems:"center",
-justifyContent:"space-between"
-},
+  header: {
+    paddingTop: 60,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#020617"
+  },
 
-title:{
-color:"#fff",
-fontSize:20,
-fontWeight:"bold"
-},
+  title: {
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "bold"
+  },
 
-subtitle:{
-color:"#aaa",
-fontSize:12
-},
+  subtitle: {
+    color: "#aaa",
+    fontSize: 12
+  },
 
-profile:{
-width:36,
-height:36,
-borderRadius:20
-}
+  profile: {
+    width: 36,
+    height: 36,
+    borderRadius: 20
+  }
 
 });

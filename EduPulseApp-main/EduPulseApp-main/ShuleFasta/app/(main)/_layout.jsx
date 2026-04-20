@@ -55,8 +55,7 @@ export default function MainLayout() {
 
   const [modalVisible, setModalVisible] = useState(false);
 
-  // 🔥 Notification badges (example)
-  const [notifications, setNotifications] = useState({
+  const [notifications] = useState({
     results: 3,
     parents: 2,
   });
@@ -71,6 +70,10 @@ export default function MainLayout() {
   useEffect(() => {
     checkForUpdate();
   }, []);
+
+  const roleLabel = userData?.role
+    ? `${userData.role.charAt(0).toUpperCase()}${userData.role.slice(1)} Dashboard`
+    : "School Dashboard";
 
   const checkForUpdate = async () => {
     try {
@@ -133,7 +136,6 @@ export default function MainLayout() {
     { name: "create-grade", label: "Create Grade", icon: "account-tie" },
   ];
 
-  // 🔥 FILTER BASED ON ROLE
   const filteredDrawerItems =
     userData?.role === "admin"
       ? drawerItems
@@ -144,7 +146,11 @@ export default function MainLayout() {
     const float = useSharedValue(0);
 
     useEffect(() => {
-      float.value = withRepeat(withTiming(-4, { duration: 2000 }), -1, true);
+      float.value = withRepeat(
+        withTiming(-4, { duration: 2000 }),
+        -1,
+        true
+      );
     }, []);
 
     const isActive = pathname.includes(item.name);
@@ -154,44 +160,32 @@ export default function MainLayout() {
     }));
 
     return (
-      <Animated.View entering={FadeInDown.delay(index * 100)} style={animatedStyle}>
+      <Animated.View
+        entering={FadeInDown.delay(index * 100)}
+        style={animatedStyle}
+      >
         <Pressable
           android_ripple={{ color: "rgba(255,255,255,0.2)" }}
           onPress={onPress}
           onPressIn={() => (scale.value = withSpring(0.95))}
           onPressOut={() => (scale.value = withSpring(1))}
-          style={[
-            styles.drawerItem,
-            isActive && styles.activeItem
-          ]}
+          style={[styles.drawerItem, isActive && styles.activeItem]}
         >
           <LinearGradient
             colors={isActive ? ["#22c55e", "#4ade80"] : ["#36d1dc", "#5b86e5"]}
             style={styles.iconBox}
           >
-            <MaterialCommunityIcons
-              name={item.icon}
-              size={20}
-              color="#fff"
-            />
+            <MaterialCommunityIcons name={item.icon} size={20} color="#fff" />
           </LinearGradient>
 
-          <Text style={[
-            styles.drawerLabel,
-            isActive && { color: "#22c55e" }
-          ]}>
+          <Text
+            style={[
+              styles.drawerLabel,
+              isActive && { color: "#22c55e" },
+            ]}
+          >
             {item.label}
           </Text>
-
-          {/* 🔥 BADGE */}
-          {item.badge && notifications[item.badge] > 0 && (
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>
-                {notifications[item.badge]}
-              </Text>
-            </View>
-          )}
-
         </Pressable>
       </Animated.View>
     );
@@ -230,7 +224,12 @@ export default function MainLayout() {
                     }}
                     style={styles.avatar}
                   />
+
+                  {/* 🔥 ROLE DASHBOARD TITLE */}
+                  <Text style={styles.roleTitle}>{roleLabel}</Text>
+
                   <Text style={styles.welcome}>Karibu</Text>
+
                   <Text style={styles.username}>
                     {userData?.username}
                   </Text>
@@ -238,8 +237,7 @@ export default function MainLayout() {
               </LinearGradient>
             </ImageBackground>
 
-            {/* MENU */}
-            <ScrollView contentContainerStyle={{ padding: 15, paddingBottom:100 }}>
+            <ScrollView contentContainerStyle={{ padding: 15, paddingBottom: 100 }}>
               {filteredDrawerItems.map((item, index) => (
                 <AnimatedItem
                   key={item.name}
@@ -319,13 +317,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  profileCard: { alignItems: "center" },
+  profileCard: {
+    alignItems: "center",
+  },
 
   avatar: {
     width: 70,
     height: 70,
     borderRadius: 40,
     marginBottom: 8,
+  },
+
+  roleTitle: {
+    color: "#22c55e",
+    fontSize: 16,
+    fontFamily: "Bold",
+    marginBottom: 5,
   },
 
   welcome: {
@@ -372,24 +379,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  badge: {
-    backgroundColor: "#ef4444",
-    borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-  },
-
-  badgeText: {
-    color: "#fff",
-    fontSize: 12,
-    fontWeight: "bold",
-  },
-
   logoutContainer: {
     alignItems: "center",
-    position:'absolute',
-    bottom:150,
-    right:10,
+    position: "absolute",
+    bottom: 150,
+    right: 10,
   },
 
   logoutIcon: {
