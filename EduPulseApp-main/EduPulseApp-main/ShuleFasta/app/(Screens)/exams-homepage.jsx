@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useContext, useMemo } from "react";
 import {
   View,
   Text,
@@ -15,80 +15,92 @@ import Header from "../../components/Header";
 
 import { useRouter } from "expo-router";
 
-import { Ionicons, MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 
 import * as Haptics from "expo-haptics";
 
 import styles from "../../components/LoginStyles";
 
-import * as Animatable from "react-native-animatable";
+import { UserContext } from "../../components/UserContext";
 
 export default function DashboardOptions() {
 
   const router = useRouter();
-
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
+  const { userData } = useContext(UserContext);
+
+  const role = userData?.role || "user";
+
   const pressIn = () => {
-    Animated.spring(scaleAnim,{
-      toValue:0.95,
-      useNativeDriver:true
+    Animated.spring(scaleAnim, {
+      toValue: 0.95,
+      useNativeDriver: true
     }).start();
   };
 
   const pressOut = () => {
-    Animated.spring(scaleAnim,{
-      toValue:1,
-      useNativeDriver:true
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true
     }).start();
   };
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-
-    if(hour < 12) return "Good Morning ☀️";
-    if(hour < 18) return "Good Afternoon 🌤️";
+    if (hour < 12) return "Good Morning ☀️";
+    if (hour < 18) return "Good Afternoon 🌤️";
     return "Good Evening 🌙";
   };
 
+  /* ================= OPTIONS ================= */
   const options = [
     {
-      title:"Exams Categories",
-      icon:<Ionicons name="checkmark-done" size={24} color="#fff" />,
-      route:"/(Exams)/all-exam-categories",
-      colors:["#22c55e","#4ade80","#16a34a"]
+      title: "Exams Categories",
+      icon: <Ionicons name="checkmark-done" size={24} color="#fff" />,
+      route: "/(Exams)/all-exam-categories",
+      colors: ["#22c55e", "#4ade80", "#16a34a"],
+      type: "view"
     },
     {
-      title:"Add New Category",
-      icon:<MaterialIcons name="history" size={24} color="#fff" />,
-      route:"/(Exams)/create-exam-category",
-      colors:["#3b82f6","#60a5fa","#2563eb"]
+      title: "Add New Category",
+      icon: <MaterialIcons name="add-circle" size={24} color="#fff" />,
+      route: "/(Exams)/create-exam-category",
+      colors: ["#3b82f6", "#60a5fa", "#2563eb"],
+      type: "admin"
     },
-
     {
-      title:"All Exams",
-      icon:<MaterialIcons name="history" size={24} color="#fff" />,
-      route:"(Exams)/all-exams",
-      colors:["#3b82f6","#60a5fa","#2563eb"]
+      title: "All Exams",
+      icon: <MaterialIcons name="assignment" size={24} color="#fff" />,
+      route: "(Exams)/all-exams",
+      colors: ["#8b5cf6", "#60a5fa", "#2563eb"],
+      type: "view"
     },
-
     {
-      title:"Add New Exam",
-      icon:<MaterialIcons name="history" size={24} color="#fff" />,
-      route:"(Exams)/create-exam",
-      colors:["#3b82f6","#60a5fa","#2563eb"]
-    },
-   
+      title: "Add New Exam",
+      icon: <MaterialIcons name="add" size={24} color="#fff" />,
+      route: "(Exams)/create-exam",
+      colors: ["#ef4444", "#f97316", "#dc2626"],
+      type: "admin"
+    }
   ];
 
-  return(
+  /* ================= ROLE FILTER ================= */
+  const filteredOptions = useMemo(() => {
+    if (role === "admin") return options;
+    return options.filter(item => item.type !== "admin");
+  }, [role]);
+
+  return (
     <LinearGradient
-      colors={["#020617","#0f172a","#1e293b"]}
+      colors={["#020617", "#0f172a", "#1e293b"]}
       style={styles.container}
     >
 
       <Image
-        source={{uri:"https://images.unsplash.com/photo-1577896851231-70ef18881754"}}
+        source={{
+          uri: "https://images.unsplash.com/photo-1577896851231-70ef18881754"
+        }}
         style={styles.bg}
       />
 
@@ -102,6 +114,7 @@ export default function DashboardOptions() {
         showsVerticalScrollIndicator={false}
       >
 
+        {/* GREETING */}
         <BlurView intensity={50} tint="dark" style={styles.greetingCard}>
           <Text style={styles.greetingTitle}>
             {getGreeting()}
@@ -112,14 +125,16 @@ export default function DashboardOptions() {
           </Text>
         </BlurView>
 
+        {/* OPTIONS */}
         <View style={styles.optionsContainer}>
 
-          {options.map((item,index)=>(
+          {filteredOptions.map((item, index) => (
+
             <Animated.View
               key={index}
               style={[
                 styles.cardWrapper,
-                {transform:[{scale:scaleAnim}]}
+                { transform: [{ scale: scaleAnim }] }
               ]}
             >
 
@@ -127,7 +142,7 @@ export default function DashboardOptions() {
                 activeOpacity={0.9}
                 onPressIn={pressIn}
                 onPressOut={pressOut}
-                onPress={()=>{
+                onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                   router.push(item.route);
                 }}
@@ -135,15 +150,14 @@ export default function DashboardOptions() {
 
                 <LinearGradient
                   colors={item.colors}
-                  start={{x:0,y:0}}
-                  end={{x:1,y:1}}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
                   style={styles.card}
                 >
 
                   <View style={styles.cardContent}>
 
                     <View style={styles.leftContent}>
-
                       <View style={styles.iconBox}>
                         {item.icon}
                       </View>
@@ -151,10 +165,13 @@ export default function DashboardOptions() {
                       <Text style={styles.cardText}>
                         {item.title}
                       </Text>
-
                     </View>
 
-                    <Ionicons name="chevron-forward" size={22} color="#fff" />
+                    <Ionicons
+                      name="chevron-forward"
+                      size={22}
+                      color="#fff"
+                    />
 
                   </View>
 
@@ -163,10 +180,12 @@ export default function DashboardOptions() {
               </TouchableOpacity>
 
             </Animated.View>
+
           ))}
 
         </View>
 
+        {/* FOOTER */}
         <BlurView intensity={30} tint="dark" style={styles.footer}>
           <Text style={styles.footerText}>
             Shule Fasta 🚀 | Smart School System

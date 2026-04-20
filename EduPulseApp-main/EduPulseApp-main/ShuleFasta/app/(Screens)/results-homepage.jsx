@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useContext } from "react";
 import {
   View,
   Text,
@@ -23,70 +23,87 @@ import styles from "../../components/LoginStyles";
 
 import * as Animatable from "react-native-animatable";
 
+import { UserContext } from "../../components/UserContext";
+
 export default function DashboardOptions() {
 
   const router = useRouter();
+  const { userData } = useContext(UserContext);
+
+  const role = userData?.role;
 
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const pressIn = () => {
-    Animated.spring(scaleAnim,{
-      toValue:0.95,
-      useNativeDriver:true
+    Animated.spring(scaleAnim, {
+      toValue: 0.95,
+      useNativeDriver: true
     }).start();
   };
 
   const pressOut = () => {
-    Animated.spring(scaleAnim,{
-      toValue:1,
-      useNativeDriver:true
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true
     }).start();
   };
 
   const getGreeting = () => {
     const hour = new Date().getHours();
 
-    if(hour < 12) return "Good Morning ☀️";
-    if(hour < 18) return "Good Afternoon 🌤️";
+    if (hour < 12) return "Good Morning ☀️";
+    if (hour < 18) return "Good Afternoon 🌤️";
     return "Good Evening 🌙";
   };
 
+  /* ================= ROLE BASED OPTIONS ================= */
   const options = [
     {
-      title:"Get Results",
-      icon:<Ionicons name="checkmark-done" size={24} color="#fff" />,
-      route:"(Results)/get-exams-categories",
-      colors:["#22c55e","#4ade80","#16a34a"]
+      title: "Get Results",
+      icon: <Ionicons name="checkmark-done" size={24} color="#fff" />,
+      route: "(Results)/get-exams-categories",
+      colors: ["#22c55e", "#4ade80", "#16a34a"],
+      adminOnly: false
     },
     {
-      title:"Add Single Results",
-      icon:<MaterialIcons name="history" size={24} color="#fff" />,
-      route:"(Results)/add-single-results",
-      colors:["#3b82f6","#60a5fa","#2563eb"]
+      title: "Add Single Results",
+      icon: <MaterialIcons name="history" size={24} color="#fff" />,
+      route: "(Results)/add-single-results",
+      colors: ["#3b82f6", "#60a5fa", "#2563eb"],
+      adminOnly: true
     },
     {
-      title:"Add Multiple Results",
-      icon:<Ionicons name="people" size={24} color="#fff" />,
-      route:"(Results)/add-multiple-results",
-      colors:["#9333ea","#c084fc","#7e22ce"]
+      title: "Add Multiple Results",
+      icon: <Ionicons name="people" size={24} color="#fff" />,
+      route: "(Results)/add-multiple-results",
+      colors: ["#9333ea", "#c084fc", "#7e22ce"],
+      adminOnly: true
     },
     {
-      title:"Parents",
-      icon:<FontAwesome5 name="file-alt" size={22} color="#fff" />,
-      route:"(Parents)/parents-exam-categories",
-      colors:["#f59e0b","#fbbf24","#d97706"]
-    },
-    
+      title: "Parents",
+      icon: <FontAwesome5 name="file-alt" size={22} color="#fff" />,
+      route: "(Parents)/parents-exam-categories",
+      colors: ["#f59e0b", "#fbbf24", "#d97706"],
+      adminOnly: false
+    }
   ];
 
-  return(
+  /* 🔥 FILTER BASED ON ROLE */
+  const filteredOptions =
+    role === "admin"
+      ? options
+      : options.filter(item => !item.adminOnly);
+
+  return (
     <LinearGradient
-      colors={["#020617","#0f172a","#1e293b"]}
+      colors={["#020617", "#0f172a", "#1e293b"]}
       style={styles.container}
     >
 
       <Image
-        source={{uri:"https://images.unsplash.com/photo-1577896851231-70ef18881754"}}
+        source={{
+          uri: "https://images.unsplash.com/photo-1577896851231-70ef18881754"
+        }}
         style={styles.bg}
       />
 
@@ -112,12 +129,12 @@ export default function DashboardOptions() {
 
         <View style={styles.optionsContainer}>
 
-          {options.map((item,index)=>(
+          {filteredOptions.map((item, index) => (
             <Animated.View
               key={index}
               style={[
                 styles.cardWrapper,
-                {transform:[{scale:scaleAnim}]}
+                { transform: [{ scale: scaleAnim }] }
               ]}
             >
 
@@ -125,7 +142,7 @@ export default function DashboardOptions() {
                 activeOpacity={0.9}
                 onPressIn={pressIn}
                 onPressOut={pressOut}
-                onPress={()=>{
+                onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                   router.push(item.route);
                 }}
@@ -133,8 +150,8 @@ export default function DashboardOptions() {
 
                 <LinearGradient
                   colors={item.colors}
-                  start={{x:0,y:0}}
-                  end={{x:1,y:1}}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
                   style={styles.card}
                 >
 
@@ -152,7 +169,11 @@ export default function DashboardOptions() {
 
                     </View>
 
-                    <Ionicons name="chevron-forward" size={22} color="#fff" />
+                    <Ionicons
+                      name="chevron-forward"
+                      size={22}
+                      color="#fff"
+                    />
 
                   </View>
 
