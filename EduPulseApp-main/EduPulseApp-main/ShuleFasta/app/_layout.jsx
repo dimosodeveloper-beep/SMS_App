@@ -1,11 +1,13 @@
-// app/_layout.jsx
 import { Slot } from "expo-router";
 import { UserProvider } from "../components/UserContext";
+import { LanguageProvider } from "../components/LanguageContext";
 
 export default function RootLayout() {
   return (
     <UserProvider>
-      <Slot />
+      <LanguageProvider>
+        <Slot />
+      </LanguageProvider>
     </UserProvider>
   );
 }

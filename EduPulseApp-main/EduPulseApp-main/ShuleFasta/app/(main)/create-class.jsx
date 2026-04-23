@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useContext} from "react";
 
 import{
 View,
@@ -24,8 +24,11 @@ import * as Haptics from "expo-haptics";
 import styles from "../../components/LoginStyles";
 import {EndPoint} from "../../components/links";
 import Header from "../../components/Header";
+import { LanguageContext } from "../../components/LanguageContext";
 
 export default function CreateClass(){
+
+const { t } = useContext(LanguageContext);
 
 const[name,setName] = useState("");
 
@@ -78,8 +81,8 @@ if(!name){
 
 Toast.show({
 type:"error",
-text1:"Missing Field",
-text2:"Enter class name"
+text1:t("missing_field"),
+text2:t("enter_class_name")
 });
 
 return;
@@ -89,8 +92,8 @@ if(!token){
 
 Toast.show({
 type:"error",
-text1:"Authentication Error",
-text2:"Login again"
+text1:t("auth_error"),
+text2:t("login_again")
 });
 
 return;
@@ -129,8 +132,8 @@ setLoading(false);
 
 Toast.show({
 type:"success",
-text1:"Class Created",
-text2:"Classroom added successfully"
+text1:t("class_created"),
+text2:t("class_created_success")
 });
 
 setName("");
@@ -143,7 +146,7 @@ console.log("FULL ERROR => ",error.response?.data);
 
 Toast.show({
 type:"error",
-text1:"Error",
+text1:t("error"),
 text2:JSON.stringify(error.response?.data)
 });
 
@@ -166,8 +169,8 @@ style={styles.bg}
 />
 
 <Header
-title="School Dashboard"
-subtitle="Management System"
+title={t("school_dashboard")}
+subtitle={t("management_system")}
 />
 
 <ScrollView
@@ -182,24 +185,24 @@ keyboardShouldPersistTaps="handled"
 <BlurView intensity={40} tint="dark" style={styles.blur}>
 
 <Text style={styles.title}>
-Create Class
+{t("create_class")}
 </Text>
 
 <Text style={styles.subtitle}>
-School Management System
+{t("management_system")}
 </Text>
 
 <View style={styles.form}>
 
 <Text style={styles.label}>
-Class Name
+{t("class_name")}
 </Text>
 
 <TextInput
 style={styles.input}
 value={name}
 onChangeText={setName}
-placeholder="Example: Form 1"
+placeholder={t("example_form")}
 placeholderTextColor="#94a3b8"
 />
 
@@ -217,7 +220,7 @@ style={styles.button}
 >
 
 <Text style={styles.buttonText}>
-Create Class
+{t("create_class")}
 </Text>
 
 </LinearGradient>
@@ -245,7 +248,7 @@ color="#2563eb"
 />
 
 <Text style={styles.loadingText}>
-Creating class...
+{t("creating_class")}
 </Text>
 
 </View>

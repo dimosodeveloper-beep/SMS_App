@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   Image,
   Animated,
-  ActivityIndicator
+  ActivityIndicator,
+  Modal,
 } from "react-native";
 
 import { EventRegister } from "react-native-event-listeners";
@@ -32,7 +33,13 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [remember, setRemember] = useState(false);
+
+  // 🌍 LANGUAGE STATE
+  const [language, setLanguage] = useState("EN");
+
+  // MODAL CONTROL
+  const [langModalVisible, setLangModalVisible] = useState(false);
+  const [selectedLang, setSelectedLang] = useState(null);
 
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const shakeAnim = useRef(new Animated.Value(0)).current;
@@ -68,13 +75,14 @@ export default function Login() {
     ]).start();
   };
 
+  // ================= LOGIN =================
   const loginUser = async () => {
     if (!username || !password) {
       shake();
       Toast.show({
         type: "error",
-        text1: "Missing Fields",
-        text2: "Fill all fields"
+        text1: language === "EN" ? "Missing Fields" : "Taarifa hazijakamilika",
+        text2: language === "EN" ? "Fill all fields" : "Jaza taarifa zote"
       });
       return;
     }
@@ -101,12 +109,11 @@ export default function Login() {
 
       Toast.show({
         type: "success",
-        text1: "Login Successful"
+        text1: "Login Successfully"
       });
 
-      // 🔥 ROLE CHECKING HERE
       if (userData.role === "parent") {
-        router.replace("/(parent)/parent_home");
+        router.replace("/(Parents)/parent_home");
       } else {
         router.replace("/(main)/home");
       }
@@ -123,6 +130,7 @@ export default function Login() {
     }
   };
 
+  // ================= BIOMETRIC =================
   const biometricLogin = async () => {
     const result = await LocalAuthentication.authenticateAsync({
       promptMessage: "Login with Biometrics"
@@ -139,15 +147,48 @@ export default function Login() {
         } else {
           router.replace("/(main)/home");
         }
-      } else {
-        router.replace("/login");
       }
     }
+  };
+
+  // ================= LANGUAGE SELECT =================
+  const openLanguageModal = (lang) => {
+    setSelectedLang(lang);
+    setLangModalVisible(true);
+  };
+
+  const confirmLanguage = () => {
+    if (selectedLang === "EN") setLanguage("EN");
+    if (selectedLang === "SW") setLanguage("SW");
+
+    setLangModalVisible(false);
+
+    Toast.show({
+      type: "success",
+      text1:
+        selectedLang === "EN"
+          ? "Language changed to English"
+          : "Lugha imebadilishwa kwenda Kiswahili"
+    });
   };
 
   return (
     <LinearGradient colors={["#020617", "#0f172a", "#1e3a8a"]} style={{ flex: 1, justifyContent: "center" }}>
 
+      {/* LANGUAGE BUTTON */}
+      <View style={{ position: "absolute", top: 50, right: 20, flexDirection: "row", gap: 10, zIndex: 10 }}>
+        
+        <TouchableOpacity onPress={() => openLanguageModal("EN")}>
+          <Text style={{ fontSize: 22 }}>🇬🇧</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => openLanguageModal("SW")}>
+          <Text style={{ fontSize: 22 }}>🇹🇿</Text>
+        </TouchableOpacity>
+
+      </View>
+
+      {/* BACKGROUND */}
       <Image
         source={{ uri: "https://images.unsplash.com/photo-1588072432836-e10032774350" }}
         style={{ position: "absolute", width: "100%", height: "100%" }}
@@ -204,11 +245,54 @@ export default function Login() {
         </BlurView>
       </Animated.View>
 
+      {/* LOADER */}
       {loading && (
         <View style={loaderStyle}>
           <ActivityIndicator size="large" color="#fff" />
         </View>
       )}
+
+      {/* LANGUAGE MODAL */}
+      <Modal transparent visible={langModalVisible} animationType="fade">
+        <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "center", alignItems: "center" }}>
+          
+          <View style={{ backgroundColor: "#0f172a", padding: 25, borderRadius: 20, width: "80%" }}>
+
+            <Text style={{ color: "#fff", fontSize: 18, marginBottom: 20, textAlign: "center" }}>
+              {selectedLang === "EN"
+                ? "Change language to English?"
+                : "Badilisha lugha kwenda Kiswahili?"}
+            </Text>
+            {selectedLang === "EN" ? (
+            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+             
+              <TouchableOpacity onPress={() => setLangModalVisible(false)}>
+                <Text style={{ color: "#ef4444", fontWeight: "bold" }}>Cancel</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={confirmLanguage}>
+                <Text style={{ color: "#22c55e", fontWeight: "bold" }}>Confirm</Text>
+              </TouchableOpacity>
+
+            </View>):(
+
+                  <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+             
+              <TouchableOpacity onPress={() => setLangModalVisible(false)}>
+                <Text style={{ color: "#ef4444", fontWeight: "bold" }}>Hapana</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={confirmLanguage}>
+                <Text style={{ color: "#22c55e", fontWeight: "bold" }}>Kubali</Text>
+              </TouchableOpacity>
+
+            </View>
+            )}
+
+          </View>
+
+        </View>
+      </Modal>
 
       <Toast />
     </LinearGradient>

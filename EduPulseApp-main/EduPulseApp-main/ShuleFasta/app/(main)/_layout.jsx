@@ -26,6 +26,7 @@ import axios from "axios";
 import { StatusBar } from "expo-status-bar";
 
 import { UserContext } from "../../components/UserContext";
+import { LanguageContext } from "../../components/LanguageContext";
 
 import { EndPoint } from "../../components/links";
 
@@ -53,7 +54,11 @@ export default function MainLayout() {
   const { userData, userToken, setUserData, setUserToken } =
     useContext(UserContext);
 
+  const { language, changeLanguage, t } = useContext(LanguageContext);
+
   const [modalVisible, setModalVisible] = useState(false);
+  const [langModal, setLangModal] = useState(false);
+  const [selectedLang, setSelectedLang] = useState("en");
 
   const [notifications] = useState({
     results: 3,
@@ -72,8 +77,8 @@ export default function MainLayout() {
   }, []);
 
   const roleLabel = userData?.role
-    ? `${userData.role.charAt(0).toUpperCase()}${userData.role.slice(1)} Dashboard`
-    : "School Dashboard";
+    ? `${userData.role.charAt(0).toUpperCase()}${userData.role.slice(1)} ${t("dashboard")}`
+    : `School ${t("dashboard")}`;
 
   const checkForUpdate = async () => {
     try {
@@ -85,17 +90,17 @@ export default function MainLayout() {
 
       if (currentVersion < latestVersion) {
         Alert.alert(
-          "New Version Available",
-          "Please update the application.",
+          t("new_version"),
+          t("update_required"),
           [
             {
-              text: "Download",
+              text: t("download"),
               onPress: () =>
                 Linking.openURL(
                   "https://play.google.com/store/apps/details?id=ttpc.AgriHub"
                 ),
             },
-            { text: "Later", style: "cancel" },
+            { text: t("later"), style: "cancel" },
           ]
         );
       }
@@ -122,18 +127,23 @@ export default function MainLayout() {
     }
   };
 
+  const confirmLanguageChange = async () => {
+    await changeLanguage(selectedLang);
+    setLangModal(false);
+  };
+
   if (!fontsLoaded) return null;
 
   const drawerItems = [
-    { name: "home", label: "Home", icon: "view-dashboard" },
-    { name: "register-user", label: "Register User", icon: "account-group" },
-    { name: "create-class", label: "Create Class", icon: "account-tie" },
-    { name: "create-stream", label: "Create Stream", icon: "file-document-edit" },
-    { name: "create-student", label: "Create Student", icon: "chart-bar" },
-    { name: "create-teacher", label: "Create Teacher", icon: "chart-bar" },
-    { name: "create-timetable", label: "Create Timetable", icon: "chart-bar" },
-    { name: "create-event", label: "Create Events", icon: "view-dashboard" },
-    { name: "create-grade", label: "Create Grade", icon: "account-tie" },
+    { name: "home", label: t("home"), icon: "view-dashboard" },
+    { name: "register-user", label: t("register_user"), icon: "account-group" },
+    { name: "create-class", label: t("create_class"), icon: "account-tie" },
+    { name: "create-stream", label: t("create_stream"), icon: "file-document-edit" },
+    { name: "create-student", label: t("create_student"), icon: "chart-bar" },
+    { name: "create-teacher", label: t("create_teacher"), icon: "chart-bar" },
+    { name: "create-timetable", label: t("create_timetable"), icon: "chart-bar" },
+    { name: "create-event", label: t("create_event"), icon: "view-dashboard" },
+    { name: "create-grade", label: t("create_grade"), icon: "account-tie" },
   ];
 
   const filteredDrawerItems =
@@ -160,10 +170,7 @@ export default function MainLayout() {
     }));
 
     return (
-      <Animated.View
-        entering={FadeInDown.delay(index * 100)}
-        style={animatedStyle}
-      >
+      <Animated.View entering={FadeInDown.delay(index * 100)} style={animatedStyle}>
         <Pressable
           android_ripple={{ color: "rgba(255,255,255,0.2)" }}
           onPress={onPress}
@@ -178,12 +185,7 @@ export default function MainLayout() {
             <MaterialCommunityIcons name={item.icon} size={20} color="#fff" />
           </LinearGradient>
 
-          <Text
-            style={[
-              styles.drawerLabel,
-              isActive && { color: "#22c55e" },
-            ]}
-          >
+          <Text style={[styles.drawerLabel, isActive && { color: "#22c55e" }]}>
             {item.label}
           </Text>
         </Pressable>
@@ -202,37 +204,34 @@ export default function MainLayout() {
           },
         }}
         drawerContent={(props) => (
-          <LinearGradient
-            colors={["#0f2027", "#203a43", "#2c5364"]}
-            style={{ flex: 1 }}
-          >
+          <LinearGradient colors={["#0f2027", "#203a43", "#2c5364"]} style={{ flex: 1 }}>
+
+            {/* LANGUAGE BUTTONS */}
+            <View style={{ flexDirection: "row", justifyContent: "center", marginTop: 20, gap: 20 }}>
+              <TouchableOpacity onPress={() => { setSelectedLang("en"); setLangModal(true); }}>
+                <Text style={{ fontSize: 26 }}>🇬🇧</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => { setSelectedLang("sw"); setLangModal(true); }}>
+                <Text style={{ fontSize: 26 }}>🇹🇿</Text>
+              </TouchableOpacity>
+            </View>
+
             {/* HEADER */}
             <ImageBackground
-              source={{
-                uri: "https://images.unsplash.com/photo-1523240795612-9a054b0db644",
-              }}
+              source={{ uri: "https://images.unsplash.com/photo-1523240795612-9a054b0db644" }}
               style={styles.headerImage}
             >
-              <LinearGradient
-                colors={["rgba(0,0,0,0.7)", "rgba(0,0,0,0.2)"]}
-                style={styles.headerOverlay}
-              >
+              <LinearGradient colors={["rgba(0,0,0,0.7)", "rgba(0,0,0,0.2)"]} style={styles.headerOverlay}>
                 <View style={styles.profileCard}>
                   <Image
-                    source={{
-                      uri: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
-                    }}
+                    source={{ uri: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png" }}
                     style={styles.avatar}
                   />
 
-                  {/* 🔥 ROLE DASHBOARD TITLE */}
                   <Text style={styles.roleTitle}>{roleLabel}</Text>
-
-                  <Text style={styles.welcome}>Karibu</Text>
-
-                  <Text style={styles.username}>
-                    {userData?.username}
-                  </Text>
+                  <Text style={styles.welcome}>{t("welcome")}</Text>
+                  <Text style={styles.username}>{userData?.username}</Text>
                 </View>
               </LinearGradient>
             </ImageBackground>
@@ -250,56 +249,61 @@ export default function MainLayout() {
 
             {/* LOGOUT */}
             <View style={styles.logoutContainer}>
-              <Pressable
-                onPress={() => setModalVisible(true)}
-                style={({ pressed }) => [
-                  styles.logoutButton,
-                  pressed && { transform: [{ scale: 0.9 }] },
-                ]}
-              >
-                <LinearGradient
-                  colors={["#ff416c", "#ff4b2b"]}
-                  style={styles.logoutIcon}
-                >
+              <Pressable onPress={() => setModalVisible(true)}>
+                <LinearGradient colors={["#ff416c", "#ff4b2b"]} style={styles.logoutIcon}>
                   <FontAwesome name="sign-out" size={22} color="#fff" />
                 </LinearGradient>
               </Pressable>
             </View>
 
-            {/* MODAL */}
-            <Modal visible={modalVisible} transparent animationType="fade">
+            {/* LANGUAGE MODAL */}
+            <Modal visible={langModal} transparent animationType="fade">
               <View style={styles.modalOverlay}>
                 <View style={styles.modalBox}>
-                  <Text style={styles.modalTitle}>Logout</Text>
-                  <Text style={styles.modalText}>
-                    {userData?.username}, do you want to logout?
+                  <Text style={styles.modalTitle}>
+                    {selectedLang === "en" ? t("change_to_english") : t("change_to_swahili")}
                   </Text>
 
                   <View style={styles.modalButtons}>
-                    <TouchableOpacity onPress={() => setModalVisible(false)}>
-                      <Text style={{ color: "#ef4444", fontFamily: "Bold" }}>
-                        NO
-                      </Text>
+                    <TouchableOpacity onPress={() => setLangModal(false)}>
+                      <Text style={{ color: "#ef4444", fontFamily: "Bold" }}>{t("no")}</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={handleLogout}>
-                      <Text style={{ color: "#22c55e", fontFamily: "Bold" }}>
-                        YES
-                      </Text>
+                    <TouchableOpacity onPress={confirmLanguageChange}>
+                      <Text style={{ color: "#22c55e", fontFamily: "Bold" }}>{t("yes")}</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
               </View>
             </Modal>
+
+            {/* LOGOUT MODAL */}
+            <Modal visible={modalVisible} transparent animationType="fade">
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalBox}>
+                  <Text style={styles.modalTitle}>{t("logout")}</Text>
+                  <Text style={styles.modalText}>
+                    {userData?.username}, {t("confirm_logout")}
+                  </Text>
+
+                  <View style={styles.modalButtons}>
+                    <TouchableOpacity onPress={() => setModalVisible(false)}>
+                      <Text style={{ color: "#ef4444", fontFamily: "Bold" }}>{t("no")}</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={handleLogout}>
+                      <Text style={{ color: "#22c55e", fontFamily: "Bold" }}>{t("yes")}</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </Modal>
+
           </LinearGradient>
         )}
       >
         {filteredDrawerItems.map((item) => (
-          <Drawer.Screen
-            key={item.name}
-            name={item.name}
-            options={{ drawerLabel: item.label }}
-          />
+          <Drawer.Screen key={item.name} name={item.name} options={{ drawerLabel: item.label }} />
         ))}
       </Drawer>
 
@@ -310,43 +314,12 @@ export default function MainLayout() {
 
 const styles = StyleSheet.create({
   headerImage: { height: 220, width: "100%" },
-
-  headerOverlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  profileCard: {
-    alignItems: "center",
-  },
-
-  avatar: {
-    width: 70,
-    height: 70,
-    borderRadius: 40,
-    marginBottom: 8,
-  },
-
-  roleTitle: {
-    color: "#22c55e",
-    fontSize: 16,
-    fontFamily: "Bold",
-    marginBottom: 5,
-  },
-
-  welcome: {
-    color: "#ccc",
-    fontSize: 14,
-    fontFamily: "Medium",
-  },
-
-  username: {
-    color: "#fff",
-    fontSize: 20,
-    fontFamily: "Bold",
-  },
-
+  headerOverlay: { flex: 1, justifyContent: "center", alignItems: "center" },
+  profileCard: { alignItems: "center" },
+  avatar: { width: 70, height: 70, borderRadius: 40, marginBottom: 8 },
+  roleTitle: { color: "#22c55e", fontSize: 16, fontFamily: "Bold", marginBottom: 5 },
+  welcome: { color: "#ccc", fontSize: 14, fontFamily: "Medium" },
+  username: { color: "#fff", fontSize: 20, fontFamily: "Bold" },
   drawerItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -357,12 +330,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.08)",
   },
-
-  activeItem: {
-    backgroundColor: "rgba(2, 20, 18, 0.86)",
-    borderColor: "#22c55e",
-  },
-
+  activeItem: { backgroundColor: "rgba(2, 20, 18, 0.86)", borderColor: "#22c55e" },
   iconBox: {
     width: 38,
     height: 38,
@@ -371,55 +339,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 12,
   },
-
-  drawerLabel: {
-    color: "#fff",
-    fontFamily: "Medium",
-    fontSize: 15,
-    flex: 1,
-  },
-
-  logoutContainer: {
-    alignItems: "center",
-    position: "absolute",
-    bottom: 150,
-    right: 10,
-  },
-
-  logoutIcon: {
-    padding: 15,
-    borderRadius: 50,
-  },
-
+  drawerLabel: { color: "#fff", fontFamily: "Medium", fontSize: 15, flex: 1 },
+  logoutContainer: { alignItems: "center", position: "absolute", bottom: 150, right: 10 },
+  logoutIcon: { padding: 15, borderRadius: 50 },
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.6)",
   },
-
   modalBox: {
     width: "80%",
     backgroundColor: "#1e293b",
     padding: 25,
     borderRadius: 15,
   },
-
-  modalTitle: {
-    fontSize: 18,
-    color: "#fff",
-    fontFamily: "Bold",
-    marginBottom: 10,
-  },
-
-  modalText: {
-    color: "#ccc",
-    marginBottom: 20,
-    fontFamily: "Regular",
-  },
-
-  modalButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
+  modalTitle: { fontSize: 18, color: "#fff", fontFamily: "Bold", marginBottom: 10 },
+  modalText: { color: "#ccc", marginBottom: 20, fontFamily: "Regular" },
+  modalButtons: { flexDirection: "row", justifyContent: "space-between" },
 });

@@ -25,6 +25,8 @@ import axios from "axios";
 import { EndPoint } from "../../components/links";
 import { useRouter } from "expo-router";
 
+import i18n from "../../components/translations";
+
 export default function ParentHome() {
   const router = useRouter();
   const { setUserData, setUserToken } = useContext(UserContext);
@@ -65,40 +67,39 @@ export default function ParentHome() {
     }
   };
 
-  /* ================= MENU ================= */
   const menu = [
     {
-      title: "Results",
+      title: i18n.t("results"),
       icon: "assessment",
       route: "/(Parents)/parents-exam-categories",
       color: ["#4f46e5", "#06b6d4"],
     },
     {
-      title: "Attendance",
+      title: i18n.t("attendance"),
       icon: "how-to-reg",
       route: "/(Screens)/attendance-homepage",
       color: ["#f97316", "#ef4444"],
     },
     {
-      title: "Events",
+      title: i18n.t("all_events"),
       icon: "event",
       route: "/(Calender)/events-calender",
       color: ["#22c55e", "#16a34a"],
     },
     {
-      title: "Reports",
+      title: i18n.t("view_reports"),
       icon: "bar-chart",
       route: "/(Reports)/report-exam-categories",
       color: ["#a855f7", "#ec4899"],
     },
     {
-      title: "TimeTable",
+      title: i18n.t("timetable"),
       icon: "schedule",
       route: "/(Timetable)/timetable-class",
       color: ["#0ea5e9", "#2563eb"],
     },
     {
-      title: "ShuleFasta",
+      title: i18n.t("about_app"),
       icon: "school",
       route: "/(Screens)/AboutApp",
       color: ["#f59e0b", "#ef4444"],
@@ -156,68 +157,67 @@ export default function ParentHome() {
     <LinearGradient colors={["#020617", "#0f172a", "#020617"]} style={styles.container}>
       <StatusBar barStyle="light-content" />
 
-      {/* HEADER */}
       <ParentHeader
-        title="Parent Dashboard"
-        subtitle="Monitor your child progress"
+        title={i18n.t("dashboard")}
+        subtitle={i18n.t("dashboard_description")}
       />
 
-      {/* HERO */}
       <LinearGradient colors={["#2563eb", "#7c3aed"]} style={styles.hero}>
-        <Text style={styles.heroTitle}>Welcome Parent 👋</Text>
+        <Text style={styles.heroTitle}>{i18n.t("welcome")} 👋</Text>
         <Text style={styles.heroText}>
-          Everything is now organized for your child’s academic journey
+          {i18n.t("dashboard_description")}
         </Text>
       </LinearGradient>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* GRID */}
         <View style={styles.grid}>
           {menu.map((item, index) => (
             <Card key={index} item={item} />
           ))}
         </View>
 
-        {/* PARENT INSIGHTS (RESTORED) */}
         <View style={styles.insight}>
-          <Text style={styles.sectionTitle}>Parent Insights</Text>
+          <Text style={styles.sectionTitle}>{i18n.t("dashboard")}</Text>
 
           <View style={styles.insightCard}>
-            <Text style={styles.insightText}>📊 Track academic performance in real time</Text>
-            <Text style={styles.insightText}>📅 Monitor attendance history</Text>
-            <Text style={styles.insightText}>🏆 View exam & event updates</Text>
-            <Text style={styles.insightText}>📩 Receive instant notifications</Text>
-            <Text style={styles.insightText}>🕒 Check timetable anytime</Text>
+            <Text style={styles.insightText}>📊 {i18n.t("dashboard_description")}</Text>
+            <Text style={styles.insightText}>📅 {i18n.t("attendance")}</Text>
+            <Text style={styles.insightText}>🏆 {i18n.t("results")}</Text>
+            <Text style={styles.insightText}>📩 {i18n.t("recent_activities")}</Text>
+            <Text style={styles.insightText}>🕒 {i18n.t("timetable")}</Text>
           </View>
         </View>
 
-        {/* LOGOUT BUTTON */}
         <View style={styles.logoutBox}>
           <Pressable onPress={() => setLogoutModal(true)} style={styles.logoutBtn}>
             <FontAwesome name="sign-out" size={20} color="#fff" />
-            <Text style={{ color: "#fff", marginLeft: 10 }}>Logout</Text>
+            <Text style={{ color: "#fff", marginLeft: 10 }}>
+              {i18n.t("logout")}
+            </Text>
           </Pressable>
         </View>
 
         <View style={{ height: 40 }} />
       </ScrollView>
 
-      {/* LOGOUT MODAL */}
       <Modal transparent visible={logoutModal} animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalBox}>
-            <Text style={styles.modalTitle}>Logout</Text>
+            <Text style={styles.modalTitle}>{i18n.t("logout")}</Text>
+
             <Text style={styles.modalText}>
-              Are you sure you want to logout?
+              {i18n.t("confirm_logout")}
             </Text>
 
             <View style={styles.modalActions}>
               <TouchableOpacity onPress={() => setLogoutModal(false)}>
-                <Text style={{ color: "#ef4444" }}>Cancel</Text>
+                <Text style={{ color: "#ef4444" }}>{i18n.t("no")}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity onPress={handleLogout}>
-                <Text style={{ color: "#22c55e" }}>Yes Logout</Text>
+                <Text style={{ color: "#22c55e" }}>
+                  {i18n.t("yes")}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -227,7 +227,7 @@ export default function ParentHome() {
   );
 }
 
-/* ================= STYLES ================= */
+/* styles unchanged (NOT MODIFIED) */
 const styles = StyleSheet.create({
   container: { flex: 1 },
 
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
   logoutBox: {
     alignItems: "center",
     marginTop: 20,
-    marginBottom:100,
+    marginBottom: 100,
   },
 
   logoutBtn: {

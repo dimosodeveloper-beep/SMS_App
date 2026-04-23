@@ -1,5 +1,4 @@
 import { useRouter } from "expo-router";
-import { useNavigation, DrawerActions } from "@react-navigation/native";
 import React, { useContext } from "react";
 import {
   StyleSheet,
@@ -8,34 +7,30 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { UserContext } from "./UserContext";
+import i18n from "./translations";
 
 export default function ParentHeader({ title, subtitle }) {
-  const router = useRouter();
-  const navigation = useNavigation();
+
   const { userData } = useContext(UserContext);
 
   const roleTitle = userData?.role
-    ? `${userData.role.charAt(0).toUpperCase()}${userData.role.slice(1)} Dashboard`
+    ? `${userData.role.charAt(0).toUpperCase()}${userData.role.slice(1)} ${i18n.t("dashboard_title")}`
     : title;
 
   return (
     <View style={styles.header}>
 
-      {/* LEFT - App Icon (NO MENU) */}
       <Image
         source={require("../assets/icon.png")}
         style={styles.appIcon}
       />
 
-      {/* CENTER */}
       <View style={{ alignItems: "center" }}>
         <Text style={styles.title}>{roleTitle}</Text>
         <Text style={styles.subtitle}>{subtitle}</Text>
       </View>
 
-      {/* RIGHT - PROFILE */}
       <TouchableOpacity>
         <Image
           source={{ uri: "https://i.pravatar.cc/100" }}

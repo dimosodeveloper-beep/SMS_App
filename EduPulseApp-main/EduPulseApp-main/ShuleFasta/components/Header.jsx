@@ -12,13 +12,13 @@ import {
 import React, { useContext } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { UserContext } from './UserContext';
+import i18n from "./translations";
 
 export default function Header({ title, subtitle }) {
 
   const router = useRouter();
   const navigation = useNavigation();
   const { width, height } = Dimensions.get('window');
-
   const { userData } = useContext(UserContext);
 
   const goBack = () => {
@@ -27,7 +27,6 @@ export default function Header({ title, subtitle }) {
     }
   };
 
-  // 🔥 ROLE BASED HOME NAVIGATION
   const goHome = () => {
     if (userData?.role === "parent") {
       router.push("/(Parents)/parent_home");
@@ -37,43 +36,25 @@ export default function Header({ title, subtitle }) {
   };
 
   const roleTitle = userData?.role
-    ? `${userData.role.charAt(0).toUpperCase()}${userData.role.slice(1)} Dashboard`
+    ? `${userData.role.charAt(0).toUpperCase()}${userData.role.slice(1)} ${i18n.t("dashboard_title")}`
     : title;
 
   return (
     <View style={styles.header}>
 
-      {/* LEFT BACK */}
-      <TouchableOpacity
-        onPress={goBack}
-        style={styles.leftBtn}
-      >
-        <Ionicons
-          name="arrow-back-circle"
-          size={36}
-          color="#38bdf8"
-        />
+      <TouchableOpacity onPress={goBack} style={styles.leftBtn}>
+        <Ionicons name="arrow-back-circle" size={36} color="#38bdf8" />
       </TouchableOpacity>
 
-      {/* CENTER */}
       <View style={styles.center}>
         <Text style={styles.title}>{roleTitle}</Text>
-
         {subtitle ? (
           <Text style={styles.subtitle}>{subtitle}</Text>
         ) : null}
       </View>
 
-      {/* RIGHT HOME (ROLE BASED) */}
-      <TouchableOpacity
-        onPress={goHome}
-        style={styles.rightBtn}
-      >
-        <Ionicons
-          name="home"
-          size={36}
-          color="#38bdf8"
-        />
+      <TouchableOpacity onPress={goHome} style={styles.rightBtn}>
+        <Ionicons name="home" size={36} color="#38bdf8" />
       </TouchableOpacity>
 
     </View>
