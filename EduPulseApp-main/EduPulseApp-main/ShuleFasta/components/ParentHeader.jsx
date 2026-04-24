@@ -26,17 +26,12 @@ export default function ParentHeader({ title, subtitle }) {
         style={styles.appIcon}
       />
 
-      <View style={{ alignItems: "center" }}>
+      <View style={{ alignItems: "center", marginLeft:20 }}>
         <Text style={styles.title}>{roleTitle}</Text>
         <Text style={styles.subtitle}>{subtitle}</Text>
       </View>
 
-      <TouchableOpacity>
-        <Image
-          source={{ uri: "https://i.pravatar.cc/100" }}
-          style={styles.profile}
-        />
-      </TouchableOpacity>
+     
 
     </View>
   );

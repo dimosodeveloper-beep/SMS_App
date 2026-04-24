@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import {
   View,
   Text,
@@ -26,22 +26,22 @@ import { Ionicons } from "@expo/vector-icons";
 import styles from "../components/LoginStyles";
 import { EndPoint } from "../components/links";
 
+import i18n from "../components/translations";
+import { LanguageContext } from "../components/LanguageContext"; // 🔥 ADDED
+
 export default function Login() {
   const router = useRouter();
+
+  const { language, changeLanguage } = useContext(LanguageContext); // 🔥 GLOBAL LANGUAGE
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // 🌍 LANGUAGE STATE
-  const [language, setLanguage] = useState("EN");
-
-  // MODAL CONTROL
   const [langModalVisible, setLangModalVisible] = useState(false);
   const [selectedLang, setSelectedLang] = useState(null);
 
-  const scaleAnim = useRef(new Animated.Value(1)).current;
   const shakeAnim = useRef(new Animated.Value(0)).current;
   const floatAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -81,8 +81,8 @@ export default function Login() {
       shake();
       Toast.show({
         type: "error",
-        text1: language === "EN" ? "Missing Fields" : "Taarifa hazijakamilika",
-        text2: language === "EN" ? "Fill all fields" : "Jaza taarifa zote"
+        text1: i18n.t("missing_fields"),
+        text2: i18n.t("fill_all_fields")
       });
       return;
     }
@@ -109,7 +109,7 @@ export default function Login() {
 
       Toast.show({
         type: "success",
-        text1: "Login Successfully"
+        text1: i18n.t("login_success")
       });
 
       if (userData.role === "parent") {
@@ -122,8 +122,8 @@ export default function Login() {
       shake();
       Toast.show({
         type: "error",
-        text1: "Login Failed",
-        text2: "Invalid credentials"
+        text1: i18n.t("login_failed"),
+        text2: i18n.t("invalid_credentials")
       });
     } finally {
       setLoading(false);
@@ -133,7 +133,7 @@ export default function Login() {
   // ================= BIOMETRIC =================
   const biometricLogin = async () => {
     const result = await LocalAuthentication.authenticateAsync({
-      promptMessage: "Login with Biometrics"
+      promptMessage: i18n.t("biometric_login")
     });
 
     if (result.success) {
@@ -151,24 +151,22 @@ export default function Login() {
     }
   };
 
-  // ================= LANGUAGE SELECT =================
+  // ================= LANGUAGE =================
   const openLanguageModal = (lang) => {
     setSelectedLang(lang);
     setLangModalVisible(true);
   };
 
-  const confirmLanguage = () => {
-    if (selectedLang === "EN") setLanguage("EN");
-    if (selectedLang === "SW") setLanguage("SW");
-
+  const confirmLanguage = async () => {
+    await changeLanguage(selectedLang); // 🔥 SAME AS DRAWER
     setLangModalVisible(false);
 
     Toast.show({
       type: "success",
       text1:
-        selectedLang === "EN"
-          ? "Language changed to English"
-          : "Lugha imebadilishwa kwenda Kiswahili"
+        selectedLang === "en"
+          ? i18n.t("lang_changed_en")
+          : i18n.t("lang_changed_sw")
     });
   };
 
@@ -177,18 +175,15 @@ export default function Login() {
 
       {/* LANGUAGE BUTTON */}
       <View style={{ position: "absolute", top: 50, right: 20, flexDirection: "row", gap: 10, zIndex: 10 }}>
-        
-        <TouchableOpacity onPress={() => openLanguageModal("EN")}>
+        <TouchableOpacity onPress={() => openLanguageModal("en")}>
           <Text style={{ fontSize: 22 }}>🇬🇧</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => openLanguageModal("SW")}>
+        <TouchableOpacity onPress={() => openLanguageModal("sw")}>
           <Text style={{ fontSize: 22 }}>🇹🇿</Text>
         </TouchableOpacity>
-
       </View>
 
-      {/* BACKGROUND */}
       <Image
         source={{ uri: "https://images.unsplash.com/photo-1588072432836-e10032774350" }}
         style={{ position: "absolute", width: "100%", height: "100%" }}
@@ -206,35 +201,49 @@ export default function Login() {
           </Text>
 
           <Text style={{ textAlign: "center", color: "#cbd5f5", marginBottom: 20 }}>
-            Smart School System
+            {i18n.t("smart_system")}
           </Text>
 
           <TextInput
-            placeholder="Username"
+            placeholder={i18n.t("username")}
             placeholderTextColor="#94a3b8"
             value={username}
             onChangeText={setUsername}
-            style={inputStyle}
+            style={{
+              backgroundColor: "rgba(255,255,255,0.08)",
+              padding: 15,
+              borderRadius: 12,
+              color: "#fff",
+              marginBottom: 15
+            }}
           />
 
           <TextInput
-            placeholder="Password"
+            placeholder={i18n.t("password")}
             placeholderTextColor="#94a3b8"
             secureTextEntry={!showPassword}
             value={password}
             onChangeText={setPassword}
-            style={inputStyle}
+            style={{
+              backgroundColor: "rgba(255,255,255,0.08)",
+              padding: 15,
+              borderRadius: 12,
+              color: "#fff",
+              marginBottom: 15
+            }}
           />
 
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
             <Text style={{ color: "#38bdf8", marginTop: 5 }}>
-              {showPassword ? "Hide Password" : "Show Password"}
+              {showPassword ? i18n.t("hide_password") : i18n.t("show_password")}
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={loginUser} style={{ marginTop: 20 }}>
-            <LinearGradient colors={["#2563eb", "#38bdf8"]} style={btnStyle}>
-              <Text style={{ color: "#fff", fontWeight: "bold" }}>Login</Text>
+            <LinearGradient colors={["#2563eb", "#38bdf8"]} style={{ padding: 15, borderRadius: 15, alignItems: "center" }}>
+              <Text style={{ color: "#fff", fontWeight: "bold" }}>
+                {i18n.t("login")}
+              </Text>
             </LinearGradient>
           </TouchableOpacity>
 
@@ -245,49 +254,27 @@ export default function Login() {
         </BlurView>
       </Animated.View>
 
-      {/* LOADER */}
-      {loading && (
-        <View style={loaderStyle}>
-          <ActivityIndicator size="large" color="#fff" />
-        </View>
-      )}
-
-      {/* LANGUAGE MODAL */}
+      {/* MODAL */}
       <Modal transparent visible={langModalVisible} animationType="fade">
         <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "center", alignItems: "center" }}>
-          
+
           <View style={{ backgroundColor: "#0f172a", padding: 25, borderRadius: 20, width: "80%" }}>
 
             <Text style={{ color: "#fff", fontSize: 18, marginBottom: 20, textAlign: "center" }}>
-              {selectedLang === "EN"
-                ? "Change language to English?"
-                : "Badilisha lugha kwenda Kiswahili?"}
+              {selectedLang === "en"
+                ? i18n.t("change_lang_en")
+                : i18n.t("change_lang_sw")}
             </Text>
-            {selectedLang === "EN" ? (
+
             <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-             
               <TouchableOpacity onPress={() => setLangModalVisible(false)}>
-                <Text style={{ color: "#ef4444", fontWeight: "bold" }}>Cancel</Text>
+                <Text style={{ color: "#ef4444" }}>{i18n.t("cancel")}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity onPress={confirmLanguage}>
-                <Text style={{ color: "#22c55e", fontWeight: "bold" }}>Confirm</Text>
+                <Text style={{ color: "#22c55e" }}>{i18n.t("confirm")}</Text>
               </TouchableOpacity>
-
-            </View>):(
-
-                  <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-             
-              <TouchableOpacity onPress={() => setLangModalVisible(false)}>
-                <Text style={{ color: "#ef4444", fontWeight: "bold" }}>Hapana</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity onPress={confirmLanguage}>
-                <Text style={{ color: "#22c55e", fontWeight: "bold" }}>Kubali</Text>
-              </TouchableOpacity>
-
             </View>
-            )}
 
           </View>
 
@@ -298,26 +285,3 @@ export default function Login() {
     </LinearGradient>
   );
 }
-
-const inputStyle = {
-  backgroundColor: "rgba(255,255,255,0.08)",
-  padding: 15,
-  borderRadius: 12,
-  color: "#fff",
-  marginBottom: 15
-};
-
-const btnStyle = {
-  padding: 15,
-  borderRadius: 15,
-  alignItems: "center"
-};
-
-const loaderStyle = {
-  position: "absolute",
-  width: "100%",
-  height: "100%",
-  justifyContent: "center",
-  alignItems: "center",
-  backgroundColor: "rgba(0,0,0,0.6)"
-};

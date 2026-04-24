@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "ShuleFasta",
+    "name": "Shule Fasta",
     "slug": "ShuleFasta",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -15,9 +15,9 @@
       "backgroundColor": "#000000",
       "adaptiveIcon": {
         "backgroundColor": "#000000",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "foregroundImage": "./assets/icon.png",
+        "backgroundImage": "./assets/icon.png",
+        "monochromeImage": "./assets/icon.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
@@ -25,19 +25,19 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/icon.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/splash2.png",
+          "image": "./assets/splash.png",
           "resizeMode": "cover",
           "backgroundColor": "#000000",
-          "tabletImage": "./assets/splash2.png",
+          "tabletImage": "./assets/splash.png",
           "dark": {
-            "image": "./assets/splash2.png",
+            "image": "./assets/splash.png",
             "backgroundColor": "#000000"
           }
         }

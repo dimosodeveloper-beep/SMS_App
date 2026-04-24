@@ -30,6 +30,7 @@ const {examId,categoryName} = useLocalSearchParams();
 const[token,setToken] = useState(null);
 const[loading,setLoading] = useState(false);
 const[data,setData] = useState(null);
+const[noData,setNoData] = useState(false);
 
 const scaleAnim = new Animated.Value(1);
 
@@ -51,10 +52,7 @@ const loadToken = async()=>{
 const savedToken = await AsyncStorage.getItem("userToken");
 
 if(!savedToken){
-Toast.show({
-type:"error",
-text1:"Login required"
-});
+Toast.show({ type:"error", text1:"Login required" });
 return;
 }
 
@@ -72,10 +70,11 @@ if(token) fetchResults(token);
 const fetchResults = async(token)=>{
 
 setLoading(true);
+setNoData(false);
+setData(null);
 
 try{
 
-/* GET CHILD */
 const childRes = await axios.get(
 EndPoint + "/parent-children/",
 {
@@ -86,21 +85,24 @@ headers:{Authorization:`Token ${token}`}
 const studentId = childRes.data[0]?.id;
 
 if(!studentId){
-Toast.show({
-type:"error",
-text1:"No child found"
-});
+setNoData(true);
 setLoading(false);
 return;
 }
 
-/* GET RESULTS */
 const res = await axios.get(
 EndPoint + `/parent-child-results/${studentId}/${examId}/`,
 {
 headers:{Authorization:`Token ${token}`}
 }
 );
+
+// 🔥 FIX: empty safe check
+if(!res.data || !res.data.details || res.data.details.length === 0){
+setNoData(true);
+setLoading(false);
+return;
+}
 
 setData(res.data);
 
@@ -115,8 +117,10 @@ console.log("ERROR => ",e.response?.data);
 Toast.show({
 type:"error",
 text1:"Error",
-text2:JSON.stringify(e.response?.data)
+text2:"No results found"
 });
+
+setNoData(true);
 
 }
 
@@ -124,12 +128,39 @@ setLoading(false);
 };
 
 /* ================= LOADING ================= */
-if(loading || !data){
+if(loading){
 return(
 <View style={[styles.container,{justifyContent:"center",alignItems:"center"}]}>
 <ActivityIndicator size="large" color="#2563eb"/>
 <Text style={{color:"#fff",marginTop:10}}>
 Loading results...
+</Text>
+</View>
+);
+}
+
+/* ================= NO DATA ================= */
+if(noData){
+return(
+<View style={[styles.container,{justifyContent:"center",alignItems:"center",padding:20}]}>
+<Text style={{color:"#fff",fontSize:18,fontWeight:"bold",textAlign:"center"}}>
+Hakuna matokeo yaliyopatikana
+</Text>
+
+<Text style={{color:"#94a3b8",marginTop:10,textAlign:"center"}}>
+Mtoto hana matokeo kwa mtihani huu kwa sasa.
+</Text>
+</View>
+);
+}
+
+/* ================= SAFETY CHECK ================= */
+if(!data){
+return(
+<View style={[styles.container,{justifyContent:"center",alignItems:"center"}]}>
+<ActivityIndicator size="large" color="#2563eb"/>
+<Text style={{color:"#fff",marginTop:10}}>
+Preparing data...
 </Text>
 </View>
 );
@@ -152,12 +183,11 @@ style={styles.bg}
 <BlurView intensity={40} tint="dark" style={[styles.blur,{padding:20}]}>
 
 <Text style={styles.title}>
-{data.name}
+{data?.name}
 </Text>
 
 <View style={{flexDirection:"row",justifyContent:"space-between",marginTop:15}}>
 
-{/* AVG */}
 <View style={{
 flex:1,
 backgroundColor:"#0f172a",
@@ -168,11 +198,10 @@ alignItems:"center"
 }}>
 <Text style={{color:"#94a3b8"}}>Average</Text>
 <Text style={{color:"#22c55e",fontSize:20,fontWeight:"bold"}}>
-{data.average}
+{data?.average}
 </Text>
 </View>
 
-{/* GRADE */}
 <View style={{
 flex:1,
 backgroundColor:"#0f172a",
@@ -183,15 +212,14 @@ alignItems:"center"
 }}>
 <Text style={{color:"#94a3b8"}}>Grade</Text>
 <Text style={{
-color:getGradeColor(data.grade),
+color:getGradeColor(data?.grade),
 fontSize:20,
 fontWeight:"bold"
 }}>
-{data.grade}
+{data?.grade}
 </Text>
 </View>
 
-{/* TOTAL */}
 <View style={{
 flex:1,
 backgroundColor:"#0f172a",
@@ -202,13 +230,12 @@ alignItems:"center"
 }}>
 <Text style={{color:"#94a3b8"}}>Total</Text>
 <Text style={{color:"#38bdf8",fontSize:20,fontWeight:"bold"}}>
-{data.total_marks}
+{data?.total_marks}
 </Text>
 </View>
 
 </View>
 
-{/* ================= PROGRESS ================= */}
 <View style={{marginTop:20}}>
 <Text style={{color:"#94a3b8",marginBottom:5}}>
 Performance Level
@@ -222,7 +249,7 @@ overflow:"hidden"
 }}>
 
 <View style={{
-width:`${data.average}%`,
+width:`${data?.average || 0}%`,
 height:"100%",
 backgroundColor:"#22c55e"
 }}/>
@@ -235,16 +262,9 @@ backgroundColor:"#22c55e"
 
 {/* ================= SUBJECTS ================= */}
 <BlurView intensity={40} tint="dark" style={[styles.blur,{marginTop:15}]}>
-
 <Text style={styles.title}>Subjects</Text>
 
-{data.details.length === 0 &&(
-<Text style={{color:"#94a3b8",marginTop:20}}>
-No results found
-</Text>
-)}
-
-{data.details.map((item,index)=>{
+{data?.details?.map((item,index)=>{
 
 const gradeColor = getGradeColor(item.grade);
 
@@ -304,7 +324,6 @@ fontWeight:"bold"
 
 </View>
 
-{/* MARKS */}
 <View style={{marginTop:10}}>
 
 <Text style={{

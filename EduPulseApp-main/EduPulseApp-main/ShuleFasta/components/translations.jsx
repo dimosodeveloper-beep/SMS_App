@@ -60,6 +60,49 @@ const i18n = new I18n({
     time1: "2 minutes ago",
     time2: "30 minutes ago",
     time3: "1 hour ago",
+
+    // LOGIN
+    missing_fields: "Missing Fields",
+    fill_all_fields: "Fill all fields",
+    login_success: "Login Successfully",
+    login_failed: "Login Failed",
+    invalid_credentials: "Invalid credentials",
+    biometric_login: "Login with Biometrics",
+    smart_system: "Smart School System",
+    username: "Username",
+    password: "Password",
+    show_password: "Show Password",
+    hide_password: "Hide Password",
+    change_lang_en: "Change language to English?",
+    change_lang_sw: "Badilisha lugha kwenda Kiswahili?",
+    cancel: "Cancel",
+    confirm: "Confirm",
+    lang_changed_en: "Language changed to English",
+    lang_changed_sw: "Language changed to Swahili",
+
+    // ================= NEW HOME KEYS ADDED =================
+    welcome_back_title: "Welcome Back",
+    manage_description: "Manage students, teachers and classes easily with your dashboard",
+
+    all_subjects_title: "All Subjects",
+    add_subject_title: "Add Subject",
+    teachers_title: "Teachers",
+    timetable_title: "Time Table",
+
+    events_title: "All Events",
+    grades_title: "All Grades",
+    reports_title: "View Reports",
+    about_title: "Shule Fasta",
+
+    quick_actions_title: "Quick Actions",
+    recent_title: "Recent Activities",
+
+    student_registered: "New student registered in Form One.",
+    math_uploaded: "Mathematics exam results uploaded.",
+    meeting_scheduled: "Teacher meeting scheduled for tomorrow.",
+
+    minutes_ago: "minutes ago",
+    hour_ago: "hour ago"
   },
 
   sw: {
@@ -121,6 +164,48 @@ const i18n = new I18n({
     time1: "Dakika 2 zilizopita",
     time2: "Dakika 30 zilizopita",
     time3: "Saa 1 iliyopita",
+
+    missing_fields: "Taarifa hazijakamilika",
+    fill_all_fields: "Jaza taarifa zote",
+    login_success: "Umefanikiwa kuingia",
+    login_failed: "Imeshindikana kuingia",
+    invalid_credentials: "Taarifa si sahihi",
+    biometric_login: "Ingia kwa alama za kidole",
+    smart_system: "Mfumo wa Shule Smart",
+    username: "Jina la mtumiaji",
+    password: "Nenosiri",
+    show_password: "Onyesha Nenosiri",
+    hide_password: "Ficha Nenosiri",
+    change_lang_en: "Badilisha lugha kwenda Kiingereza?",
+    change_lang_sw: "Badilisha lugha kwenda Kiswahili?",
+    cancel: "Ghairi",
+    confirm: "Thibitisha",
+    lang_changed_en: "Lugha imebadilishwa kwenda Kiingereza",
+    lang_changed_sw: "Lugha imebadilishwa kwenda Kiswahili",
+
+    // NEW HOME KEYS
+    welcome_back_title: "Karibu Tena",
+    manage_description: "Simamia wanafunzi, walimu na madarasa kwa urahisi",
+
+    all_subjects_title: "Masomo Yote",
+    add_subject_title: "Ongeza Somo",
+    teachers_title: "Walimu",
+    timetable_title: "Ratiba",
+
+    events_title: "Matukio Yote",
+    grades_title: "Madaraja Yote",
+    reports_title: "Ripoti",
+    about_title: "Shule Fasta",
+
+    quick_actions_title: "Vitendo vya Haraka",
+    recent_title: "Shughuli za Hivi Karibuni",
+
+    student_registered: "Mwanafunzi mpya amesajiliwa Form One.",
+    math_uploaded: "Matokeo ya hisabati yamepakiwa.",
+    meeting_scheduled: "Mkutano wa walimu umepangwa kesho.",
+
+    minutes_ago: "dakika zilizopita",
+    hour_ago: "saa iliyopita"
   },
 });
 
