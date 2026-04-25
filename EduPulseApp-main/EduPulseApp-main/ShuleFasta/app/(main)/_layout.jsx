@@ -130,6 +130,12 @@ export default function MainLayout() {
   const confirmLanguageChange = async () => {
     await changeLanguage(selectedLang);
     setLangModal(false);
+
+      // reload effect + redirect kwenda home page
+  setTimeout(() => {
+    router.replace("/(main)/home");
+  }, 200);
+  
   };
 
   if (!fontsLoaded) return null;

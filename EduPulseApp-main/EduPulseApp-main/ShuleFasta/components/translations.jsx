@@ -11,6 +11,8 @@ const i18n = new I18n({
     confirm_logout: "Do you want to logout?",
     yes: "YES",
     no: "NO",
+    Fee: "Fee",
+    Fees: "Fees",
 
     register_user: "Register User",
     create_class: "Create Class",
@@ -115,6 +117,8 @@ const i18n = new I18n({
     confirm_logout: "Unataka kutoka?",
     yes: "NDIO",
     no: "HAPANA",
+    Fee: "Ada",
+    Fees: "Ada",
 
     register_user: "Sajili Mtumiaji",
     create_class: "Tengeneza Darasa",

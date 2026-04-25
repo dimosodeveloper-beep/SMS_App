@@ -118,7 +118,7 @@ export default function Home() {
 
   const actions = [
     { id: 1, title: i18n.t("all_subjects"), icon: "book-open", route: "/(Screens)/all-subjects" },
-    { id: 2, title: i18n.t("add_subject"), icon: "book", route: "/create-subject" },
+    { id: 2, title: i18n.t("Fees"), icon: "book", route: "/(Fee)/fee_home" },
     { id: 3, title: i18n.t("teachers"), icon: "school", route: "/(Teachers)/all-teachers" },
     { id: 4, title: i18n.t("timetable"), icon: "check-circle", route: "/(Timetable)/timetable-class" },
     { id: 5, title: i18n.t("all_events"), icon: "book-open", route: "/(Calender)/events-calender" },

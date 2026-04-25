@@ -92,9 +92,9 @@ export default function ParentHome() {
       color: ["#22c55e", "#16a34a"],
     },
     {
-      title: i18n.t("view_reports"),
+      title: i18n.t("Fee"),
       icon: "bar-chart",
-      route: "/(Reports)/report-exam-categories",
+      route: "/(Fee)/fee_home",
       color: ["#a855f7", "#ec4899"],
     },
     {
