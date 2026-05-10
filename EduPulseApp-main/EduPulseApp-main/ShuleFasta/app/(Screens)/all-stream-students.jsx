@@ -31,7 +31,12 @@ export default function AllStudents(){
 
 const router = useRouter();
 
-const {streamId,streamName,className} = useLocalSearchParams();
+const {
+streamId,
+streamName,
+className,
+classId
+} = useLocalSearchParams();
 
 const[students,setStudents] = useState([]);
 const[filteredStudents,setFilteredStudents] = useState([]);
@@ -103,7 +108,7 @@ console.log("TOKEN => ",token);
 
 const response = await axios.get(
 
-EndPoint + "/students/stream/" + streamId + "/",
+EndPoint + "/students/stream/" + classId + "/" + streamId + "/",
 
 {
 headers:{
@@ -300,6 +305,27 @@ color:"#64748b",
 marginTop:2
 }}>
 Gender: {item.gender}
+</Text>
+
+<Text style={{
+color:"#38bdf8",
+marginTop:2
+}}>
+Class: {item.classroom}
+</Text>
+
+<Text style={{
+color:"#22c55e",
+marginTop:2
+}}>
+Stream: {item.stream}
+</Text>
+
+<Text style={{
+color:"#f59e0b",
+marginTop:2
+}}>
+Year: {item.year}
 </Text>
 
 </View>

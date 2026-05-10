@@ -131,7 +131,7 @@ setFilteredClasses(filtered);
 /* NAVIGATE */
 const goToResults=(item)=>{
 router.push({
-pathname:"/(Reports)/all-students-reports",
+pathname:"/(Reports)/reports-choose-year",
 params:{
 classId:item.id,
 examId:examId,   // 👈 muhimu sana

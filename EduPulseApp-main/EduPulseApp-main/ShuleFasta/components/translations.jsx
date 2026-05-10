@@ -16,6 +16,7 @@ const i18n = new I18n({
 
     register_user: "Register User",
     create_class: "Create Class",
+    create_year: "Create Year",
     create_stream: "Create Stream",
     create_student: "Create Student",
     create_teacher: "Create Teacher",
@@ -122,6 +123,7 @@ const i18n = new I18n({
 
     register_user: "Sajili Mtumiaji",
     create_class: "Tengeneza Darasa",
+    create_year: "Tengeneza Mwaka",
     create_stream: "Tengeneza Mkondo",
     create_student: "Tengeneza Mwanafunzi",
     create_teacher: "Tengeneza Mwalimu",

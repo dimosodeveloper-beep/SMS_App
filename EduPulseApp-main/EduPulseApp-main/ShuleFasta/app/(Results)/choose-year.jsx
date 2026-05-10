@@ -1,5 +1,4 @@
 import React,{useState,useEffect} from "react";
-//classname
 import{
 View,
 Text,
@@ -26,15 +25,20 @@ import {EndPoint} from "../../components/links";
 import Header from "../../components/Header";
 
 import {useRouter,useLocalSearchParams} from "expo-router";
-import {Ionicons} from "@expo/vector-icons";
 
-export default function ResultsAllExams(){
+export default function ChooseYear(){
 
 const router = useRouter();
-const {categoryId,categoryName} = useLocalSearchParams();
 
-const [exams,setExams] = useState([]);
-const [filteredExams,setFilteredExams] = useState([]);
+const {
+classId,
+className,
+examId,
+categoryName
+} = useLocalSearchParams();
+
+const [years,setYears] = useState([]);
+const [filteredYears,setFilteredYears] = useState([]);
 const [search,setSearch] = useState("");
 const [loading,setLoading] = useState(false);
 const [token,setToken] = useState(null);
@@ -65,20 +69,21 @@ setToken(savedToken);
 loadToken();
 },[]);
 
-/* FETCH EXAMS */
+/* FETCH YEARS */
 useEffect(()=>{
 if(token){
-fetchExams(token);
+fetchYears(token);
 }
 },[token]);
 
-const fetchExams = async(token)=>{
+const fetchYears = async(token)=>{
+
 setLoading(true);
 
 try{
 
 const response = await axios.get(
-EndPoint + `/exams_results/?category_id=${categoryId}`,
+EndPoint + `/academic-years/`,
 {
 headers:{
 Authorization:`Token ${token}`,
@@ -87,8 +92,8 @@ Authorization:`Token ${token}`,
 }
 );
 
-setExams(response.data);
-setFilteredExams(response.data);
+setYears(response.data);
+setFilteredYears(response.data);
 
 Haptics.notificationAsync(
 Haptics.NotificationFeedbackType.Success
@@ -102,7 +107,7 @@ setLoading(false);
 
 Toast.show({
 type:"error",
-text1:"Error fetching exams",
+text1:"Error fetching years",
 text2:JSON.stringify(error.response?.data)
 });
 
@@ -116,21 +121,30 @@ const handleSearch=(text)=>{
 setSearch(text);
 
 if(text === ""){
-setFilteredExams(exams);
+setFilteredYears(years);
 return;
 }
 
-const filtered = exams.filter((item)=>
-item.name.toLowerCase().includes(text.toLowerCase())
+const filtered = years.filter((item)=>
+String(item.year).includes(text)
 );
 
-setFilteredExams(filtered);
+setFilteredYears(filtered);
 
 };
 
 /* NAVIGATE */
-const goToCreate = ()=>{
-router.push("/(Screens)/create-exam");
+const goToResults=(item)=>{
+router.push({
+pathname:"/(Results)/all-students-results",
+params:{
+classId:classId,
+className:className,
+examId:examId,
+year:item.year,
+categoryName:categoryName
+}
+});
 };
 
 return(
@@ -148,8 +162,8 @@ style={styles.bg}
 />
 
 <Header
-title={categoryName || "Exams"}
-subtitle="Filtered by category"
+title="Choose Year"
+subtitle={className || "Academic Years"}
 />
 
 <ScrollView
@@ -157,20 +171,26 @@ contentContainerStyle={{
 padding:10,
 paddingBottom:300
 }}
+showsVerticalScrollIndicator={false}
+keyboardShouldPersistTaps="handled"
 >
 
 <BlurView intensity={40} tint="dark" style={styles.blur}>
 
-<Text style={styles.title}>All Exams</Text>
+<Text style={styles.title}>
+Select Academic Year
+</Text>
 
 <Text style={styles.subtitle}>
-Showing exams for: {categoryName}
+Choose year to continue
 </Text>
+
+<View style={{marginTop:20}}>
 
 <TextInput
 value={search}
 onChangeText={handleSearch}
-placeholder="Search exam..."
+placeholder="Search year..."
 placeholderTextColor="#94a3b8"
 style={{
 backgroundColor:"#0f172a",
@@ -183,17 +203,17 @@ marginBottom:20
 }}
 />
 
-{filteredExams.length === 0 && !loading &&(
+{filteredYears.length === 0 && !loading &&(
 <Text style={{
 color:"#94a3b8",
 textAlign:"center",
 marginTop:30
 }}>
-No exams found
+No years found
 </Text>
 )}
 
-{filteredExams.map(item=>(
+{filteredYears.map((item,index)=>(
 
 <Animated.View
 key={item.id}
@@ -204,15 +224,10 @@ marginBottom:15
 >
 
 <TouchableOpacity
-onPress={()=>{
-router.push({
-pathname:"/(Parents)/parent-choose-year",
-params:{
-examId:item.id,
-categoryName:categoryName
-}
-})
-}}
+onPressIn={pressIn}
+onPressOut={pressOut}
+onPress={()=>goToResults(item)}
+activeOpacity={0.9}
 >
 
 <LinearGradient
@@ -228,47 +243,43 @@ borderColor:"#334155"
 <View style={{
 flexDirection:"row",
 justifyContent:"space-between",
-alignItems:"center",
-marginBottom:10
+alignItems:"center"
 }}>
+
+<View>
 
 <Text style={{
 color:"#ffffff",
 fontSize:18,
 fontWeight:"bold"
 }}>
-{item.name}
+{item.year}
 </Text>
+
+<Text style={{
+color:"#94a3b8",
+marginTop:4
+}}>
+Academic Year
+</Text>
+
+</View>
 
 <View style={{
 backgroundColor:"#2563eb",
-paddingHorizontal:10,
-paddingVertical:4,
+paddingHorizontal:12,
+paddingVertical:6,
 borderRadius:8
 }}>
+
 <Text style={{
-color:"#fff",
+color:"#ffffff",
 fontWeight:"bold"
 }}>
-ID {item.id}
+YEAR
 </Text>
+
 </View>
-
-</View>
-
-<View style={{marginTop:5}}>
-
-<Text style={{color:"#94a3b8"}}>
-📅 Date: {item.date}
-</Text>
-
-<Text style={{color:"#94a3b8"}}>
-🏫 Class: {item.classroom?.name || item.classroom}
-</Text>
-
-<Text style={{color:"#94a3b8"}}>
-📚 Category: {item.category?.name || item.category}
-</Text>
 
 </View>
 
@@ -280,45 +291,23 @@ ID {item.id}
 
 ))}
 
+</View>
+
 </BlurView>
 
 </ScrollView>
 
-<TouchableOpacity
-onPress={goToCreate}
-style={{
-position:"absolute",
-bottom:30,
-right:20
-}}
->
-
-<LinearGradient
-colors={["#2563eb","#38bdf8"]}
-style={{
-width:65,
-height:65,
-borderRadius:35,
-justifyContent:"center",
-alignItems:"center"
-}}
->
-
-<Ionicons name="add" size={30} color="#fff"/>
-
-</LinearGradient>
-
-</TouchableOpacity>
-
 {loading &&(
+
 <View style={styles.loader}>
 <View style={styles.loaderCard}>
 <ActivityIndicator size="large" color="#2563eb"/>
 <Text style={styles.loadingText}>
-Fetching exams...
+Fetching years...
 </Text>
 </View>
 </View>
+
 )}
 
 <Toast/>

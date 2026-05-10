@@ -25,7 +25,7 @@ import {useLocalSearchParams} from "expo-router";
 
 export default function StudentResults(){
 
-const {studentId,examId} = useLocalSearchParams();
+const {studentId,examId,year} = useLocalSearchParams();
 
 const[token,setToken] = useState(null);
 const[loading,setLoading] = useState(false);
@@ -66,7 +66,7 @@ setLoading(true);
 try{
 
 const res = await axios.get(
-EndPoint + `/student_results/${studentId}/?exam_id=${examId}`,
+EndPoint + `/student_results/${studentId}/?exam_id=${examId}&year=${year}`,
 {
 headers:{Authorization:`Token ${token}`}
 }

@@ -30,7 +30,7 @@ import {useLocalSearchParams,useRouter} from "expo-router";
 export default function AllStudentsResults(){
 
 const router = useRouter();
-const {classId,examId,categoryName} = useLocalSearchParams();
+const {year,classId,examId,categoryName} = useLocalSearchParams();
 
 const[token,setToken] = useState(null);
 const[loading,setLoading] = useState(false);
@@ -68,7 +68,7 @@ const fetchResults = async()=>{
   setLoading(true);
   try{
     const res = await axios.get(
-      EndPoint + `/students_results/?class_id=${classId}&exam_id=${examId}`,
+      EndPoint + `/students_results/?year=${year}&class_id=${classId}&exam_id=${examId}`,
       { headers:{Authorization:`Token ${token}`} }
     );
 
@@ -201,7 +201,7 @@ marginBottom:20
   <View style={{flexDirection:"row",justifyContent:"space-between",marginTop:10}}>
 
   {/* VIEW */}
-  <TouchableOpacity onPress={()=>router.push({pathname:"/(Results)/student-results",params:{studentId:item.student_id,examId:examId}})}>
+  <TouchableOpacity onPress={()=>router.push({pathname:"/(Results)/student-results",params:{studentId:item.student_id,examId:examId,year:year}})}>
     <LinearGradient colors={["#2563eb","#38bdf8"]} style={{padding:10,borderRadius:8}}>
       <Text style={{color:"#fff",fontWeight:"bold"}}>View</Text>
     </LinearGradient>
@@ -259,7 +259,7 @@ marginBottom:20
 
 <TouchableOpacity onPress={()=>{
   setModalVisible(false);
-  router.push({pathname: "/(Results)/results-summary", params: { classId: classId, examId: examId }});
+  router.push({pathname: "/(Results)/results-summary", params: { classId: classId, examId: examId, year:year }});
 }}>
 <LinearGradient colors={["#2563eb","#38bdf8"]} style={{padding:12,borderRadius:10,marginBottom:10}}>
 <Text style={{color:"#fff",textAlign:"center"}}>📊 Results Summary</Text>

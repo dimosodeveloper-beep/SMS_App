@@ -72,7 +72,7 @@ const fetchStudents = async()=>{
 setLoading(true);
 try{
 const res = await axios.get(
-EndPoint + "/students/stream/" + streamId + "/",
+EndPoint + "/students/stream/" + classId + "/" + streamId + "/",
 {
 headers:{Authorization:`Token ${token}`,"Content-Type":"application/json"}
 }

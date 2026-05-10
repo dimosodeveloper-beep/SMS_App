@@ -27,7 +27,12 @@ export default function AttendanceHistory(){
 
 const router = useRouter();
 
-const {streamId,className,streamName} = useLocalSearchParams();
+const {
+streamId,
+classId,
+className,
+streamName
+} = useLocalSearchParams();
 
 const[token,setToken] = useState(null);
 const[data,setData] = useState([]);
@@ -48,24 +53,36 @@ fetchData();
 },[token]);
 
 const fetchData = async()=>{
+
 setLoading(true);
 
 try{
 
 const res = await axios.get(
-EndPoint + `/stream-attendance-stats/${streamId}/`,
+EndPoint + `/stream-attendance-stats/${classId}/${streamId}/`,
 {
 headers:{Authorization:`Token ${token}`}
 }
 );
 
+console.log("ATTENDANCE HISTORY => ",res.data);
+
 setData(res.data);
 
 }catch(e){
-Toast.show({type:"error",text1:"Error loading data"});
+
+console.log("ERROR => ",e.response?.data);
+
+Toast.show({
+type:"error",
+text1:"Error loading data",
+text2:JSON.stringify(e.response?.data)
+});
+
 }
 
 setLoading(false);
+
 };
 
 return(
@@ -144,6 +161,20 @@ borderRadius:8
 }}>
 <Text style={{color:"#38bdf8",textAlign:"center"}}>
 Attendance: {item.percentage}%
+</Text>
+</View>
+
+{/* YEAR */}
+<View style={{
+marginTop:10,
+backgroundColor:"#1e293b",
+padding:8,
+borderRadius:8,
+borderWidth:1,
+borderColor:"#334155"
+}}>
+<Text style={{color:"#94a3b8",textAlign:"center"}}>
+Year: {item.year}
 </Text>
 </View>
 

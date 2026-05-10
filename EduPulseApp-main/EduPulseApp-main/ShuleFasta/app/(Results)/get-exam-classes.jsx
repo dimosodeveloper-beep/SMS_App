@@ -129,12 +129,13 @@ setFilteredClasses(filtered);
 };
 
 /* NAVIGATE */
-const goToResults=(item)=>{
+const goToYears=(item)=>{
 router.push({
-pathname:"/(Results)/all-students-results",
+pathname:"/(Results)/choose-year",
 params:{
 classId:item.id,
-examId:examId,   // 👈 muhimu sana
+className:item.name,
+examId:examId,
 categoryName:categoryName
 }
 });
@@ -219,7 +220,7 @@ marginBottom:15
 <TouchableOpacity
 onPressIn={pressIn}
 onPressOut={pressOut}
-onPress={()=>goToResults(item)}
+onPress={()=>goToYears(item)}
 activeOpacity={0.9}
 >
 

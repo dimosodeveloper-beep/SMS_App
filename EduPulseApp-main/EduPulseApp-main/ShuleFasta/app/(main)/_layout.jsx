@@ -150,6 +150,7 @@ export default function MainLayout() {
     { name: "create-timetable", label: t("create_timetable"), icon: "chart-bar" },
     { name: "create-event", label: t("create_event"), icon: "view-dashboard" },
     { name: "create-grade", label: t("create_grade"), icon: "account-tie" },
+    { name: "create-year", label: t("create_year"), icon: "account-tie" },
   ];
 
   const filteredDrawerItems =

@@ -25,7 +25,7 @@ import {useLocalSearchParams} from "expo-router";
 
 export default function ChildResults(){
 
-const {examId,categoryName} = useLocalSearchParams();
+const {examId,categoryName, year} = useLocalSearchParams();
 
 const[token,setToken] = useState(null);
 const[loading,setLoading] = useState(false);
@@ -91,7 +91,7 @@ return;
 }
 
 const res = await axios.get(
-EndPoint + `/parent-child-results/${studentId}/${examId}/`,
+EndPoint + `/parent-child-results/${studentId}/${examId}/?year=${year}`,
 {
 headers:{Authorization:`Token ${token}`}
 }
