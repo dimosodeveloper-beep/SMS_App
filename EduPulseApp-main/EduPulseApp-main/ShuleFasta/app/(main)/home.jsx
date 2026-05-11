@@ -124,7 +124,7 @@ export default function Home() {
     { id: 5, title: i18n.t("all_events"), icon: "book-open", route: "/(Calender)/events-calender" },
     { id: 6, title: i18n.t("all_grades"), icon: "book", route: "/(Grading)/all-grades" },
     { id: 7, title: i18n.t("view_reports"), icon: "book-open", route: "/(Reports)/report-exam-categories" },
-    { id: 8, title: i18n.t("about_app"), icon: "book", route: "/(Screens)/AboutApp" },
+    { id: 8, title: i18n.t("More"), icon: "book", route: "/(Screens)/other-homepage" },
   ];
 
   const AnimatedCard = ({ children, onPress, index, percentage, isLoading }) => {

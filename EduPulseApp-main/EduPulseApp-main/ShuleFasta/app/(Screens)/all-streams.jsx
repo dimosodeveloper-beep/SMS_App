@@ -151,7 +151,7 @@ setFilteredStreams(filtered);
 const openStudents=(item)=>{
 
 router.push({
-pathname:"/(Screens)/all-stream-students",
+pathname:"/(Screens)/students-choose-year",
 params:{
 streamId:item.id,
 streamName:item.name,

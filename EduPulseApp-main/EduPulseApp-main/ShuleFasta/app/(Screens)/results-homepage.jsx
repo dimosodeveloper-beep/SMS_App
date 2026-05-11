@@ -80,9 +80,9 @@ export default function DashboardOptions() {
       adminOnly: true
     },
     {
-      title: "Parents",
+      title: "Upload Results",
       icon: <FontAwesome5 name="file-alt" size={22} color="#fff" />,
-      route: "(Parents)/parents-exam-categories",
+      route: "(Results)/upload-results-excel",
       colors: ["#f59e0b", "#fbbf24", "#d97706"],
       adminOnly: false
     }

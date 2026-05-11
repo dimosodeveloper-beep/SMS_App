@@ -42,10 +42,11 @@ export default function MainHeader({ title, subtitle }) {
         <Text style={styles.subtitle}>{subtitle}</Text>
       </View>
 
-      <Image
-        source={{ uri: "https://i.pravatar.cc/100" }}
-        style={styles.profile}
-      />
+    
+       <Image
+              source={require("../assets/icon.png")}
+              style={styles.profile}
+            />
 
     </View>
   );

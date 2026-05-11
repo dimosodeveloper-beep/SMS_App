@@ -146,11 +146,15 @@ export default function MainLayout() {
     { name: "create-class", label: t("create_class"), icon: "account-tie" },
     { name: "create-stream", label: t("create_stream"), icon: "file-document-edit" },
     { name: "create-student", label: t("create_student"), icon: "chart-bar" },
+    { name: "create-subject", label: t("create_subject"), icon: "account-tie" },
     { name: "create-teacher", label: t("create_teacher"), icon: "chart-bar" },
     { name: "create-timetable", label: t("create_timetable"), icon: "chart-bar" },
     { name: "create-event", label: t("create_event"), icon: "view-dashboard" },
     { name: "create-grade", label: t("create_grade"), icon: "account-tie" },
     { name: "create-year", label: t("create_year"), icon: "account-tie" },
+    { name: "create-student-behaviour", label: t("create_student_behaviour"), icon: "chart-bar" },
+     { name: "promote-students", label: t("promote_students"), icon: "file-document-edit" },
+
   ];
 
   const filteredDrawerItems =

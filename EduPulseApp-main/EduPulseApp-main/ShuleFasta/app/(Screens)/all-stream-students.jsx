@@ -35,7 +35,8 @@ const {
 streamId,
 streamName,
 className,
-classId
+classId,
+year
 } = useLocalSearchParams();
 
 const[students,setStudents] = useState([]);
@@ -108,7 +109,7 @@ console.log("TOKEN => ",token);
 
 const response = await axios.get(
 
-EndPoint + "/students/stream/" + classId + "/" + streamId + "/",
+EndPoint + "/students/stream/" + classId + "/" + streamId + "/" + year + "/",
 
 {
 headers:{

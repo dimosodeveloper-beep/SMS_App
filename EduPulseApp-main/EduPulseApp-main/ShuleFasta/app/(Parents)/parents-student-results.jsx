@@ -97,7 +97,6 @@ headers:{Authorization:`Token ${token}`}
 }
 );
 
-// 🔥 FIX: empty safe check
 if(!res.data || !res.data.details || res.data.details.length === 0){
 setNoData(true);
 setLoading(false);
@@ -236,23 +235,40 @@ alignItems:"center"
 
 </View>
 
+{/* ================= RANKING ================= */}
 <View style={{marginTop:20}}>
-<Text style={{color:"#94a3b8",marginBottom:5}}>
-Performance Level
+
+<Text style={{color:"#fff",fontWeight:"bold",marginBottom:10}}>
+🏆 Position Analysis
 </Text>
 
-<View style={{
-height:10,
-backgroundColor:"#334155",
-borderRadius:10,
-overflow:"hidden"
-}}>
+<View style={{flexDirection:"row",justifyContent:"space-between"}}>
 
 <View style={{
-width:`${data?.average || 0}%`,
-height:"100%",
-backgroundColor:"#22c55e"
-}}/>
+flex:1,
+backgroundColor:"#0f172a",
+padding:12,
+borderRadius:10,
+marginRight:5
+}}>
+<Text style={{color:"#94a3b8"}}>Class Position</Text>
+<Text style={{color:"#22c55e",fontSize:18,fontWeight:"bold"}}>
+{data?.class_position} / {data?.class_total_students}
+</Text>
+</View>
+
+<View style={{
+flex:1,
+backgroundColor:"#0f172a",
+padding:12,
+borderRadius:10,
+marginLeft:5
+}}>
+<Text style={{color:"#94a3b8"}}>Stream Position</Text>
+<Text style={{color:"#38bdf8",fontSize:18,fontWeight:"bold"}}>
+{data?.stream_position} / {data?.stream_total_students}
+</Text>
+</View>
 
 </View>
 
@@ -334,13 +350,6 @@ fontWeight:"bold"
 {item.marks} Marks
 </Text>
 
-<Text style={{
-color:"#64748b",
-marginTop:4
-}}>
-📅 {item.exam_date}
-</Text>
-
 </View>
 
 </LinearGradient>
@@ -351,6 +360,50 @@ marginTop:4
 
 })}
 
+</BlurView>
+
+{/* ================= CLASS GRAPH ================= */}
+<BlurView intensity={40} tint="dark" style={[styles.blur,{marginTop:15,padding:15}]}>
+<Text style={{color:"#fff",fontWeight:"bold",marginBottom:10}}>
+📊 Class Performance Graph
+</Text>
+
+{data?.class_graph?.map((item,index)=>(
+<View key={index} style={{marginBottom:10}}>
+<Text style={{color:"#94a3b8"}}>{item.name}</Text>
+
+<View style={{height:8,backgroundColor:"#334155",borderRadius:10}}>
+<View style={{
+width:`${item.value}%`,
+height:"100%",
+backgroundColor:"#22c55e"
+}}/>
+</View>
+
+</View>
+))}
+</BlurView>
+
+{/* ================= STREAM GRAPH ================= */}
+<BlurView intensity={40} tint="dark" style={[styles.blur,{marginTop:15,padding:15}]}>
+<Text style={{color:"#fff",fontWeight:"bold",marginBottom:10}}>
+📊 Stream Performance Graph
+</Text>
+
+{data?.stream_graph?.map((item,index)=>(
+<View key={index} style={{marginBottom:10}}>
+<Text style={{color:"#94a3b8"}}>{item.name}</Text>
+
+<View style={{height:8,backgroundColor:"#334155",borderRadius:10}}>
+<View style={{
+width:`${item.value}%`,
+height:"100%",
+backgroundColor:"#38bdf8"
+}}/>
+</View>
+
+</View>
+))}
 </BlurView>
 
 </ScrollView>

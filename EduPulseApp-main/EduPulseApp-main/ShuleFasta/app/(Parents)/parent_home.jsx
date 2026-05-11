@@ -104,9 +104,9 @@ export default function ParentHome() {
       color: ["#0ea5e9", "#2563eb"],
     },
     {
-      title: i18n.t("about_app"),
+      title: i18n.t("More"),
       icon: "school",
-      route: "/(Screens)/AboutApp",
+      route: "/(Screens)/other-homepage",
       color: ["#f59e0b", "#ef4444"],
     },
   ];

@@ -16,6 +16,7 @@ const i18n = new I18n({
 
     register_user: "Register User",
     create_class: "Create Class",
+    create_student_behaviour:"Create Student Behaviour",
     create_year: "Create Year",
     create_stream: "Create Stream",
     create_student: "Create Student",
@@ -23,6 +24,7 @@ const i18n = new I18n({
     create_timetable: "Create Timetable",
     create_event: "Create Events",
     create_grade: "Create Grade",
+    promote_students:"Promote students",
 
     change_to_english: "Change language to English?",
     change_to_swahili: "Change language to Swahili?",
@@ -63,6 +65,8 @@ const i18n = new I18n({
     time1: "2 minutes ago",
     time2: "30 minutes ago",
     time3: "1 hour ago",
+    More:"More",
+    create_subject:"Create Subject",
 
     // LOGIN
     missing_fields: "Missing Fields",
@@ -110,8 +114,10 @@ const i18n = new I18n({
 
   sw: {
     home: "Nyumbani",
+    More:"Zaidi",
     dashboard: "Dashibodi",
     dashboard_title: "Dashibodi",
+    create_student_behaviour:"Jaza Mwenendo wa mwanafunzi",
     dashboard_description: "Mfumo wa Usimamizi",
     welcome: "Karibu",
     logout: "Toka",
@@ -128,6 +134,8 @@ const i18n = new I18n({
     create_student: "Tengeneza Mwanafunzi",
     create_teacher: "Tengeneza Mwalimu",
     create_timetable: "Ratiba",
+    promote_students:"Pandisha Darasa",
+     create_subject:"Tengeneza Somo",
     create_event: "Matukio",
     create_grade: "Tengeneza Daraja",
 
@@ -212,6 +220,7 @@ const i18n = new I18n({
 
     minutes_ago: "dakika zilizopita",
     hour_ago: "saa iliyopita"
+
   },
 });
 
