@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useRef} from "react";
 
 import{
 View,
@@ -25,7 +25,8 @@ import styles from "../../components/LoginStyles";
 import {EndPoint} from "../../components/links";
 import Header from "../../components/Header";
 
-import {useRouter,useLocalSearchParams} from "expo-router";
+import {useRouter,useLocalSearchParams, useFocusEffect} from "expo-router";
+import { useCallback } from "react";
 
 export default function AllStudents(){
 
@@ -39,6 +40,17 @@ classId,
 year
 } = useLocalSearchParams();
 
+/* =========================
+🔥 DEBUG: PARAMS ZOTE HAPA
+========================= */
+console.log("===== ALL STUDENTS SCREEN OPENED =====");
+console.log("classId =>", classId);
+console.log("streamId =>", streamId);
+console.log("streamName =>", streamName);
+console.log("className =>", className);
+console.log("year =>", year);
+console.log("=======================================");
+
 const[students,setStudents] = useState([]);
 const[filteredStudents,setFilteredStudents] = useState([]);
 const[search,setSearch] = useState("");
@@ -46,7 +58,7 @@ const[search,setSearch] = useState("");
 const[loading,setLoading] = useState(false);
 const[token,setToken] = useState(null);
 
-const scaleAnim = new Animated.Value(1);
+const scaleAnim = useRef(new Animated.Value(1)).current;
 
 const pressIn=()=>{
 Animated.spring(scaleAnim,{
@@ -62,9 +74,8 @@ useNativeDriver:true
 }).start();
 }
 
-
 /* =========================
-1️⃣ LOAD TOKEN
+LOAD TOKEN
 ========================= */
 
 useEffect(()=>{
@@ -72,7 +83,6 @@ useEffect(()=>{
 const loadToken = async()=>{
 
 const savedToken = await AsyncStorage.getItem("userToken");
-
 setToken(savedToken);
 
 };
@@ -81,49 +91,43 @@ loadToken();
 
 },[]);
 
-
-/* =========================
-2️⃣ FETCH STUDENTS AFTER TOKEN
-========================= */
-
-useEffect(()=>{
-
-if(token){
-fetchStudents(token);
-}
-
-},[token]);
-
-
 /* =========================
 FETCH STUDENTS
 ========================= */
 
-const fetchStudents = async(token)=>{
+const fetchStudents = async(tokenParam)=>{
 
 setLoading(true);
 
 try{
 
-console.log("TOKEN => ",token);
+const cleanYear = parseInt(year);
+
+console.log("🔥 FETCHING STUDENTS API CALL");
+console.log("classId =>", classId);
+console.log("streamId =>", streamId);
+console.log("year =>", cleanYear);
+
+const url = EndPoint + "/students/stream/" + classId + "/" + streamId + "/" + cleanYear + "/";
+
+console.log("REQUEST URL =>", url);
 
 const response = await axios.get(
-
-EndPoint + "/students/stream/" + classId + "/" + streamId + "/" + year + "/",
-
+url,
 {
 headers:{
-Authorization:`Token ${token}`,
+Authorization:`Token ${tokenParam}`,
 "Content-Type":"application/json"
 }
 }
-
 );
 
-console.log("STUDENTS => ",response.data);
+console.log("✅ RESPONSE COUNT =>", response.data?.count);
+console.log("✅ RESULTS =>", response.data?.results);
 
-setStudents(response.data);
-setFilteredStudents(response.data);
+/* 🔥 FIX ILIYOHARIBU MAP ERROR */
+setStudents(response.data.results || []);
+setFilteredStudents(response.data.results || []);
 
 Haptics.notificationAsync(
 Haptics.NotificationFeedbackType.Success
@@ -135,7 +139,7 @@ setLoading(false);
 
 setLoading(false);
 
-console.log("ERROR => ",error.response?.data);
+console.log("❌ ERROR => ",error.response?.data);
 
 Toast.show({
 type:"error",
@@ -145,9 +149,38 @@ text2:JSON.stringify(error.response?.data)
 
 }
 
+};
+
+/* =========================
+INITIAL LOAD
+========================= */
+
+useEffect(()=>{
+
+if(token && classId && streamId && year){
+
+console.log("🚀 TRIGGERING INITIAL FETCH");
+fetchStudents(token);
+
 }
 
+},[token,classId,streamId,year]);
 
+/* =========================
+ON FOCUS REFRESH
+========================= */
+
+useFocusEffect(
+useCallback(()=>{
+
+console.log("🔄 SCREEN FOCUSED - REFRESHING DATA");
+
+if(token && classId && streamId && year){
+fetchStudents(token);
+}
+
+},[token,classId,streamId,year])
+);
 
 /* =========================
 SEARCH
@@ -172,10 +205,8 @@ setFilteredStudents(filtered);
 
 }
 
-
-
 /* =========================
-UI
+UI (UNCHANGED)
 ========================= */
 
 return(
@@ -191,7 +222,6 @@ uri:"https://images.unsplash.com/photo-1588072432836-e10032774350"
 }}
 style={styles.bg}
 />
-
 
 <Header
 title="School Dashboard"
@@ -217,7 +247,6 @@ keyboardShouldPersistTaps="handled"
 Students in this stream
 </Text>
 
-
 <View style={{marginTop:20}}>
 
 <TextInput
@@ -236,7 +265,6 @@ marginBottom:20
 }}
 />
 
-
 {filteredStudents.length === 0 && !loading &&(
 
 <Text style={{
@@ -248,7 +276,6 @@ No students found
 </Text>
 
 )}
-
 
 {filteredStudents.map((item,index)=>{
 
@@ -364,7 +391,6 @@ ID {item.id}
 </BlurView>
 
 </ScrollView>
-
 
 {loading &&(
 

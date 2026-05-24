@@ -8,8 +8,12 @@ TouchableOpacity,
 Image,
 ActivityIndicator,
 Animated,
-ScrollView
+ScrollView,
+Modal,
+Platform
 } from "react-native";
+
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -32,10 +36,16 @@ export default function PromoteStudents(){
 
 const { t } = useContext(LanguageContext);
 
-const[currentYear,setCurrentYear] = useState("");
-
+/* 🔥 CHANGED: year now is number not text */
+const[currentYear,setCurrentYear] = useState(new Date().getFullYear());
 const[loading,setLoading] = useState(false);
 const[token,setToken] = useState(null);
+
+/* 🔥 DATE PICKER STATES */
+const [showYearPicker,setShowYearPicker] = useState(false);
+
+const [showModal,setShowModal] = useState(false);
+const [summaryData,setSummaryData] = useState({});
 
 const scaleAnim = new Animated.Value(1);
 
@@ -52,7 +62,6 @@ toValue:1,
 useNativeDriver:true
 }).start();
 }
-
 
 /* =========================
 LOAD TOKEN
@@ -72,7 +81,6 @@ loadToken();
 
 },[]);
 
-
 /* =========================
 PROMOTE STUDENTS
 ========================= */
@@ -84,7 +92,7 @@ if(!currentYear){
 Toast.show({
 type:"error",
 text1:"Missing field",
-text2:"Enter current year"
+text2:"Select year"
 });
 
 return;
@@ -130,19 +138,12 @@ Haptics.NotificationFeedbackType.Success
 
 setLoading(false);
 
-Toast.show({
-type:"success",
-text1:"Students promoted successfully",
-text2:`${response.data.promoted_count} students promoted`
-});
-
-setCurrentYear("");
+setSummaryData(response.data.summary || {});
+setShowModal(true);
 
 }catch(error){
 
 setLoading(false);
-
-console.log("FULL ERROR => ",error.response?.data);
 
 Toast.show({
 type:"error",
@@ -153,6 +154,56 @@ text2:JSON.stringify(error.response?.data)
 }
 
 }
+
+/* =========================
+YEAR PICKER CHANGE
+========================= */
+
+const onChangeYear = (event, selectedDate) => {
+
+setShowYearPicker(Platform.OS === "ios");
+
+if(selectedDate){
+setCurrentYear(selectedDate.getFullYear());
+}
+
+};
+
+/* =========================
+FORMAT SUMMARY
+========================= */
+const renderSummary = () => {
+return Object.entries(summaryData).map(([key, value], index) => (
+<View
+key={index}
+style={{
+backgroundColor:"#0f172a",
+padding:12,
+borderRadius:10,
+marginBottom:10,
+borderWidth:1,
+borderColor:"#334155"
+}}
+>
+
+<Text style={{
+color:"#38bdf8",
+fontWeight:"bold",
+fontSize:15
+}}>
+{value} students moved
+</Text>
+
+<Text style={{
+color:"#cbd5e1",
+marginTop:4
+}}>
+From {key}
+</Text>
+
+</View>
+));
+};
 
 return(
 
@@ -198,14 +249,34 @@ Move students to next class
 Current Academic Year
 </Text>
 
-<TextInput
-style={styles.input}
-value={currentYear}
-onChangeText={setCurrentYear}
-placeholder="Example: 2025"
-placeholderTextColor="#94a3b8"
-keyboardType="numeric"
+{/* 🔥 YEAR SELECT BUTTON (instead of TextInput) */}
+<TouchableOpacity
+onPress={()=>setShowYearPicker(true)}
+style={{
+backgroundColor:"#0f172a",
+padding:15,
+borderRadius:12,
+borderWidth:1,
+borderColor:"#334155",
+marginBottom:20
+}}
+>
+<Text style={{
+color:"#fff",
+fontSize:16
+}}>
+{currentYear}
+</Text>
+</TouchableOpacity>
+
+{showYearPicker && (
+<DateTimePicker
+value={new Date(currentYear,0,1)}
+mode="date"
+display="calendar"
+onChange={onChangeYear}
 />
+)}
 
 <View style={{
 backgroundColor:"#0f172a",
@@ -268,6 +339,68 @@ Promote Students
 </BlurView>
 
 </ScrollView>
+
+{/* =========================
+MODAL SUMMARY
+========================= */}
+<Modal
+visible={showModal}
+transparent
+animationType="fade"
+>
+<View style={{
+flex:1,
+backgroundColor:"rgba(0,0,0,0.7)",
+justifyContent:"center",
+alignItems:"center",
+padding:20
+}}>
+
+<View style={{
+width:"100%",
+backgroundColor:"#0f172a",
+borderRadius:16,
+padding:20,
+borderWidth:1,
+borderColor:"#334155",
+maxHeight:"80%"
+}}>
+
+<Text style={{
+color:"#38bdf8",
+fontSize:18,
+fontWeight:"bold",
+marginBottom:15
+}}>
+🎉 Promotion Summary
+</Text>
+
+<ScrollView>
+{renderSummary()}
+</ScrollView>
+
+<TouchableOpacity
+onPress={()=>setShowModal(false)}
+style={{
+marginTop:15,
+backgroundColor:"#2563eb",
+padding:12,
+borderRadius:10,
+alignItems:"center"
+}}
+>
+<Text style={{
+color:"#fff",
+fontWeight:"bold"
+}}>
+Close
+</Text>
+</TouchableOpacity>
+
+</View>
+
+</View>
+</Modal>
 
 {loading &&(
 

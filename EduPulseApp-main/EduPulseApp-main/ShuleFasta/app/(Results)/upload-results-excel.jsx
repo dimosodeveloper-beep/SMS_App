@@ -129,7 +129,6 @@ text1:"Failed to pick excel file"
 /* =========================
 UPLOAD EXCEL
 ========================= */
-
 const uploadExcel = async()=>{
 
 if(!file){
@@ -165,32 +164,59 @@ type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 });
 
 const response = await axios.post(
-
 EndPoint + "/upload-results-excel/",
-
 formData,
-
 {
 headers:{
 Authorization:`Token ${token}`,
 "Content-Type":"multipart/form-data"
 }
 }
-
 );
 
 console.log("UPLOAD RESPONSE => ",response.data);
 
-Haptics.notificationAsync(
-Haptics.NotificationFeedbackType.Success
-);
-
 setLoading(false);
+
+/* =========================
+🔥 SMART UI LOGIC
+========================= */
+
+if(response.data.status === "success"){
+
+Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
 Toast.show({
 type:"success",
-text1:"Results uploaded successfully"
+text1:"Upload Successful",
+text2:`${response.data.saved_count} results saved`
 });
+
+}
+
+else if(response.data.status === "partial_success"){
+
+Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+
+Toast.show({
+type:"error",
+text1:"Partial Upload",
+text2:`Saved: ${response.data.saved_count} | Failed: ${response.data.error_count}`
+});
+
+}
+
+else{
+
+Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+
+Toast.show({
+type:"error",
+text1:"Upload Failed",
+text2:response.data.message
+});
+
+}
 
 setFile(null);
 
@@ -203,13 +229,12 @@ console.log("UPLOAD ERROR => ",error.response?.data);
 Toast.show({
 type:"error",
 text1:"Upload failed",
-text2:JSON.stringify(error.response?.data)
+text2: error.response?.data?.message || "Check file format"
 });
 
 }
 
 }
-
 
 
 return(

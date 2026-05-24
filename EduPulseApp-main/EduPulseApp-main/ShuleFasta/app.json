@@ -33,7 +33,7 @@
         "expo-splash-screen",
         {
           "image": "./assets/splash.png",
-          "resizeMode": "cover",
+          "resizeMode": "contain",
           "backgroundColor": "#000000",
           "tabletImage": "./assets/splash.png",
           "dark": {

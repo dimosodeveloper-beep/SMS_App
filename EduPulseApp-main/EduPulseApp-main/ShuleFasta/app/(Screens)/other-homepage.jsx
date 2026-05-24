@@ -53,11 +53,28 @@ export default function DashboardOptions() {
 
   const options = [
     {
-      title:"Student Behaviour",
+      title:"Student Behaviour & Extra Cariculum Activities",
       icon:<Ionicons name="checkmark-done" size={24} color="#fff" />,
       route:"/(Screens)/get-all-behaviour-students",
-      colors:["#22c55e","#4ade80","#16a34a"]
+      colors:["rgb(2, 23, 10)","#0f1210","#16a34a"]
     },
+
+     {
+      title:"Create Teacher Scheme",
+      icon:<Ionicons name="checkmark-done" size={24} color="#fff" />,
+      route:"/(Screens)/create-teacher-scheme",
+      colors:["#22c55e","#0e78e1","#16a34a"]
+    },
+
+     {
+      title:"Give a Comment",
+      icon:<Ionicons name="checkmark-done" size={24} color="#fff" />,
+      route:"/(Parents)/parent-comment",
+      colors:["#373a38","#4ade80","#d41a93"]
+    },
+
+
+
     {
       title:"About ShuleFasta",
       icon:<MaterialIcons name="history" size={24} color="#fff" />,
