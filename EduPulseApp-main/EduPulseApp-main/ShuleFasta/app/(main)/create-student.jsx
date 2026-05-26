@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useRef} from "react";
 
 import{
 View,
@@ -8,11 +8,14 @@ TouchableOpacity,
 Image,
 ActivityIndicator,
 Animated,
-ScrollView
+ScrollView,
+KeyboardAvoidingView,
+Platform
 } from "react-native";
 
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {useRouter} from "expo-router";
 
 import {LinearGradient} from "expo-linear-gradient";
 import {BlurView} from "expo-blur";
@@ -21,563 +24,387 @@ import Toast from "react-native-toast-message";
 
 import * as Haptics from "expo-haptics";
 
+import {Ionicons} from "@expo/vector-icons";
+
 import {Picker} from "@react-native-picker/picker";
 
 import styles from "../../components/LoginStyles";
-import {EndPoint} from "../../components/links";
 import Header from "../../components/Header";
 
-import {useRouter} from "expo-router";
+import {EndPoint} from "../../components/links";
+
+export default function Register(){
+
+  const router = useRouter();
+
+  const [username,setUsername] = useState("");
+  const [email,setEmail] = useState("");
+  const [password,setPassword] = useState("");
+  const [confirmPassword,setConfirmPassword] = useState("");
+  const [role,setRole] = useState("teacher");
+
+  const [loading,setLoading] = useState(false);
+
+  const [errors,setErrors] = useState({});
+
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const pressIn=()=>{ Animated.spring(scaleAnim,{ toValue:0.95, useNativeDriver:true }).start(); }
+  const pressOut=()=>{ Animated.spring(scaleAnim,{ toValue:1, useNativeDriver:true }).start(); }
 
-
-export default function CreateStudent(){
-
-const router = useRouter();
-
-const[firstName,setFirstName] = useState("");
-const[lastName,setLastName] = useState("");
-
-const[classroom,setClassroom] = useState(null);
-const[stream,setStream] = useState(null);
-
-const[parent,setParent] = useState(null);
-const[parentSearch,setParentSearch] = useState("");
-
-const[admission,setAdmission] = useState("");
-const[gender,setGender] = useState("");
-
-const[classrooms,setClassrooms] = useState([]);
-const[streams,setStreams] = useState([]);
-const[parents,setParents] = useState([]);
-const[filteredParents,setFilteredParents] = useState([]);
-
-const[loading,setLoading] = useState(false);
-const[token,setToken] = useState(null);
-
-const scaleAnim = new Animated.Value(1);
-
-
-
-const pressIn=()=>{
-Animated.spring(scaleAnim,{
-toValue:0.95,
-useNativeDriver:true
-}).start();
-}
-
-const pressOut=()=>{
-Animated.spring(scaleAnim,{
-toValue:1,
-useNativeDriver:true
-}).start();
-}
-
-
-/* LOAD TOKEN */
-
-useEffect(()=>{
-
-const loadToken = async()=>{
-
-const savedToken = await AsyncStorage.getItem("userToken");
-
-setToken(savedToken);
-
-};
-
-loadToken();
-
-},[]);
-
-
-/* FETCH DATA */
-
-useEffect(()=>{
-
-if(token){
-
-fetchClassrooms(token);
-fetchParents(token);
-
-}
-
-},[token]);
-
-
-
-const fetchClassrooms = async(token)=>{
-
-try{
-
-const response = await axios.get(
-
-EndPoint + "/classes/",
-
-{
-headers:{
-Authorization:`Token ${token}`
-}
-}
-
-);
-
-setClassrooms(response.data);
-
-}catch(error){
-
-console.log("CLASSROOM ERROR",error.response?.data);
-
-}
-
-}
-
-
-
-const fetchStreams = async(classId)=>{
-
-try{
-
-const response = await axios.get(
-
-EndPoint + "/streams/" + classId + "/",
-
-{
-headers:{
-Authorization:`Token ${token}`
-}
-}
-
-);
-
-setStreams(response.data);
-
-}catch(error){
-
-console.log("STREAM ERROR",error.response?.data);
-
-}
-
-}
-
-
-
-const fetchParents = async(token)=>{
-
-try{
-
-const response = await axios.get(
-
-EndPoint + "/parents/",
-
-{
-headers:{
-Authorization:`Token ${token}`
-}
-}
-
-);
-
-setParents(response.data);
-
-}catch(error){
-
-console.log("PARENTS ERROR",error.response?.data);
-
-}
-
-}
-
-
-
-const handleClassChange = (value)=>{
-
-setClassroom(value);
-
-setStream(null);
-
-if(value){
-
-fetchStreams(value);
-
-}
-
-};
-
-
-
-/* SEARCH PARENT */
-
-const handleParentSearch = (text)=>{
-
-setParentSearch(text);
-
-if(text.trim() === ""){
-
-setFilteredParents([]);
-
-return;
-
-}
-
-const filtered = parents.filter((item)=>
-item.username.toLowerCase().includes(text.toLowerCase())
-).slice(0,6);
-
-setFilteredParents(filtered);
-
-};
-
-
-
-const selectParent = (item)=>{
-
-setParent(item.id);
-
-setParentSearch(item.username);
-
-setFilteredParents([]);
-
-};
-
-
-
-const createStudent = async()=>{
-
-if(!firstName || !lastName || !classroom || !stream || !admission || !gender){
-
-Toast.show({
-type:"error",
-text1:"Missing Fields",
-text2:"Fill all required fields"
-});
-
-return;
-
-}
-
-if(!token){
-
-Toast.show({
-type:"error",
-text1:"Authentication Error",
-text2:"Login again"
-});
-
-return;
-
-}
-
-setLoading(true);
-
-try{
-
-await axios.post(
-
-EndPoint + "/create-student/",
-
-{
-first_name:firstName,
-last_name:lastName,
-classroom:classroom,
-stream:stream,
-parent:parent,
-admission_number:admission,
-gender:gender
-},
-
-{
-headers:{
-Authorization:`Token ${token}`,
-"Content-Type":"application/json"
-}
-}
-
-);
-
-Haptics.notificationAsync(
-Haptics.NotificationFeedbackType.Success
-);
-
-setLoading(false);
-
-Toast.show({
-type:"success",
-text1:"Student Created",
-text2:"Student registered successfully"
-});
-
-router.back();
-
-}catch(error){
-
-setLoading(false);
-
-Toast.show({
-type:"error",
-text1:"Failed",
-text2:"Could not create student"
-});
-
-}
-
-}
-
-
-
-return(
-
-<LinearGradient
-colors={["#020617","#0f172a","#1e293b"]}
-style={styles.container}
->
-
-<Image
-source={{
-uri:"https://images.unsplash.com/photo-1588072432836-e10032774350"
-}}
-style={styles.bg}
-/>
-
-<Header
-title="School Dashboard"
-subtitle="Management System"
-/>
-
-<ScrollView
-contentContainerStyle={{
-padding:10,
-paddingBottom:500
-}}
-showsVerticalScrollIndicator={false}
-keyboardShouldPersistTaps="handled"
->
-
-<BlurView intensity={40} tint="dark" style={styles.blur}>
-
-<Text style={styles.title}>Register Student</Text>
-<Text style={styles.subtitle}>School Management System</Text>
-
-<View style={styles.form}>
-
-<Text style={styles.label}>First Name</Text>
-
-<TextInput
-style={styles.input}
-value={firstName}
-onChangeText={setFirstName}
-placeholder="First name"
-placeholderTextColor="#94a3b8"
-/>
-
-
-<Text style={styles.label}>Last Name</Text>
-
-<TextInput
-style={styles.input}
-value={lastName}
-onChangeText={setLastName}
-placeholder="Last name"
-placeholderTextColor="#94a3b8"
-/>
-
-
-
-<Text style={styles.label}>Select Classroom</Text>
-
-<View style={{
-borderWidth:1,
-borderColor:"#334155",
-borderRadius:10,
-marginBottom:20
-}}>
-
-<Picker
-selectedValue={classroom}
-onValueChange={(value)=>handleClassChange(value)}
-style={{color:"#fff"}}
->
-
-<Picker.Item label="Select Classroom" value={null}/>
-
-{classrooms.map((item)=>(
-<Picker.Item
-key={item.id}
-label={item.name}
-value={item.id}
-/>
-))}
-
-</Picker>
-
-</View>
-
-
-
-<Text style={styles.label}>Select Stream</Text>
-
-<View style={{
-borderWidth:1,
-borderColor:"#334155",
-borderRadius:10,
-marginBottom:20
-}}>
-
-<Picker
-selectedValue={stream}
-onValueChange={(itemValue)=>setStream(itemValue)}
-style={{color:"#fff"}}
->
-
-<Picker.Item label="Select Stream" value={null}/>
-
-{streams.map((item)=>(
-<Picker.Item
-key={item.id}
-label={item.name}
-value={item.id}
-/>
-))}
-
-</Picker>
-
-</View>
-
-
-
-<Text style={styles.label}>Search Parent</Text>
-
-<TextInput
-style={styles.input}
-value={parentSearch}
-onChangeText={handleParentSearch}
-placeholder="Type parent username..."
-placeholderTextColor="#94a3b8"
-/>
-
-
-{filteredParents.length > 0 &&(
-
-<View style={{
-backgroundColor:"#0f172a",
-borderWidth:1,
-borderColor:"#334155",
-borderRadius:10,
-marginTop:-10,
-marginBottom:20
-}}>
-
-{filteredParents.map((item)=>{
-
-return(
-
-<TouchableOpacity
-key={item.id}
-onPress={()=>selectParent(item)}
-style={{
-padding:12,
-borderBottomWidth:1,
-borderBottomColor:"#1e293b"
-}}
->
-
-<Text style={{color:"#fff"}}>
-{item.username}
-</Text>
-
-</TouchableOpacity>
-
-)
-
-})}
-
-</View>
-
-)}
-
-
-
-<Text style={styles.label}>Admission Number</Text>
-
-<TextInput
-style={styles.input}
-value={admission}
-onChangeText={setAdmission}
-placeholder="Admission number"
-placeholderTextColor="#94a3b8"
-/>
-
-
-
-<Text style={styles.label}>Gender</Text>
-
-<TextInput
-style={styles.input}
-value={gender}
-onChangeText={setGender}
-placeholder="Male or Female"
-placeholderTextColor="#94a3b8"
-/>
-
-
-
-<Animated.View style={{transform:[{scale:scaleAnim}]}}
-
->
-
-<TouchableOpacity
-onPressIn={pressIn}
-onPressOut={pressOut}
-onPress={createStudent}
->
-
-<LinearGradient
-colors={["#2563eb","#38bdf8"]}
-style={styles.button}
->
-
-<Text style={styles.buttonText}>
-Create Student
-</Text>
-
-</LinearGradient>
-
-</TouchableOpacity>
-
-</Animated.View>
-
-</View>
-
-</BlurView>
-
-</ScrollView>
-
-
-
-{loading &&(
-
-<View style={styles.loader}>
-
-<View style={styles.loaderCard}>
-
-<ActivityIndicator
-size="large"
-color="#2563eb"
-/>
-
-<Text style={styles.loadingText}>
-Creating student...
-</Text>
-
-</View>
-
-</View>
-
-)}
-
-<Toast/>
-
-</LinearGradient>
-
-)
-
+  const isValidEmail = (value) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(value);
+  };
+
+  const isCommonPassword = (pass) => {
+    const common = ["123456","password","12345678","qwerty","111111"];
+    return common.includes(pass.toLowerCase());
+  };
+
+  // 🔥 VALIDATION FUNCTION
+  const validate = ()=>{
+    let err = {};
+
+    if(!username){
+      err.username = "Username required";
+    }else if(username.length < 3){
+      err.username = "Min 3 characters";
+    }
+
+    if(!email){
+      err.email = "Email required";
+    }else if(!isValidEmail(email)){
+      err.email = "Invalid email";
+    }
+
+    if(!password){
+      err.password = "Password required";
+    }else if(password.length < 8){
+      err.password = "Min 8 characters";
+    }else if(isCommonPassword(password)){
+      err.password = "Too common password";
+    }
+
+    if(!confirmPassword){
+      err.confirmPassword = "Confirm password required";
+    }else if(password !== confirmPassword){
+      err.confirmPassword = "Passwords do not match";
+    }
+
+    setErrors(err);
+
+    return Object.keys(err).length === 0;
+  };
+
+  useEffect(()=>{
+    validate();
+  },[username,email,password,confirmPassword]);
+
+  const registerUser = async()=>{
+
+    if(!validate()) return;
+
+    setLoading(true);
+
+    try{
+      const userToken = await AsyncStorage.getItem("userToken");
+
+      const response = await axios.post(
+        EndPoint + "/register/",
+        {
+          username,
+          email,
+          password,
+          confirm_password: confirmPassword,
+          role
+        },
+        {
+          headers:{
+            Authorization:userToken ? `Token ${userToken}` : ""
+          }
+        }
+      );
+
+      if(response.status === 200 || response.status === 201){
+
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+        Toast.show({
+          type:"success",
+          text1:"Success",
+          text2:"User created successfully"
+        });
+
+        setUsername("");
+        setEmail("");
+        setPassword("");
+        setConfirmPassword("");
+        setRole("teacher");
+        setErrors({});
+      }
+
+      setLoading(false);
+
+    }catch(error){
+      setLoading(false);
+
+      let errorMessage = "Please check your information";
+
+      if(error.response?.data){
+        const data = error.response.data;
+
+        errorMessage = Object.entries(data)
+          .map(([key,val])=>`${key}: ${Array.isArray(val)? val.join(", "): val}`)
+          .join("\n");
+      }
+
+      Toast.show({
+        type:"error",
+        text1:"Registration Failed",
+        text2:errorMessage
+      });
+    }
+  };
+
+  const isFormValid = Object.keys(errors).length === 0 &&
+    username && email && password && confirmPassword;
+
+  return(
+    <LinearGradient colors={["#020617","#0f172a","#1e293b"]} style={{flex:1}}>
+
+      <Image
+        source={{ uri:"https://images.unsplash.com/photo-1588072432836-e10032774350" }}
+        style={[styles.bg,{opacity:0.18}]}
+      />
+
+      <View style={{
+        position:"absolute",
+        top:120,
+        right:-40,
+        width:180,
+        height:180,
+        borderRadius:100,
+        backgroundColor:"rgba(56,189,248,0.08)"
+      }}/>
+
+      <View style={{
+        position:"absolute",
+        bottom:120,
+        left:-50,
+        width:220,
+        height:220,
+        borderRadius:120,
+        backgroundColor:"rgba(37,99,235,0.08)"
+      }}/>
+
+      <Header title="School Dashboard" subtitle="Management System" />
+
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={100}
+        style={{flex:1}}
+      >
+
+      <ScrollView
+        contentContainerStyle={{ padding:14, paddingBottom:500 }}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+
+        <BlurView
+          intensity={45}
+          tint="dark"
+          style={{
+            backgroundColor:"rgba(15,23,42,0.72)",
+            borderRadius:28,
+            padding:20,
+            borderWidth:1,
+            borderColor:"rgba(148,163,184,0.15)",
+            overflow:"hidden"
+          }}
+        >
+
+          <LinearGradient
+            colors={[
+              "rgba(255,255,255,0.08)",
+              "rgba(255,255,255,0.02)"
+            ]}
+            start={{x:0,y:0}}
+            end={{x:1,y:1}}
+            style={{
+              position:"absolute",
+              top:0,
+              left:0,
+              right:0,
+              height:120,
+              borderTopLeftRadius:28,
+              borderTopRightRadius:28
+            }}
+          />
+
+          <View style={{
+            flexDirection:"row",
+            alignItems:"center",
+            justifyContent:"space-between",
+            marginBottom:25
+          }}>
+
+            <View style={{flex:1}}>
+
+              <Text style={{
+                color:"#ffffff",
+                fontSize:28,
+                fontWeight:"bold",
+                letterSpacing:0.5
+              }}>
+                Create User
+              </Text>
+
+              <Text style={{
+                color:"#94a3b8",
+                fontSize:14,
+                marginTop:6,
+                lineHeight:22
+              }}>
+                Register new system users easily
+              </Text>
+
+            </View>
+
+            <View style={{
+              width:62,
+              height:62,
+              borderRadius:20,
+              backgroundColor:"rgba(37,99,235,0.18)",
+              justifyContent:"center",
+              alignItems:"center",
+              borderWidth:1,
+              borderColor:"rgba(59,130,246,0.25)"
+            }}>
+              <Ionicons name="person-add-outline" size={28} color="#38bdf8"/>
+            </View>
+
+          </View>
+
+          {/* FORM */}
+          <View style={{backgroundColor:"rgba(2,6,23,0.45)",padding:18,borderRadius:24,borderWidth:1,borderColor:"rgba(148,163,184,0.1)"}}>
+
+            {/* USERNAME */}
+            <Text style={{color:"#e2e8f0",fontWeight:"700",marginBottom:8,fontSize:14}}>Username</Text>
+            <TextInput
+              style={{backgroundColor:"#0f172a",borderRadius:16,borderWidth:1,borderColor:"#334155",padding:14,color:"#fff",marginBottom:8}}
+              value={username}
+              onChangeText={setUsername}
+              placeholder="Enter username"
+              placeholderTextColor="#94a3b8"
+            />
+            {errors.username && <Text style={{color:"red",marginBottom:10}}>{errors.username}</Text>}
+
+            {/* EMAIL */}
+            <Text style={{color:"#e2e8f0",fontWeight:"700",marginBottom:8,fontSize:14}}>Email</Text>
+            <TextInput
+              style={{backgroundColor:"#0f172a",borderRadius:16,borderWidth:1,borderColor:"#334155",padding:14,color:"#fff",marginBottom:8}}
+              value={email}
+              onChangeText={setEmail}
+              placeholder="Enter email"
+              placeholderTextColor="#94a3b8"
+            />
+            {errors.email && <Text style={{color:"red",marginBottom:10}}>{errors.email}</Text>}
+
+            {/* ROLE */}
+            <Text style={{color:"#e2e8f0",fontWeight:"700",marginBottom:8,fontSize:14}}>Role</Text>
+            <View style={{borderWidth:1,borderColor:"#334155",borderRadius:16,marginBottom:18,overflow:"hidden"}}>
+              <Picker
+                selectedValue={role}
+                onValueChange={(itemValue)=>setRole(itemValue)}
+                dropdownIconColor="#38bdf8"
+                style={{color:"#fff",backgroundColor:"#0f172a"}}
+              >
+                <Picker.Item label="Teacher" value="teacher"/>
+                <Picker.Item label="Admin" value="admin"/>
+                <Picker.Item label="Parent" value="parent"/>
+              </Picker>
+            </View>
+
+            {/* PASSWORD */}
+            <Text style={{color:"#e2e8f0",fontWeight:"700",marginBottom:8,fontSize:14}}>Password</Text>
+            <TextInput
+              style={{backgroundColor:"#0f172a",borderRadius:16,borderWidth:1,borderColor:"#334155",padding:14,color:"#fff",marginBottom:8}}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              placeholder="Enter password"
+              placeholderTextColor="#94a3b8"
+            />
+            {errors.password && <Text style={{color:"red",marginBottom:10}}>{errors.password}</Text>}
+
+            {/* CONFIRM PASSWORD */}
+            <Text style={{color:"#e2e8f0",fontWeight:"700",marginBottom:8,fontSize:14}}>Confirm Password</Text>
+            <TextInput
+              style={{backgroundColor:"#0f172a",borderRadius:16,borderWidth:1,borderColor:"#334155",padding:14,color:"#fff",marginBottom:8}}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry
+              placeholder="Confirm password"
+              placeholderTextColor="#94a3b8"
+            />
+            {errors.confirmPassword && <Text style={{color:"red",marginBottom:10}}>{errors.confirmPassword}</Text>}
+
+            {/* BUTTON */}
+            <Animated.View style={{transform:[{scale:scaleAnim}],marginTop:20}}>
+              <TouchableOpacity
+                disabled={!isFormValid}
+                onPressIn={pressIn}
+                onPressOut={pressOut}
+                onPress={registerUser}
+              >
+                <LinearGradient
+                  colors={isFormValid ? ["#2563eb","#38bdf8","#0ea5e9"] : ["#334155","#334155","#334155"]}
+                  start={{x:0,y:0}}
+                  end={{x:1,y:1}}
+                  style={{
+                    paddingVertical:17,
+                    borderRadius:18,
+                    justifyContent:"center",
+                    alignItems:"center",
+                    shadowColor:"#38bdf8",
+                    shadowOpacity:0.35,
+                    shadowRadius:12,
+                    elevation:10
+                  }}
+                >
+                  <Text style={{color:"#fff",fontWeight:"bold",fontSize:16}}>
+                    Register
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </Animated.View>
+
+            <TouchableOpacity onPress={()=>router.push("/login")} style={{marginTop:15}}>
+              <Text style={{color:"#94a3b8",textAlign:"center"}}>
+                Already have account? Login
+              </Text>
+            </TouchableOpacity>
+
+          </View>
+
+        </BlurView>
+
+      </ScrollView>
+      </KeyboardAvoidingView>
+
+      {loading &&(
+        <View style={styles.loader}>
+          <View style={[styles.loaderCard,{backgroundColor:"#0f172a",borderWidth:1,borderColor:"#334155"}]}>
+            <ActivityIndicator size="large" color="#38bdf8"/>
+            <Text style={{marginTop:12,color:"#fff"}}>Creating user...</Text>
+          </View>
+        </View>
+      )}
+
+      <Toast/>
+
+    </LinearGradient>
+  )
 }

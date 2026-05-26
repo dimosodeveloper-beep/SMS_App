@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useRef} from "react";
 
 import{
 View,
@@ -38,12 +38,16 @@ const [search,setSearch] = useState("");
 const [loading,setLoading] = useState(false);
 const [token,setToken] = useState(null);
 
-const scaleAnim = new Animated.Value(1);
+const fadeAnim = useRef(new Animated.Value(0)).current;
+const slideAnim = useRef(new Animated.Value(40)).current;
+
+const scaleAnim = useRef(new Animated.Value(1)).current;
 
 /* Animation */
 const pressIn=()=>{
 Animated.spring(scaleAnim,{
-toValue:0.95,
+toValue:0.96,
+friction:4,
 useNativeDriver:true
 }).start();
 }
@@ -51,9 +55,31 @@ useNativeDriver:true
 const pressOut=()=>{
 Animated.spring(scaleAnim,{
 toValue:1,
+friction:4,
 useNativeDriver:true
 }).start();
 }
+
+/* PAGE ANIMATION */
+useEffect(()=>{
+
+Animated.parallel([
+
+Animated.timing(fadeAnim,{
+toValue:1,
+duration:900,
+useNativeDriver:true
+}),
+
+Animated.timing(slideAnim,{
+toValue:0,
+duration:900,
+useNativeDriver:true
+})
+
+]).start();
+
+},[]);
 
 /* LOAD TOKEN */
 useEffect(()=>{
@@ -135,7 +161,7 @@ router.push("/(Screens)/create-exam");
 return(
 
 <LinearGradient
-colors={["#020617","#0f172a","#1e293b"]}
+colors={["#020617","#0f172a","#111827","#1e293b"]}
 style={styles.container}
 >
 
@@ -143,135 +169,477 @@ style={styles.container}
 source={{
 uri:"https://images.unsplash.com/photo-1588072432836-e10032774350"
 }}
-style={styles.bg}
+style={[
+styles.bg,
+{
+opacity:0.18
+}
+]}
 />
+
+<View style={{
+position:"absolute",
+top:-120,
+right:-100,
+width:250,
+height:250,
+borderRadius:200,
+backgroundColor:"rgba(37,99,235,0.18)"
+}}/>
+
+<View style={{
+position:"absolute",
+bottom:-100,
+left:-80,
+width:220,
+height:220,
+borderRadius:200,
+backgroundColor:"rgba(56,189,248,0.12)"
+}}/>
 
 <Header
 title="Exams"
 subtitle="School Management System"
 />
 
-<ScrollView
-contentContainerStyle={{
-padding:10,
-paddingBottom:300
+<Animated.View
+style={{
+flex:1,
+opacity:fadeAnim,
+transform:[{translateY:slideAnim}]
 }}
 >
 
-<BlurView intensity={40} tint="dark" style={styles.blur}>
+<ScrollView
+contentContainerStyle={{
+padding:14,
+paddingBottom:320
+}}
+showsVerticalScrollIndicator={false}
+keyboardShouldPersistTaps="handled"
+>
 
-<Text style={styles.title}>All Exams</Text>
+<BlurView
+intensity={60}
+tint="dark"
+style={[
+styles.blur,
+{
+borderRadius:30,
+padding:20,
+backgroundColor:"rgba(15,23,42,0.55)",
+borderWidth:1,
+borderColor:"rgba(255,255,255,0.08)",
+overflow:"hidden"
+}
+]}
+>
 
-<Text style={styles.subtitle}>
+<View style={{
+marginBottom:25
+}}>
+
+<Text style={{
+fontSize:30,
+fontWeight:"900",
+color:"#ffffff",
+letterSpacing:0.5
+}}>
+All Exams
+</Text>
+
+<Text style={{
+color:"#94a3b8",
+fontSize:15,
+marginTop:8,
+lineHeight:22
+}}>
 Manage all exams in your school
 </Text>
+
+</View>
+
+<View style={{
+marginBottom:25
+}}>
+
+<View style={{
+flexDirection:"row",
+alignItems:"center",
+backgroundColor:"rgba(15,23,42,0.9)",
+borderRadius:18,
+borderWidth:1,
+borderColor:"rgba(148,163,184,0.18)",
+paddingHorizontal:15,
+height:58
+}}>
+
+<Ionicons
+name="search"
+size={20}
+color="#94a3b8"
+style={{marginRight:10}}
+/>
 
 <TextInput
 value={search}
 onChangeText={handleSearch}
 placeholder="Search exam..."
-placeholderTextColor="#94a3b8"
+placeholderTextColor="#64748b"
 style={{
-backgroundColor:"#0f172a",
-borderWidth:1,
-borderColor:"#334155",
-borderRadius:10,
-padding:12,
-color:"#fff",
-marginBottom:20
+flex:1,
+color:"#ffffff",
+fontSize:16,
+fontWeight:"600"
 }}
 />
 
+{search !== "" &&(
+
+<TouchableOpacity onPress={()=>handleSearch("")}>
+
+<Ionicons
+name="close-circle"
+size={20}
+color="#94a3b8"
+/>
+
+</TouchableOpacity>
+
+)}
+
+</View>
+
+</View>
+
+<View style={{
+flexDirection:"row",
+justifyContent:"space-between",
+alignItems:"center",
+marginBottom:20
+}}>
+
+<View style={{
+backgroundColor:"rgba(37,99,235,0.18)",
+paddingHorizontal:14,
+paddingVertical:8,
+borderRadius:14,
+borderWidth:1,
+borderColor:"rgba(59,130,246,0.25)"
+}}>
+
+<Text style={{
+color:"#bfdbfe",
+fontWeight:"700",
+fontSize:13
+}}>
+TOTAL EXAMS : {filteredExams.length}
+</Text>
+
+</View>
+
+<View style={{
+flexDirection:"row",
+alignItems:"center"
+}}>
+
+<View style={{
+width:10,
+height:10,
+borderRadius:20,
+backgroundColor:"#22c55e",
+marginRight:6
+}}/>
+
+<Text style={{
+color:"#86efac",
+fontSize:13,
+fontWeight:"700"
+}}>
+Active
+</Text>
+
+</View>
+
+</View>
+
 {filteredExams.length === 0 && !loading &&(
+
+<View style={{
+paddingVertical:50,
+alignItems:"center",
+justifyContent:"center"
+}}>
+
+<Ionicons
+name="document-text-outline"
+size={65}
+color="#475569"
+/>
+
 <Text style={{
 color:"#94a3b8",
 textAlign:"center",
-marginTop:30
+marginTop:15,
+fontSize:17,
+fontWeight:"700"
 }}>
 No exams found
 </Text>
+
+<Text style={{
+color:"#64748b",
+textAlign:"center",
+marginTop:6
+}}>
+Try searching with another keyword
+</Text>
+
+</View>
+
 )}
 
-{filteredExams.map(item=>(
+{filteredExams.map((item,index)=>(
 
 <Animated.View
 key={item.id}
 style={{
 transform:[{scale:scaleAnim}],
-marginBottom:15
+marginBottom:18
 }}
 >
 
 <TouchableOpacity
 onPressIn={pressIn}
 onPressOut={pressOut}
-activeOpacity={0.9}
+activeOpacity={0.92}
 >
 
 <LinearGradient
-colors={["#1e293b","#0f172a"]}
+colors={[
+"rgba(30,41,59,0.98)",
+"rgba(15,23,42,0.98)"
+]}
+start={{x:0,y:0}}
+end={{x:1,y:1}}
 style={{
-padding:18,
-borderRadius:14,
+padding:20,
+borderRadius:24,
 borderWidth:1,
-borderColor:"#334155"
+borderColor:"rgba(148,163,184,0.12)",
+overflow:"hidden",
+shadowColor:"#000",
+shadowOpacity:0.25,
+shadowRadius:14,
+elevation:8
 }}
 >
 
-{/* HEADER */}
+<View style={{
+position:"absolute",
+top:-30,
+right:-30,
+width:110,
+height:110,
+borderRadius:100,
+backgroundColor:"rgba(37,99,235,0.12)"
+}}/>
+
 <View style={{
 flexDirection:"row",
 justifyContent:"space-between",
-alignItems:"center",
-marginBottom:10
+alignItems:"flex-start"
 }}>
+
+<View style={{flex:1,paddingRight:10}}>
 
 <Text style={{
 color:"#ffffff",
-fontSize:18,
-fontWeight:"bold"
+fontSize:20,
+fontWeight:"900",
+lineHeight:28
 }}>
-{item.name} {item.classroom?.name || item.classroom}
+{item.name}
 </Text>
 
-<View style={{
-backgroundColor:"#2563eb",
-paddingHorizontal:10,
-paddingVertical:4,
-borderRadius:8
-}}>
 <Text style={{
-color:"#fff",
-fontWeight:"bold"
+color:"#38bdf8",
+fontSize:14,
+marginTop:6,
+fontWeight:"700"
+}}>
+{item.classroom?.name || item.classroom}
+</Text>
+
+</View>
+
+<View style={{
+backgroundColor:"rgba(37,99,235,0.2)",
+paddingHorizontal:14,
+paddingVertical:8,
+borderRadius:14,
+borderWidth:1,
+borderColor:"rgba(59,130,246,0.35)"
+}}>
+
+<Text style={{
+color:"#dbeafe",
+fontWeight:"800",
+fontSize:13
 }}>
 ID {item.id}
 </Text>
+
+</View>
+
+</View>
+
+<View style={{
+marginTop:20,
+borderTopWidth:1,
+borderTopColor:"rgba(148,163,184,0.08)",
+paddingTop:18
+}}>
+
+<View style={{
+flexDirection:"row",
+alignItems:"center",
+marginBottom:12
+}}>
+
+<View style={{
+width:38,
+height:38,
+borderRadius:12,
+backgroundColor:"rgba(245,158,11,0.15)",
+justifyContent:"center",
+alignItems:"center",
+marginRight:12
+}}>
+
+<Ionicons
+name="calendar-outline"
+size={20}
+color="#f59e0b"
+/>
+
+</View>
+
+<View>
+
+<Text style={{
+color:"#64748b",
+fontSize:12,
+fontWeight:"700"
+}}>
+EXAM DATE
+</Text>
+
+<Text style={{
+color:"#e2e8f0",
+fontSize:15,
+fontWeight:"700",
+marginTop:2
+}}>
+{item.date}
+</Text>
+
 </View>
 
 </View>
 
-{/* DETAILS */}
-<View style={{marginTop:5}}>
+<View style={{
+flexDirection:"row",
+alignItems:"center",
+marginBottom:12
+}}>
+
+<View style={{
+width:38,
+height:38,
+borderRadius:12,
+backgroundColor:"rgba(34,197,94,0.15)",
+justifyContent:"center",
+alignItems:"center",
+marginRight:12
+}}>
+
+<Ionicons
+name="school-outline"
+size={20}
+color="#22c55e"
+/>
+
+</View>
+
+<View>
 
 <Text style={{
-color:"#94a3b8",
-marginBottom:4
+color:"#64748b",
+fontSize:12,
+fontWeight:"700"
 }}>
-📅 Date: {item.date}
+CLASSROOM
 </Text>
 
 <Text style={{
-color:"#94a3b8",
-marginBottom:4
+color:"#e2e8f0",
+fontSize:15,
+fontWeight:"700",
+marginTop:2
 }}>
-🏫 Class: {item.classroom?.name || item.classroom}
+{item.classroom?.name || item.classroom}
+</Text>
+
+</View>
+
+</View>
+
+<View style={{
+flexDirection:"row",
+alignItems:"center"
+}}>
+
+<View style={{
+width:38,
+height:38,
+borderRadius:12,
+backgroundColor:"rgba(168,85,247,0.15)",
+justifyContent:"center",
+alignItems:"center",
+marginRight:12
+}}>
+
+<Ionicons
+name="book-outline"
+size={20}
+color="#a855f7"
+/>
+
+</View>
+
+<View>
+
+<Text style={{
+color:"#64748b",
+fontSize:12,
+fontWeight:"700"
+}}>
+CATEGORY
 </Text>
 
 <Text style={{
-color:"#94a3b8"
+color:"#e2e8f0",
+fontSize:15,
+fontWeight:"700",
+marginTop:2
 }}>
-📚 Category: {item.category?.name || item.category}
+{item.category?.name || item.category}
 </Text>
+
+</View>
+
+</View>
 
 </View>
 
@@ -287,46 +655,87 @@ color:"#94a3b8"
 
 </ScrollView>
 
+</Animated.View>
+
 {/* FLOAT BUTTON */}
 <TouchableOpacity
 onPress={goToCreate}
+activeOpacity={0.9}
 style={{
 position:"absolute",
-bottom:30,
-right:20
+bottom:35,
+right:25
 }}
 >
 
 <LinearGradient
-colors={["#2563eb","#38bdf8"]}
+colors={["#2563eb","#38bdf8","#0ea5e9"]}
+start={{x:0,y:0}}
+end={{x:1,y:1}}
 style={{
-width:65,
-height:65,
-borderRadius:35,
+width:72,
+height:72,
+borderRadius:40,
 justifyContent:"center",
 alignItems:"center",
-elevation:10,
-shadowColor:"#000",
-shadowOpacity:0.3,
-shadowRadius:10
+shadowColor:"#2563eb",
+shadowOpacity:0.5,
+shadowRadius:15,
+elevation:12
 }}
 >
 
-<Ionicons name="add" size={30} color="#fff"/>
+<Ionicons name="add" size={34} color="#fff"/>
 
 </LinearGradient>
 
 </TouchableOpacity>
 
 {loading &&(
-<View style={styles.loader}>
-<View style={styles.loaderCard}>
-<ActivityIndicator size="large" color="#2563eb"/>
-<Text style={styles.loadingText}>
+
+<View style={[
+styles.loader,
+{
+backgroundColor:"rgba(2,6,23,0.55)"
+}
+]}>
+
+<BlurView
+intensity={80}
+tint="dark"
+style={[
+styles.loaderCard,
+{
+borderRadius:24,
+padding:30,
+backgroundColor:"rgba(15,23,42,0.8)",
+borderWidth:1,
+borderColor:"rgba(255,255,255,0.08)"
+}
+]}
+>
+
+<ActivityIndicator
+size="large"
+color="#38bdf8"
+/>
+
+<Text style={[
+styles.loadingText,
+{
+marginTop:18,
+fontSize:16,
+fontWeight:"700",
+color:"#e2e8f0"
+}
+]}>
 Fetching exams...
 </Text>
+
+</BlurView>
+
 </View>
-</View>
+
 )}
 
 <Toast/>

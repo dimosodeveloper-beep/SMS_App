@@ -1,4 +1,5 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useRef} from "react";
+
 import{
 View,
 Text,
@@ -25,6 +26,7 @@ import {EndPoint} from "../../components/links";
 import Header from "../../components/Header";
 
 import {useRouter,useLocalSearchParams} from "expo-router";
+import {Ionicons} from "@expo/vector-icons";
 
 export default function ChooseYear(){
 
@@ -38,24 +40,69 @@ const [search,setSearch] = useState("");
 const [loading,setLoading] = useState(false);
 const [token,setToken] = useState(null);
 
-const scaleAnim = new Animated.Value(1);
+const fadeAnim = useRef(new Animated.Value(0)).current;
+const slideAnim = useRef(new Animated.Value(40)).current;
 
-/* Animation */
-const pressIn=()=>{
-Animated.spring(scaleAnim,{
-toValue:0.95,
-useNativeDriver:true
-}).start();
-}
+const scaleAnims = useRef({}).current;
 
-const pressOut=()=>{
-Animated.spring(scaleAnim,{
+/* =========================
+ANIMATION
+========================= */
+
+useEffect(()=>{
+
+Animated.parallel([
+
+Animated.timing(fadeAnim,{
 toValue:1,
+duration:800,
 useNativeDriver:true
-}).start();
+}),
+
+Animated.spring(slideAnim,{
+toValue:0,
+friction:7,
+tension:40,
+useNativeDriver:true
+})
+
+]).start();
+
+},[]);
+
+const getScaleAnim=(id)=>{
+
+if(!scaleAnims[id]){
+scaleAnims[id] = new Animated.Value(1);
 }
 
-/* LOAD TOKEN */
+return scaleAnims[id];
+
+};
+
+const pressIn=(id)=>{
+
+Animated.spring(getScaleAnim(id),{
+toValue:0.96,
+useNativeDriver:true
+}).start();
+
+};
+
+const pressOut=(id)=>{
+
+Animated.spring(getScaleAnim(id),{
+toValue:1,
+friction:4,
+useNativeDriver:true
+}).start();
+
+};
+
+/* =========================
+LOAD TOKEN
+========================= */
+
 useEffect(()=>{
 const loadToken = async()=>{
 const savedToken = await AsyncStorage.getItem("userToken");
@@ -64,7 +111,10 @@ setToken(savedToken);
 loadToken();
 },[]);
 
-/* FETCH YEARS */
+/* =========================
+FETCH YEARS
+========================= */
+
 useEffect(()=>{
 if(token){
 fetchYears(token);
@@ -110,7 +160,10 @@ text2:JSON.stringify(error.response?.data)
 
 };
 
-/* SEARCH */
+/* =========================
+SEARCH
+========================= */
+
 const handleSearch=(text)=>{
 
 setSearch(text);
@@ -128,23 +181,28 @@ setFilteredYears(filtered);
 
 };
 
-/* NAVIGATE */
+/* =========================
+NAVIGATE
+========================= */
+
 const goToResults=(item)=>{
+
 router.push({
 pathname:"/(Reports)/all-students-reports",
 params:{
 classId:classId,
-examId:examId,   // 👈 muhimu sana
+examId:examId,
 year:item.year,
 categoryName:categoryName
 }
 });
+
 };
 
 return(
 
 <LinearGradient
-colors={["#020617","#0f172a","#1e293b"]}
+colors={["#020617","#0f172a","#111827","#1e293b"]}
 style={styles.container}
 >
 
@@ -152,87 +210,79 @@ style={styles.container}
 source={{
 uri:"https://images.unsplash.com/photo-1588072432836-e10032774350"
 }}
-style={styles.bg}
+style={[
+styles.bg,
+{
+opacity:0.18
+}
+]}
 />
+
+<View style={{
+position:"absolute",
+top:-120,
+right:-100,
+width:260,
+height:260,
+borderRadius:200,
+backgroundColor:"rgba(59,130,246,0.15)"
+}}/>
+
+<View style={{
+position:"absolute",
+bottom:-140,
+left:-100,
+width:280,
+height:280,
+borderRadius:200,
+backgroundColor:"rgba(14,165,233,0.12)"
+}}/>
 
 <Header
 title="Choose Year"
 subtitle="Academic Years"
 />
 
-<ScrollView
+<Animated.ScrollView
 contentContainerStyle={{
-padding:10,
-paddingBottom:300
+padding:14,
+paddingBottom:320
 }}
 showsVerticalScrollIndicator={false}
 keyboardShouldPersistTaps="handled"
->
-
-<BlurView intensity={40} tint="dark" style={styles.blur}>
-
-<Text style={styles.title}>
-Select Academic Year
-</Text>
-
-<Text style={styles.subtitle}>
-Choose year to continue
-</Text>
-
-<View style={{marginTop:20}}>
-
-<TextInput
-value={search}
-onChangeText={handleSearch}
-placeholder="Search year..."
-placeholderTextColor="#94a3b8"
 style={{
-backgroundColor:"#0f172a",
-borderWidth:1,
-borderColor:"#334155",
-borderRadius:10,
-padding:12,
-color:"#fff",
-marginBottom:20
-}}
-/>
-
-{filteredYears.length === 0 && !loading &&(
-<Text style={{
-color:"#94a3b8",
-textAlign:"center",
-marginTop:30
-}}>
-No years found
-</Text>
-)}
-
-{filteredYears.map((item,index)=>(
-
-<Animated.View
-key={item.id}
-style={{
-transform:[{scale:scaleAnim}],
-marginBottom:15
+opacity:fadeAnim,
+transform:[{translateY:slideAnim}]
 }}
 >
 
-<TouchableOpacity
-onPressIn={pressIn}
-onPressOut={pressOut}
-onPress={()=>goToResults(item)}
-activeOpacity={0.9}
->
+{/* =========================
+TOP CARD
+========================= */}
 
 <LinearGradient
-colors={["#1e293b","#0f172a"]}
+colors={["rgba(37,99,235,0.30)","rgba(15,23,42,0.92)"]}
+start={{x:0,y:0}}
+end={{x:1,y:1}}
 style={{
-padding:18,
-borderRadius:14,
+borderRadius:28,
+padding:24,
+marginBottom:24,
 borderWidth:1,
-borderColor:"#334155"
+borderColor:"rgba(255,255,255,0.08)",
+overflow:"hidden"
 }}
 >
+
+<View style={{
+position:"absolute",
+top:-30,
+right:-30,
+width:120,
+height:120,
+borderRadius:100,
+backgroundColor:"rgba(96,165,250,0.15)"
+}}/>
 
 <View style={{
 flexDirection:"row",
@@ -240,38 +290,385 @@ justifyContent:"space-between",
 alignItems:"center"
 }}>
 
-<View>
+<View style={{flex:1,paddingRight:10}}>
+
+<Text style={{
+fontSize:29,
+fontWeight:"900",
+color:"#ffffff",
+letterSpacing:0.5
+}}>
+Academic Years
+</Text>
+
+<Text style={{
+fontSize:15,
+color:"#cbd5e1",
+marginTop:10,
+lineHeight:22
+}}>
+Choose an academic year to continue viewing reports and examination performance.
+</Text>
+
+<View style={{
+flexDirection:"row",
+alignItems:"center",
+marginTop:18
+}}>
+
+<View style={{
+backgroundColor:"rgba(59,130,246,0.18)",
+paddingHorizontal:14,
+paddingVertical:8,
+borderRadius:14,
+marginRight:10,
+borderWidth:1,
+borderColor:"rgba(96,165,250,0.25)"
+}}>
+
+<Text style={{
+color:"#dbeafe",
+fontWeight:"700",
+fontSize:13
+}}>
+Total: {filteredYears.length}
+</Text>
+
+</View>
+
+<View style={{
+backgroundColor:"rgba(16,185,129,0.15)",
+paddingHorizontal:14,
+paddingVertical:8,
+borderRadius:14,
+borderWidth:1,
+borderColor:"rgba(16,185,129,0.25)"
+}}>
+
+<Text style={{
+color:"#bbf7d0",
+fontWeight:"700",
+fontSize:13
+}}>
+Academic Records
+</Text>
+
+</View>
+
+</View>
+
+</View>
+
+<View style={{
+width:78,
+height:78,
+borderRadius:24,
+backgroundColor:"rgba(255,255,255,0.08)",
+justifyContent:"center",
+alignItems:"center",
+borderWidth:1,
+borderColor:"rgba(255,255,255,0.08)"
+}}>
+
+<Ionicons
+name="calendar-outline"
+size={38}
+color="#60a5fa"
+/>
+
+</View>
+
+</View>
+
+</LinearGradient>
+
+{/* =========================
+SEARCH AREA
+========================= */}
+
+<BlurView
+intensity={60}
+tint="dark"
+style={{
+borderRadius:24,
+padding:18,
+marginBottom:20,
+overflow:"hidden",
+borderWidth:1,
+borderColor:"rgba(255,255,255,0.06)",
+backgroundColor:"rgba(15,23,42,0.45)"
+}}
+>
+
+<View style={{
+flexDirection:"row",
+alignItems:"center",
+backgroundColor:"rgba(2,6,23,0.75)",
+borderRadius:18,
+paddingHorizontal:16,
+borderWidth:1,
+borderColor:"rgba(148,163,184,0.15)"
+}}>
+
+<Ionicons
+name="search"
+size={22}
+color="#94a3b8"
+style={{marginRight:10}}
+/>
+
+<TextInput
+value={search}
+onChangeText={handleSearch}
+placeholder="Search year..."
+placeholderTextColor="#94a3b8"
+style={{
+flex:1,
+paddingVertical:16,
+fontSize:15,
+color:"#ffffff"
+}}
+/>
+
+{search !== "" &&(
+
+<TouchableOpacity onPress={()=>handleSearch("")}>
+
+<Ionicons
+name="close-circle"
+size={22}
+color="#64748b"
+/>
+
+</TouchableOpacity>
+
+)}
+
+</View>
+
+</BlurView>
+
+{/* =========================
+EMPTY STATE
+========================= */}
+
+{filteredYears.length === 0 && !loading &&(
+
+<BlurView
+intensity={50}
+tint="dark"
+style={{
+padding:30,
+borderRadius:24,
+alignItems:"center",
+backgroundColor:"rgba(15,23,42,0.45)",
+borderWidth:1,
+borderColor:"rgba(255,255,255,0.05)"
+}}
+>
+
+<Ionicons
+name="calendar-clear-outline"
+size={60}
+color="#475569"
+/>
+
+<Text style={{
+color:"#e2e8f0",
+fontSize:18,
+fontWeight:"700",
+marginTop:15
+}}>
+No Years Found
+</Text>
+
+<Text style={{
+color:"#94a3b8",
+textAlign:"center",
+marginTop:8,
+lineHeight:22
+}}>
+Try searching using another keyword or add more academic years.
+</Text>
+
+</BlurView>
+
+)}
+
+{/* =========================
+YEARS LIST
+========================= */}
+
+{filteredYears.map((item,index)=>(
+
+<Animated.View
+key={item.id}
+style={{
+transform:[{scale:getScaleAnim(item.id)}],
+marginBottom:18
+}}
+>
+
+<TouchableOpacity
+activeOpacity={0.9}
+onPressIn={()=>pressIn(item.id)}
+onPressOut={()=>pressOut(item.id)}
+onPress={()=>goToResults(item)}
+>
+
+<LinearGradient
+colors={[
+"rgba(30,41,59,0.98)",
+"rgba(15,23,42,0.97)",
+"rgba(2,6,23,0.98)"
+]}
+start={{x:0,y:0}}
+end={{x:1,y:1}}
+style={{
+borderRadius:26,
+padding:20,
+borderWidth:1,
+borderColor:"rgba(148,163,184,0.10)",
+overflow:"hidden"
+}}
+>
+
+<View style={{
+position:"absolute",
+top:-20,
+right:-20,
+width:100,
+height:100,
+borderRadius:60,
+backgroundColor:"rgba(59,130,246,0.08)"
+}}/>
+
+<View style={{
+flexDirection:"row",
+justifyContent:"space-between",
+alignItems:"center"
+}}>
+
+<View style={{
+flexDirection:"row",
+alignItems:"center",
+flex:1
+}}>
+
+<View style={{
+width:62,
+height:62,
+borderRadius:20,
+justifyContent:"center",
+alignItems:"center",
+backgroundColor:"rgba(37,99,235,0.18)",
+borderWidth:1,
+borderColor:"rgba(96,165,250,0.18)",
+marginRight:16
+}}
+>
+
+<Ionicons
+name="time-outline"
+size={28}
+color="#60a5fa"
+/>
+
+</View>
+
+<View style={{flex:1}}>
 
 <Text style={{
 color:"#ffffff",
-fontSize:18,
-fontWeight:"bold"
+fontSize:19,
+fontWeight:"800",
+letterSpacing:0.3
 }}>
 {item.year}
 </Text>
 
 <Text style={{
 color:"#94a3b8",
-marginTop:4
+marginTop:6,
+fontSize:14
 }}>
 Academic Year
+</Text>
+
+<View style={{
+flexDirection:"row",
+alignItems:"center",
+marginTop:12
+}}>
+
+<View style={{
+backgroundColor:"rgba(16,185,129,0.14)",
+paddingHorizontal:10,
+paddingVertical:5,
+borderRadius:10,
+marginRight:10
+}}>
+
+<Text style={{
+color:"#bbf7d0",
+fontSize:12,
+fontWeight:"700"
+}}>
+Available
 </Text>
 
 </View>
 
 <View style={{
+backgroundColor:"rgba(245,158,11,0.14)",
+paddingHorizontal:10,
+paddingVertical:5,
+borderRadius:10
+}}>
+
+<Text style={{
+color:"#fde68a",
+fontSize:12,
+fontWeight:"700"
+}}>
+#{index + 1}
+</Text>
+
+</View>
+
+</View>
+
+</View>
+
+</View>
+
+<View style={{
+alignItems:"center"
+}}>
+
+<View style={{
 backgroundColor:"#2563eb",
-paddingHorizontal:12,
-paddingVertical:6,
-borderRadius:8
+paddingHorizontal:14,
+paddingVertical:8,
+borderRadius:14,
+marginBottom:10
 }}>
 
 <Text style={{
 color:"#ffffff",
-fontWeight:"bold"
+fontWeight:"800",
+fontSize:13
 }}>
 YEAR
 </Text>
+
+</View>
+
+<Ionicons
+name="chevron-forward-circle"
+size={28}
+color="#60a5fa"
+/>
 
 </View>
 
@@ -285,21 +682,52 @@ YEAR
 
 ))}
 
-</View>
+</Animated.ScrollView>
 
-</BlurView>
-
-</ScrollView>
+{/* =========================
+LOADING
+========================= */}
 
 {loading &&(
 
 <View style={styles.loader}>
-<View style={styles.loaderCard}>
-<ActivityIndicator size="large" color="#2563eb"/>
-<Text style={styles.loadingText}>
+
+<BlurView
+intensity={80}
+tint="dark"
+style={{
+padding:28,
+borderRadius:24,
+alignItems:"center",
+overflow:"hidden",
+backgroundColor:"rgba(15,23,42,0.8)"
+}}
+>
+
+<ActivityIndicator
+size="large"
+color="#38bdf8"
+/>
+
+<Text style={{
+color:"#ffffff",
+fontSize:16,
+fontWeight:"700",
+marginTop:16
+}}>
 Fetching years...
 </Text>
-</View>
+
+<Text style={{
+color:"#94a3b8",
+marginTop:6,
+fontSize:13
+}}>
+Please wait a moment
+</Text>
+
+</BlurView>
+
 </View>
 
 )}

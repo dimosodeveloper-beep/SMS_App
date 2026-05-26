@@ -1,13 +1,14 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useRef} from "react";
+
 import{
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Image,
-  ActivityIndicator,
-  Animated,
-  ScrollView
+View,
+Text,
+TextInput,
+TouchableOpacity,
+Image,
+ActivityIndicator,
+Animated,
+ScrollView
 } from "react-native";
 
 import axios from "axios";
@@ -25,257 +26,731 @@ import {EndPoint} from "../../components/links";
 import Header from "../../components/Header";
 
 import {useRouter} from "expo-router";
+import {Ionicons} from "@expo/vector-icons";
 
 export default function AttandanceAllClasses(){
 
-  const router = useRouter();
+const router = useRouter();
 
-  const [classes,setClasses] = useState([]);
-  const [filteredClasses,setFilteredClasses] = useState([]);
-  const [search,setSearch] = useState("");
-  const [loading,setLoading] = useState(false);
-  const [token,setToken] = useState(null);
+const [classes,setClasses] = useState([]);
+const [filteredClasses,setFilteredClasses] = useState([]);
+const [search,setSearch] = useState("");
+const [loading,setLoading] = useState(false);
+const [token,setToken] = useState(null);
 
-  const scaleAnim = new Animated.Value(1);
+const fadeAnim = useRef(new Animated.Value(0)).current;
+const slideAnim = useRef(new Animated.Value(40)).current;
 
-  // Animation
-  const pressIn=()=>{
-    Animated.spring(scaleAnim,{
-      toValue:0.95,
-      useNativeDriver:true
-    }).start();
-  }
+const scaleAnims = useRef({}).current;
 
-  const pressOut=()=>{
-    Animated.spring(scaleAnim,{
-      toValue:1,
-      useNativeDriver:true
-    }).start();
-  }
+/* =========================
+ANIMATION
+========================= */
 
-  // 1️⃣ Get token once on mount
-  useEffect(()=>{
-    const loadToken = async()=>{
-      const savedToken = await AsyncStorage.getItem("userToken"); // make sure same key as login
-      setToken(savedToken);
-    };
-    loadToken();
-  },[]);
+useEffect(()=>{
 
-  // 2️⃣ Fetch classes after token is loaded
-  useEffect(()=>{
-    if(token){
-      fetchClasses(token);
-    }
-  },[token]);
+Animated.parallel([
 
-  const fetchClasses = async(token)=>{
-    setLoading(true);
+Animated.timing(fadeAnim,{
+toValue:1,
+duration:800,
+useNativeDriver:true
+}),
 
-    try{
-      console.log("TOKEN => ", token);
+Animated.spring(slideAnim,{
+toValue:0,
+friction:7,
+tension:40,
+useNativeDriver:true
+})
 
-      const response = await axios.get(
-        EndPoint + "/classes/",
-        {
-          headers:{
-            Authorization:`Token ${token}`,
-            "Content-Type":"application/json"
-          }
-        }
-      );
+]).start();
 
-      console.log("CLASSES => ",response.data);
+},[]);
 
-      setClasses(response.data);
-      setFilteredClasses(response.data);
+const getScaleAnim=(id)=>{
 
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+if(!scaleAnims[id]){
+scaleAnims[id] = new Animated.Value(1);
+}
 
-      setLoading(false);
-    }catch(error){
-      setLoading(false);
-      console.log("ERROR => ",error.response?.data);
-      Toast.show({
-        type:"error",
-        text1:"Error fetching classes",
-        text2:JSON.stringify(error.response?.data)
-      });
-    }
-  }
+return scaleAnims[id];
 
-  const handleSearch=(text)=>{
-    setSearch(text);
+};
 
-    if(text === ""){
-      setFilteredClasses(classes);
-      return;
-    }
+const pressIn=(id)=>{
 
-    const filtered = classes.filter((item)=>
-      item.name.toLowerCase().includes(text.toLowerCase())
-    );
+Animated.spring(getScaleAnim(id),{
+toValue:0.96,
+useNativeDriver:true
+}).start();
 
-    setFilteredClasses(filtered);
-  }
+};
 
-  const openStreams=(item)=>{
-    router.push({
-      pathname:"/(Attendance)/attandance-all-streams",
-      params:{
-        classId:item.id,
-        className:item.name
-      }
-    });
-  }
+const pressOut=(id)=>{
 
-  return(
-    <LinearGradient
-      colors={["#020617","#0f172a","#1e293b"]}
-      style={styles.container}
-    >
-      <Image
-        source={{
-          uri:"https://images.unsplash.com/photo-1588072432836-e10032774350"
-        }}
-        style={styles.bg}
-      />
+Animated.spring(getScaleAnim(id),{
+toValue:1,
+friction:4,
+useNativeDriver:true
+}).start();
 
-      <Header
-        title="School Dashboard"
-        subtitle="Management System"
-      />
+};
 
-      <ScrollView
-        contentContainerStyle={{
-          padding:10,
-          paddingBottom:300
-        }}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
+/* =========================
+LOAD TOKEN
+========================= */
 
-      <BlurView intensity={40} tint="dark" style={styles.blur}>
+useEffect(()=>{
 
-        <Text style={styles.title}>
-          All Classes
-        </Text>
+const loadToken = async()=>{
 
-        <Text style={styles.subtitle}>
-          Available classrooms in your school
-        </Text>
+const savedToken = await AsyncStorage.getItem("userToken");
+setToken(savedToken);
 
-        <View style={{marginTop:20}}>
+};
 
-          <TextInput
-            value={search}
-            onChangeText={handleSearch}
-            placeholder="Search class..."
-            placeholderTextColor="#94a3b8"
-            style={{
-              backgroundColor:"#0f172a",
-              borderWidth:1,
-              borderColor:"#334155",
-              borderRadius:10,
-              padding:12,
-              color:"#fff",
-              marginBottom:20
-            }}
-          />
+loadToken();
 
-          {filteredClasses.length === 0 && !loading &&(
-            <Text style={{
-              color:"#94a3b8",
-              textAlign:"center",
-              marginTop:30
-            }}>
-              No classes found
-            </Text>
-          )}
+},[]);
 
-          {filteredClasses.map((item,index)=>(
-            <Animated.View
-              key={item.id}
-              style={{
-                transform:[{scale:scaleAnim}],
-                marginBottom:15
-              }}
-            >
-              <TouchableOpacity
-                onPressIn={pressIn}
-                onPressOut={pressOut}
-                onPress={()=>openStreams(item)}
-                activeOpacity={0.9}
-              >
-                <LinearGradient
-                  colors={["#1e293b","#0f172a"]}
-                  style={{
-                    padding:18,
-                    borderRadius:14,
-                    borderWidth:1,
-                    borderColor:"#334155"
-                  }}
-                >
-                  <View style={{
-                    flexDirection:"row",
-                    justifyContent:"space-between",
-                    alignItems:"center"
-                  }}>
-                    <View>
-                      <Text style={{
-                        color:"#ffffff",
-                        fontSize:18,
-                        fontWeight:"bold"
-                      }}>
-                        {item.name}
-                      </Text>
+/* =========================
+FETCH CLASSES
+========================= */
 
-                      <Text style={{
-                        color:"#94a3b8",
-                        marginTop:4
-                      }}>
-                        Classroom
-                      </Text>
-                    </View>
+useEffect(()=>{
 
-                    <View style={{
-                      backgroundColor:"#2563eb",
-                      paddingHorizontal:12,
-                      paddingVertical:6,
-                      borderRadius:8
-                    }}>
-                      <Text style={{
-                        color:"#ffffff",
-                        fontWeight:"bold"
-                      }}>
-                        ID {item.id}
-                      </Text>
-                    </View>
-                  </View>
-                </LinearGradient>
-              </TouchableOpacity>
-            </Animated.View>
-          ))}
+if(token){
+fetchClasses(token);
+}
 
-        </View>
-      </BlurView>
-      </ScrollView>
+},[token]);
 
-      {loading &&(
-        <View style={styles.loader}>
-          <View style={styles.loaderCard}>
-            <ActivityIndicator
-              size="large"
-              color="#2563eb"
-            />
-            <Text style={styles.loadingText}>
-              Fetching classes...
-            </Text>
-          </View>
-        </View>
-      )}
+const fetchClasses = async(token)=>{
 
-      <Toast/>
-    </LinearGradient>
-  )
+setLoading(true);
+
+try{
+
+console.log("TOKEN => ", token);
+
+const response = await axios.get(
+EndPoint + "/classes/",
+{
+headers:{
+Authorization:`Token ${token}`,
+"Content-Type":"application/json"
+}
+}
+);
+
+console.log("CLASSES => ",response.data);
+
+setClasses(response.data);
+setFilteredClasses(response.data);
+
+Haptics.notificationAsync(
+Haptics.NotificationFeedbackType.Success
+);
+
+setLoading(false);
+
+}catch(error){
+
+setLoading(false);
+
+console.log("ERROR => ",error.response?.data);
+
+Toast.show({
+type:"error",
+text1:"Error fetching classes",
+text2:JSON.stringify(error.response?.data)
+});
+
+}
+
+}
+
+/* =========================
+SEARCH
+========================= */
+
+const handleSearch=(text)=>{
+
+setSearch(text);
+
+if(text === ""){
+setFilteredClasses(classes);
+return;
+}
+
+const filtered = classes.filter((item)=>
+item.name.toLowerCase().includes(text.toLowerCase())
+);
+
+setFilteredClasses(filtered);
+
+}
+
+/* =========================
+NAVIGATION
+========================= */
+
+const openStreams=(item)=>{
+
+router.push({
+pathname:"/(Attendance)/attandance-all-streams",
+params:{
+classId:item.id,
+className:item.name
+}
+});
+
+}
+
+return(
+
+<LinearGradient
+colors={["#020617","#0f172a","#111827","#1e293b"]}
+style={styles.container}
+>
+
+<Image
+source={{
+uri:"https://images.unsplash.com/photo-1588072432836-e10032774350"
+}}
+style={[
+styles.bg,
+{
+opacity:0.18
+}
+]}
+/>
+
+<View style={{
+position:"absolute",
+top:-120,
+right:-100,
+width:260,
+height:260,
+borderRadius:200,
+backgroundColor:"rgba(59,130,246,0.15)"
+}}/>
+
+<View style={{
+position:"absolute",
+bottom:-140,
+left:-100,
+width:280,
+height:280,
+borderRadius:200,
+backgroundColor:"rgba(14,165,233,0.12)"
+}}/>
+
+<Header
+title="Attendance Dashboard"
+subtitle="School Management System"
+/>
+
+<Animated.ScrollView
+contentContainerStyle={{
+padding:14,
+paddingBottom:320
+}}
+showsVerticalScrollIndicator={false}
+keyboardShouldPersistTaps="handled"
+style={{
+opacity:fadeAnim,
+transform:[{translateY:slideAnim}]
+}}
+>
+
+{/* =========================
+TOP CARD
+========================= */}
+
+<LinearGradient
+colors={["rgba(37,99,235,0.30)","rgba(15,23,42,0.92)"]}
+start={{x:0,y:0}}
+end={{x:1,y:1}}
+style={{
+borderRadius:28,
+padding:24,
+marginBottom:24,
+borderWidth:1,
+borderColor:"rgba(255,255,255,0.08)",
+overflow:"hidden"
+}}
+>
+
+<View style={{
+position:"absolute",
+top:-30,
+right:-30,
+width:120,
+height:120,
+borderRadius:100,
+backgroundColor:"rgba(96,165,250,0.15)"
+}}/>
+
+<View style={{
+flexDirection:"row",
+justifyContent:"space-between",
+alignItems:"center"
+}}>
+
+<View style={{flex:1,paddingRight:10}}>
+
+<Text style={{
+fontSize:29,
+fontWeight:"900",
+color:"#ffffff",
+letterSpacing:0.5
+}}>
+All Classes
+</Text>
+
+<Text style={{
+fontSize:15,
+color:"#cbd5e1",
+marginTop:10,
+lineHeight:22
+}}>
+Choose classroom and continue with student attendance management system.
+</Text>
+
+<View style={{
+flexDirection:"row",
+alignItems:"center",
+marginTop:18,
+flexWrap:"wrap"
+}}>
+
+<View style={{
+backgroundColor:"rgba(59,130,246,0.18)",
+paddingHorizontal:14,
+paddingVertical:8,
+borderRadius:14,
+marginRight:10,
+marginBottom:10,
+borderWidth:1,
+borderColor:"rgba(96,165,250,0.25)"
+}}>
+
+<Text style={{
+color:"#dbeafe",
+fontWeight:"700",
+fontSize:13
+}}>
+Total: {filteredClasses.length}
+</Text>
+
+</View>
+
+<View style={{
+backgroundColor:"rgba(16,185,129,0.15)",
+paddingHorizontal:14,
+paddingVertical:8,
+borderRadius:14,
+borderWidth:1,
+marginBottom:10,
+borderColor:"rgba(16,185,129,0.25)"
+}}>
+
+<Text style={{
+color:"#bbf7d0",
+fontWeight:"700",
+fontSize:13
+}}>
+Attendance Ready
+</Text>
+
+</View>
+
+</View>
+
+</View>
+
+<View style={{
+width:78,
+height:78,
+borderRadius:24,
+backgroundColor:"rgba(255,255,255,0.08)",
+justifyContent:"center",
+alignItems:"center",
+borderWidth:1,
+borderColor:"rgba(255,255,255,0.08)"
+}}>
+
+<Ionicons
+name="people-outline"
+size={38}
+color="#60a5fa"
+/>
+
+</View>
+
+</View>
+
+</LinearGradient>
+
+{/* =========================
+SEARCH AREA
+========================= */}
+
+<BlurView
+intensity={60}
+tint="dark"
+style={{
+borderRadius:24,
+padding:18,
+marginBottom:20,
+overflow:"hidden",
+borderWidth:1,
+borderColor:"rgba(255,255,255,0.06)",
+backgroundColor:"rgba(15,23,42,0.45)"
+}}
+>
+
+<View style={{
+flexDirection:"row",
+alignItems:"center",
+backgroundColor:"rgba(2,6,23,0.75)",
+borderRadius:18,
+paddingHorizontal:16,
+borderWidth:1,
+borderColor:"rgba(148,163,184,0.15)"
+}}>
+
+<Ionicons
+name="search"
+size={22}
+color="#94a3b8"
+style={{marginRight:10}}
+/>
+
+<TextInput
+value={search}
+onChangeText={handleSearch}
+placeholder="Search class..."
+placeholderTextColor="#94a3b8"
+style={{
+flex:1,
+paddingVertical:16,
+fontSize:15,
+color:"#ffffff"
+}}
+/>
+
+{search !== "" &&(
+
+<TouchableOpacity onPress={()=>handleSearch("")}>
+
+<Ionicons
+name="close-circle"
+size={22}
+color="#64748b"
+/>
+
+</TouchableOpacity>
+
+)}
+
+</View>
+
+</BlurView>
+
+{/* =========================
+EMPTY STATE
+========================= */}
+
+{filteredClasses.length === 0 && !loading &&(
+
+<BlurView
+intensity={50}
+tint="dark"
+style={{
+padding:30,
+borderRadius:24,
+alignItems:"center",
+backgroundColor:"rgba(15,23,42,0.45)",
+borderWidth:1,
+borderColor:"rgba(255,255,255,0.05)"
+}}
+>
+
+<Ionicons
+name="school-outline"
+size={60}
+color="#475569"
+/>
+
+<Text style={{
+color:"#e2e8f0",
+fontSize:18,
+fontWeight:"700",
+marginTop:15
+}}>
+No Classes Found
+</Text>
+
+<Text style={{
+color:"#94a3b8",
+textAlign:"center",
+marginTop:8,
+lineHeight:22
+}}>
+Try searching using another keyword or refresh your classroom records.
+</Text>
+
+</BlurView>
+
+)}
+
+{/* =========================
+CLASS LIST
+========================= */}
+
+{filteredClasses.map((item,index)=>(
+
+<Animated.View
+key={item.id}
+style={{
+transform:[{scale:getScaleAnim(item.id)}],
+marginBottom:18
+}}
+>
+
+<TouchableOpacity
+activeOpacity={0.9}
+onPressIn={()=>pressIn(item.id)}
+onPressOut={()=>pressOut(item.id)}
+onPress={()=>openStreams(item)}
+>
+
+<LinearGradient
+colors={[
+"rgba(30,41,59,0.98)",
+"rgba(15,23,42,0.97)",
+"rgba(2,6,23,0.98)"
+]}
+start={{x:0,y:0}}
+end={{x:1,y:1}}
+style={{
+borderRadius:26,
+padding:20,
+borderWidth:1,
+borderColor:"rgba(148,163,184,0.10)",
+overflow:"hidden"
+}}
+>
+
+<View style={{
+position:"absolute",
+top:-20,
+right:-20,
+width:100,
+height:100,
+borderRadius:60,
+backgroundColor:"rgba(59,130,246,0.08)"
+}}/>
+
+<View style={{
+flexDirection:"row",
+justifyContent:"space-between",
+alignItems:"center"
+}}>
+
+<View style={{
+flexDirection:"row",
+alignItems:"center",
+flex:1
+}}>
+
+<View style={{
+width:62,
+height:62,
+borderRadius:20,
+justifyContent:"center",
+alignItems:"center",
+backgroundColor:"rgba(37,99,235,0.18)",
+borderWidth:1,
+borderColor:"rgba(96,165,250,0.18)",
+marginRight:16
+}}
+>
+
+<Ionicons
+name="library-outline"
+size={28}
+color="#60a5fa"
+/>
+
+</View>
+
+<View style={{flex:1}}>
+
+<Text style={{
+color:"#ffffff",
+fontSize:19,
+fontWeight:"800",
+letterSpacing:0.3
+}}>
+{item.name}
+</Text>
+
+<Text style={{
+color:"#94a3b8",
+marginTop:6,
+fontSize:14
+}}>
+Classroom
+</Text>
+
+<View style={{
+flexDirection:"row",
+alignItems:"center",
+marginTop:12,
+flexWrap:"wrap"
+}}>
+
+<View style={{
+backgroundColor:"rgba(16,185,129,0.14)",
+paddingHorizontal:10,
+paddingVertical:5,
+borderRadius:10,
+marginRight:10,
+marginBottom:8
+}}>
+
+<Text style={{
+color:"#bbf7d0",
+fontSize:12,
+fontWeight:"700"
+}}>
+Available
+</Text>
+
+</View>
+
+<View style={{
+backgroundColor:"rgba(245,158,11,0.14)",
+paddingHorizontal:10,
+paddingVertical:5,
+borderRadius:10,
+marginBottom:8
+}}>
+
+<Text style={{
+color:"#fde68a",
+fontSize:12,
+fontWeight:"700"
+}}>
+#{index + 1}
+</Text>
+
+</View>
+
+</View>
+
+</View>
+
+</View>
+
+<View style={{
+alignItems:"center"
+}}>
+
+<View style={{
+backgroundColor:"#2563eb",
+paddingHorizontal:14,
+paddingVertical:8,
+borderRadius:14,
+marginBottom:10
+}}>
+
+<Text style={{
+color:"#ffffff",
+fontWeight:"800",
+fontSize:13
+}}>
+ID {item.id}
+</Text>
+
+</View>
+
+<Ionicons
+name="chevron-forward-circle"
+size={28}
+color="#60a5fa"
+/>
+
+</View>
+
+</View>
+
+</LinearGradient>
+
+</TouchableOpacity>
+
+</Animated.View>
+
+))}
+
+</Animated.ScrollView>
+
+{/* =========================
+LOADING
+========================= */}
+
+{loading &&(
+
+<View style={styles.loader}>
+
+<BlurView
+intensity={80}
+tint="dark"
+style={{
+padding:28,
+borderRadius:24,
+alignItems:"center",
+overflow:"hidden",
+backgroundColor:"rgba(15,23,42,0.8)"
+}}
+>
+
+<ActivityIndicator
+size="large"
+color="#38bdf8"
+/>
+
+<Text style={{
+color:"#ffffff",
+fontSize:16,
+fontWeight:"700",
+marginTop:16
+}}>
+Fetching classes...
+</Text>
+
+<Text style={{
+color:"#94a3b8",
+marginTop:6,
+fontSize:13
+}}>
+Please wait a moment
+</Text>
+
+</BlurView>
+
+</View>
+
+)}
+
+<Toast/>
+
+</LinearGradient>
+
+)
+
 }

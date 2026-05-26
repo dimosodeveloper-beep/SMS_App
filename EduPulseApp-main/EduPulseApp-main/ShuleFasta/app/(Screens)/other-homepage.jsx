@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useContext } from "react";
 import {
   View,
   Text,
@@ -23,11 +23,17 @@ import styles from "../../components/LoginStyles";
 
 import * as Animatable from "react-native-animatable";
 
+import { UserContext } from "../../components/UserContext";
+
 export default function DashboardOptions() {
 
   const router = useRouter();
 
+  const { userData } = useContext(UserContext);
+
   const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const role = userData?.role;
 
   const pressIn = () => {
     Animated.spring(scaleAnim,{
@@ -51,29 +57,41 @@ export default function DashboardOptions() {
     return "Good Evening 🌙";
   };
 
-  const options = [
+  const allOptions = [
     {
-      title:"Student Behaviour & Extra Cariculum Activities",
+      title:"Holistic Student Development",
       icon:<Ionicons name="checkmark-done" size={24} color="#fff" />,
       route:"/(Screens)/get-all-behaviour-students",
       colors:["rgb(2, 23, 10)","#0f1210","#16a34a"]
     },
 
-     {
+    {
       title:"Create Teacher Scheme",
       icon:<Ionicons name="checkmark-done" size={24} color="#fff" />,
       route:"/(Screens)/create-teacher-scheme",
       colors:["#22c55e","#0e78e1","#16a34a"]
     },
 
-     {
+    {
+      title:"Get Teacher Scheme",
+      icon:<Ionicons name="checkmark-done" size={24} color="#fff" />,
+      route:"/(Screens)/get-teacher-schemes",
+      colors:["#441bcb","#0e78e1","#ccd30d"]
+    },
+
+    {
       title:"Give a Comment",
       icon:<Ionicons name="checkmark-done" size={24} color="#fff" />,
       route:"/(Parents)/parent-comment",
       colors:["#373a38","#4ade80","#d41a93"]
     },
 
-
+    {
+      title:"Get  Comments",
+      icon:<Ionicons name="checkmark-done" size={24} color="#fff" />,
+      route:"/(Parents)/get-comments",
+      colors:["#373a38","#4ade80","#d41a93"]
+    },
 
     {
       title:"About ShuleFasta",
@@ -81,9 +99,35 @@ export default function DashboardOptions() {
       route:"/(Screens)/AboutApp",
       colors:["#3b82f6","#60a5fa","#2563eb"]
     },
-  
-    
+
   ];
+
+  let options = [];
+
+  if(role === "admin"){
+
+    options = allOptions;
+
+  } 
+  
+  else if(role === "teacher"){
+
+    options = allOptions.filter(
+      item => item.title !== "Give a Comment"
+    );
+
+  } 
+  
+  else if(role === "parent"){
+
+    options = allOptions.filter(
+      item =>
+        item.title === "Holistic Student Development" ||
+        item.title === "Give a Comment" ||
+        item.title === "About ShuleFasta"
+    );
+
+  }
 
   return(
     <LinearGradient
@@ -119,6 +163,7 @@ export default function DashboardOptions() {
         <View style={styles.optionsContainer}>
 
           {options.map((item,index)=>(
+
             <Animated.View
               key={index}
               style={[
@@ -158,7 +203,11 @@ export default function DashboardOptions() {
 
                     </View>
 
-                    <Ionicons name="chevron-forward" size={22} color="#fff" />
+                    <Ionicons
+                      name="chevron-forward"
+                      size={22}
+                      color="#fff"
+                    />
 
                   </View>
 
@@ -167,6 +216,7 @@ export default function DashboardOptions() {
               </TouchableOpacity>
 
             </Animated.View>
+
           ))}
 
         </View>

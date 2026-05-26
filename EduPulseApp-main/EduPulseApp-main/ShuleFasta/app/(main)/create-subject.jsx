@@ -166,9 +166,9 @@ style={styles.container}
 
 <Image
 source={{
-uri:"https://images.unsplash.com/photo-1588072432836-e10032774350"
+uri:"https://images.unsplash.com/photo-1577896851231-70ef18881754"
 }}
-style={styles.bg}
+style={[styles.bg,{opacity:0.25}]}
 />
 
 <Header
@@ -211,20 +211,31 @@ placeholderTextColor="#94a3b8"
 />
 
 
-<Animated.View style={{transform:[{scale:scaleAnim}]}}>
+<Animated.View style={{transform:[{scale:scaleAnim}], marginTop:20}}>
 
 <TouchableOpacity
 onPressIn={pressIn}
 onPressOut={pressOut}
 onPress={createSubject}
+activeOpacity={0.9}
 >
 
 <LinearGradient
-colors={["#2563eb","#38bdf8"]}
-style={styles.button}
+colors={["#1e293b","#0f172a"]}
+style={{
+padding:16,
+borderRadius:14,
+borderWidth:1,
+borderColor:"#334155",
+alignItems:"center"
+}}
 >
 
-<Text style={styles.buttonText}>
+<Text style={{
+color:"#fff",
+fontWeight:"bold",
+fontSize:16
+}}>
 Create Subject
 </Text>
 

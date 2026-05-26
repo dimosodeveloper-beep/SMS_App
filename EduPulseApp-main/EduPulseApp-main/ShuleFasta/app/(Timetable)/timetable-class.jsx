@@ -25,6 +25,7 @@ import {EndPoint} from "../../components/links";
 import Header from "../../components/Header";
 
 import {useRouter} from "expo-router";
+import {Ionicons,MaterialCommunityIcons} from "@expo/vector-icons";
 
 export default function getTimeTableClasses(){
 
@@ -41,7 +42,8 @@ export default function getTimeTableClasses(){
   // Animation
   const pressIn=()=>{
     Animated.spring(scaleAnim,{
-      toValue:0.95,
+      toValue:0.96,
+      friction:4,
       useNativeDriver:true
     }).start();
   }
@@ -49,6 +51,7 @@ export default function getTimeTableClasses(){
   const pressOut=()=>{
     Animated.spring(scaleAnim,{
       toValue:1,
+      friction:4,
       useNativeDriver:true
     }).start();
   }
@@ -154,11 +157,17 @@ export default function getTimeTableClasses(){
       colors={["#020617","#0f172a","#1e293b"]}
       style={styles.container}
     >
+
       <Image
         source={{
           uri:"https://images.unsplash.com/photo-1588072432836-e10032774350"
         }}
-        style={styles.bg}
+        style={[
+          styles.bg,
+          {
+            opacity:0.18
+          }
+        ]}
       />
 
       <Header
@@ -168,144 +177,490 @@ export default function getTimeTableClasses(){
 
       <ScrollView
         contentContainerStyle={{
-          padding:10,
+          padding:15,
           paddingBottom:300
         }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
 
-      <BlurView intensity={40} tint="dark" style={styles.blur}>
+      <BlurView
+        intensity={55}
+        tint="dark"
+        style={[
+          styles.blur,
+          {
+            borderRadius:28,
+            borderWidth:1,
+            borderColor:"rgba(255,255,255,0.08)",
+            overflow:"hidden",
+            backgroundColor:"rgba(15,23,42,0.45)"
+          }
+        ]}
+      >
 
-        <Text style={styles.title}>
-          Select Class
-        </Text>
+        {/* TOP HEADER */}
+        <LinearGradient
+          colors={["rgba(37,99,235,0.18)","rgba(56,189,248,0.05)"]}
+          style={{
+            padding:20,
+            borderRadius:24,
+            marginBottom:20,
+            borderWidth:1,
+            borderColor:"rgba(59,130,246,0.15)"
+          }}
+        >
 
-        <Text style={styles.subtitle}>
-          Choose class to view timetable
-        </Text>
+          <View style={{
+            flexDirection:"row",
+            justifyContent:"space-between",
+            alignItems:"center"
+          }}>
 
-        <View style={{marginTop:20}}>
+            <View style={{flex:1,paddingRight:10}}>
 
-          <TextInput
-            value={search}
-            onChangeText={handleSearch}
-            placeholder="Search class..."
-            placeholderTextColor="#94a3b8"
+              <Text style={{
+                color:"#ffffff",
+                fontSize:26,
+                fontWeight:"bold"
+              }}>
+                Select Class
+              </Text>
+
+              <Text style={{
+                color:"#cbd5e1",
+                marginTop:8,
+                lineHeight:22,
+                fontSize:14
+              }}>
+                Choose a classroom to view timetable schedules and daily sessions.
+              </Text>
+
+            </View>
+
+            <LinearGradient
+              colors={["#2563eb","#38bdf8"]}
+              style={{
+                width:65,
+                height:65,
+                borderRadius:20,
+                justifyContent:"center",
+                alignItems:"center"
+              }}
+            >
+              <Ionicons
+                name="calendar-outline"
+                size={30}
+                color="#fff"
+              />
+            </LinearGradient>
+
+          </View>
+
+        </LinearGradient>
+
+        {/* SEARCH */}
+        <View style={{
+          marginBottom:22
+        }}>
+
+          <View style={{
+            flexDirection:"row",
+            alignItems:"center",
+            backgroundColor:"rgba(15,23,42,0.9)",
+            borderRadius:18,
+            borderWidth:1,
+            borderColor:"#334155",
+            paddingHorizontal:15,
+            height:58
+          }}>
+
+            <Ionicons
+              name="search"
+              size={20}
+              color="#94a3b8"
+            />
+
+            <TextInput
+              value={search}
+              onChangeText={handleSearch}
+              placeholder="Search class..."
+              placeholderTextColor="#94a3b8"
+              style={{
+                flex:1,
+                color:"#fff",
+                marginLeft:10,
+                fontSize:15
+              }}
+            />
+
+            {search !== "" &&(
+              <TouchableOpacity onPress={()=>handleSearch("")}>
+                <Ionicons
+                  name="close-circle"
+                  size={20}
+                  color="#94a3b8"
+                />
+              </TouchableOpacity>
+            )}
+
+          </View>
+
+        </View>
+
+        {/* STATS */}
+        <View style={{
+          flexDirection:"row",
+          justifyContent:"space-between",
+          marginBottom:25
+        }}>
+
+          <LinearGradient
+            colors={["#1e293b","#0f172a"]}
             style={{
-              backgroundColor:"#0f172a",
+              width:"48%",
+              borderRadius:22,
+              padding:16,
               borderWidth:1,
-              borderColor:"#334155",
-              borderRadius:10,
-              padding:12,
-              color:"#fff",
-              marginBottom:20
+              borderColor:"#334155"
             }}
-          />
+          >
 
-          {filteredClasses.length === 0 && !loading &&(
+            <View style={{
+              width:45,
+              height:45,
+              borderRadius:14,
+              backgroundColor:"rgba(37,99,235,0.2)",
+              justifyContent:"center",
+              alignItems:"center",
+              marginBottom:12
+            }}>
+              <Ionicons
+                name="school-outline"
+                size={22}
+                color="#38bdf8"
+              />
+            </View>
+
+            <Text style={{
+              color:"#94a3b8",
+              fontSize:13
+            }}>
+              Total Classes
+            </Text>
+
+            <Text style={{
+              color:"#fff",
+              fontSize:26,
+              fontWeight:"bold",
+              marginTop:5
+            }}>
+              {classes.length}
+            </Text>
+
+          </LinearGradient>
+
+          <LinearGradient
+            colors={["#1e293b","#0f172a"]}
+            style={{
+              width:"48%",
+              borderRadius:22,
+              padding:16,
+              borderWidth:1,
+              borderColor:"#334155"
+            }}
+          >
+
+            <View style={{
+              width:45,
+              height:45,
+              borderRadius:14,
+              backgroundColor:"rgba(34,197,94,0.2)",
+              justifyContent:"center",
+              alignItems:"center",
+              marginBottom:12
+            }}>
+              <MaterialCommunityIcons
+                name="table-clock"
+                size={22}
+                color="#22c55e"
+              />
+            </View>
+
+            <Text style={{
+              color:"#94a3b8",
+              fontSize:13
+            }}>
+              Available
+            </Text>
+
+            <Text style={{
+              color:"#fff",
+              fontSize:26,
+              fontWeight:"bold",
+              marginTop:5
+            }}>
+              {filteredClasses.length}
+            </Text>
+
+          </LinearGradient>
+
+        </View>
+
+        {/* EMPTY */}
+        {filteredClasses.length === 0 && !loading &&(
+          <View style={{
+            justifyContent:"center",
+            alignItems:"center",
+            paddingVertical:50
+          }}>
+
+            <Ionicons
+              name="folder-open-outline"
+              size={70}
+              color="#475569"
+            />
+
             <Text style={{
               color:"#94a3b8",
               textAlign:"center",
-              marginTop:30
+              marginTop:15,
+              fontSize:16
             }}>
               No classes found
             </Text>
-          )}
 
-          {filteredClasses.map((item,index)=>(
+          </View>
+        )}
 
-            <Animated.View
-              key={item.id}
-              style={{
-                transform:[{scale:scaleAnim}],
-                marginBottom:15
-              }}
+        {/* CLASS LIST */}
+        {filteredClasses.map((item,index)=>(
+
+          <Animated.View
+            key={item.id}
+            style={{
+              transform:[{scale:scaleAnim}],
+              marginBottom:18
+            }}
+          >
+
+            <TouchableOpacity
+              onPressIn={pressIn}
+              onPressOut={pressOut}
+              onPress={()=>openTimetable(item)}
+              activeOpacity={0.9}
             >
 
-              <TouchableOpacity
-                onPressIn={pressIn}
-                onPressOut={pressOut}
-                onPress={()=>openTimetable(item)}
-                activeOpacity={0.9}
+              <LinearGradient
+                colors={[
+                  "rgba(30,41,59,0.95)",
+                  "rgba(15,23,42,0.98)"
+                ]}
+                style={{
+                  padding:20,
+                  borderRadius:24,
+                  borderWidth:1,
+                  borderColor:"rgba(148,163,184,0.15)",
+                  overflow:"hidden"
+                }}
               >
 
-                <LinearGradient
-                  colors={["#1e293b","#0f172a"]}
-                  style={{
-                    padding:18,
-                    borderRadius:14,
-                    borderWidth:1,
-                    borderColor:"#334155"
-                  }}
-                >
+                {/* GLOW */}
+                <View style={{
+                  position:"absolute",
+                  top:-30,
+                  right:-30,
+                  width:100,
+                  height:100,
+                  borderRadius:50,
+                  backgroundColor:"rgba(37,99,235,0.12)"
+                }}/>
 
-                  <View style={{
-                    flexDirection:"row",
-                    justifyContent:"space-between",
-                    alignItems:"center"
-                  }}>
+                <View style={{
+                  flexDirection:"row",
+                  justifyContent:"space-between",
+                  alignItems:"center"
+                }}>
 
-                    <View>
-                      <Text style={{
-                        color:"#ffffff",
-                        fontSize:18,
-                        fontWeight:"bold"
+                  <View style={{flex:1}}>
+
+                    <View style={{
+                      flexDirection:"row",
+                      alignItems:"center"
+                    }}>
+
+                      <View style={{
+                        width:52,
+                        height:52,
+                        borderRadius:16,
+                        justifyContent:"center",
+                        alignItems:"center",
+                        backgroundColor:"rgba(37,99,235,0.18)",
+                        marginRight:14
                       }}>
-                        {item.name}
-                      </Text>
 
-                      <Text style={{
-                        color:"#94a3b8",
-                        marginTop:4
-                      }}>
-                        Classroom
-                      </Text>
+                        <Ionicons
+                          name="book-outline"
+                          size={24}
+                          color="#38bdf8"
+                        />
+
+                      </View>
+
+                      <View style={{flex:1}}>
+
+                        <Text style={{
+                          color:"#ffffff",
+                          fontSize:19,
+                          fontWeight:"bold"
+                        }}>
+                          {item.name}
+                        </Text>
+
+                        <Text style={{
+                          color:"#94a3b8",
+                          marginTop:5,
+                          fontSize:13
+                        }}>
+                          Classroom Timetable
+                        </Text>
+
+                      </View>
+
                     </View>
 
                     <View style={{
-                      backgroundColor:"#2563eb",
-                      paddingHorizontal:12,
-                      paddingVertical:6,
-                      borderRadius:8
+                      flexDirection:"row",
+                      marginTop:18
                     }}>
-                      <Text style={{
-                        color:"#ffffff",
-                        fontWeight:"bold"
+
+                      <View style={{
+                        backgroundColor:"rgba(37,99,235,0.15)",
+                        paddingHorizontal:12,
+                        paddingVertical:7,
+                        borderRadius:12,
+                        marginRight:10
                       }}>
-                        ID {item.id}
-                      </Text>
+                        <Text style={{
+                          color:"#38bdf8",
+                          fontWeight:"600",
+                          fontSize:12
+                        }}>
+                          CLASS ID {item.id}
+                        </Text>
+                      </View>
+
+                      <View style={{
+                        backgroundColor:"rgba(34,197,94,0.15)",
+                        paddingHorizontal:12,
+                        paddingVertical:7,
+                        borderRadius:12
+                      }}>
+                        <Text style={{
+                          color:"#22c55e",
+                          fontWeight:"600",
+                          fontSize:12
+                        }}>
+                          ACTIVE
+                        </Text>
+                      </View>
+
                     </View>
 
                   </View>
 
-                </LinearGradient>
+                  <LinearGradient
+                    colors={["#2563eb","#38bdf8"]}
+                    style={{
+                      width:48,
+                      height:48,
+                      borderRadius:16,
+                      justifyContent:"center",
+                      alignItems:"center",
+                      marginLeft:15
+                    }}
+                  >
 
-              </TouchableOpacity>
+                    <Ionicons
+                      name="arrow-forward"
+                      size={22}
+                      color="#fff"
+                    />
 
-            </Animated.View>
+                  </LinearGradient>
 
-          ))}
+                </View>
 
-        </View>
+              </LinearGradient>
+
+            </TouchableOpacity>
+
+          </Animated.View>
+
+        ))}
+
       </BlurView>
+
       </ScrollView>
 
+      {/* LOADER */}
       {loading &&(
         <View style={styles.loader}>
-          <View style={styles.loaderCard}>
-            <ActivityIndicator
-              size="large"
-              color="#2563eb"
-            />
-            <Text style={styles.loadingText}>
-              Fetching classes...
-            </Text>
-          </View>
+
+          <BlurView
+            intensity={70}
+            tint="dark"
+            style={[
+              styles.loaderCard,
+              {
+                borderRadius:22,
+                overflow:"hidden",
+                borderWidth:1,
+                borderColor:"rgba(255,255,255,0.08)"
+              }
+            ]}
+          >
+
+            <LinearGradient
+              colors={["rgba(37,99,235,0.2)","rgba(15,23,42,0.95)"]}
+              style={{
+                padding:30,
+                alignItems:"center",
+                borderRadius:22
+              }}
+            >
+
+              <ActivityIndicator
+                size="large"
+                color="#38bdf8"
+              />
+
+              <Text style={{
+                color:"#fff",
+                marginTop:15,
+                fontSize:16,
+                fontWeight:"600"
+              }}>
+                Fetching classes...
+              </Text>
+
+              <Text style={{
+                color:"#94a3b8",
+                marginTop:6,
+                textAlign:"center"
+              }}>
+                Please wait while loading timetable classrooms
+              </Text>
+
+            </LinearGradient>
+
+          </BlurView>
+
         </View>
       )}
 
       <Toast/>
+
     </LinearGradient>
   )
 }

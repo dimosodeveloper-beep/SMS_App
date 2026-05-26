@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useRef} from "react";
 
 import{
 View,
@@ -42,20 +42,46 @@ const[loading,setLoading] = useState(false);
 
 const[token,setToken] = useState(null);
 
-const scaleAnim = new Animated.Value(1);
-
-
+const fadeAnim = useRef(new Animated.Value(0)).current;
+const slideAnim = useRef(new Animated.Value(40)).current;
+const scaleAnim = useRef(new Animated.Value(1)).current;
 
 /* =========================
-ANIMATION
+SCREEN ANIMATION
 ========================= */
+useEffect(()=>{
 
+Animated.parallel([
+
+Animated.timing(fadeAnim,{
+toValue:1,
+duration:800,
+useNativeDriver:true
+}),
+
+Animated.timing(slideAnim,{
+toValue:0,
+duration:800,
+useNativeDriver:true
+})
+
+]).start();
+
+},[]);
+
+/* =========================
+PRESS ANIMATION
+========================= */
 const pressIn=()=>{
 
 Animated.spring(scaleAnim,{
-toValue:0.95,
+toValue:0.96,
 useNativeDriver:true
 }).start();
+
+Haptics.impactAsync(
+Haptics.ImpactFeedbackStyle.Light
+);
 
 }
 
@@ -63,11 +89,11 @@ const pressOut=()=>{
 
 Animated.spring(scaleAnim,{
 toValue:1,
+friction:5,
 useNativeDriver:true
 }).start();
 
 }
-
 
 
 /* =========================
@@ -101,7 +127,6 @@ loadToken();
 },[]);
 
 
-
 /* =========================
 FETCH STUDENTS
 ========================= */
@@ -115,7 +140,6 @@ fetchStudents();
 }
 
 },[token]);
-
 
 
 const fetchStudents = async()=>{
@@ -145,7 +169,6 @@ console.log("ERROR => ",error.response?.data);
 }
 
 
-
 /* =========================
 FILTER STUDENTS
 ========================= */
@@ -157,7 +180,6 @@ const filteredStudents = students.filter((item)=>
 .includes(searchStudent.toLowerCase())
 
 );
-
 
 
 /* =========================
@@ -203,8 +225,6 @@ status:status
 
 };
 
-console.log("PAYLOAD => ",payload);
-
 const response = await axios.post(
 
 EndPoint + "/create-student-behaviour/",
@@ -220,8 +240,6 @@ Authorization:`Token ${token}`,
 
 );
 
-console.log("SUCCESS => ",response.data);
-
 Haptics.notificationAsync(
 Haptics.NotificationFeedbackType.Success
 );
@@ -233,18 +251,12 @@ text2:"Student behaviour saved successfully"
 });
 
 setStudent(null);
-
 setTitle("");
 setDescription("");
 setStatus("");
-
 setSearchStudent("");
 
-setLoading(false);
-
 }catch(error){
-
-setLoading(false);
 
 console.log("ERROR => ",error.response?.data);
 
@@ -256,14 +268,15 @@ text2:JSON.stringify(error.response?.data)
 
 }
 
-};
+setLoading(false);
 
+};
 
 
 return(
 
 <LinearGradient
-colors={["#020617","#0f172a","#1e293b"]}
+colors={["#020617","#0f172a","#111827","#1e293b"]}
 style={styles.container}
 >
 
@@ -271,41 +284,87 @@ style={styles.container}
 source={{
 uri:"https://images.unsplash.com/photo-1588072432836-e10032774350"
 }}
-style={styles.bg}
+style={[
+styles.bg,
+{opacity:0.18}
+]}
 />
+
+<View style={{
+position:"absolute",
+top:-120,
+right:-100,
+width:260,
+height:260,
+borderRadius:200,
+backgroundColor:"rgba(59,130,246,0.18)"
+}}/>
+
+<View style={{
+position:"absolute",
+bottom:-140,
+left:-100,
+width:260,
+height:260,
+borderRadius:200,
+backgroundColor:"rgba(14,165,233,0.12)"
+}}/>
 
 <Header
 title="School Dashboard"
 subtitle="Management System"
 />
 
-<ScrollView
+<Animated.ScrollView
 contentContainerStyle={{
-padding:10,
+padding:14,
 paddingBottom:300
 }}
 showsVerticalScrollIndicator={false}
 keyboardShouldPersistTaps="handled"
+style={{
+opacity:fadeAnim,
+transform:[{translateY:slideAnim}]
+}}
 >
 
-<BlurView intensity={40} tint="dark" style={styles.blur}>
+<BlurView
+intensity={60}
+tint="dark"
+style={[
+styles.blur,
+{
+borderRadius:28,
+borderWidth:1,
+borderColor:"rgba(255,255,255,0.08)",
+backgroundColor:"rgba(15,23,42,0.72)",
+padding:18
+}
+]}
+>
 
-<Text style={styles.title}>
+<Text style={{
+color:"#fff",
+fontSize:26,
+fontWeight:"bold",
+textAlign:"center"
+}}>
 Create Student Behaviour
 </Text>
 
-<Text style={styles.subtitle}>
-Student behaviour management
+<Text style={{
+color:"#94a3b8",
+textAlign:"center",
+marginTop:6,
+marginBottom:20
+}}>
+Student behaviour management system
 </Text>
 
 <View style={styles.form}>
 
-
-{/* SELECT STUDENT */}
-
-<Text style={styles.label}>
-Student
-</Text>
+{/* STUDENT SELECT */}
+<Text style={styles.label}>Student</Text>
 
 <TouchableOpacity onPress={()=>setShowStudent(true)}>
 
@@ -319,7 +378,6 @@ editable={false}
 
 </TouchableOpacity>
 
-
 {showStudent &&(
 
 <View style={{
@@ -327,7 +385,9 @@ backgroundColor:"#0f172a",
 borderRadius:12,
 padding:10,
 marginBottom:10,
-maxHeight:200
+maxHeight:200,
+borderWidth:1,
+borderColor:"rgba(148,163,184,0.15)"
 }}>
 
 <TextInput
@@ -347,11 +407,7 @@ key={item.id}
 onPress={()=>{
 
 setStudent(item.id);
-
-setSearchStudent(
-item.first_name + " " + item.last_name
-);
-
+setSearchStudent(item.first_name + " " + item.last_name);
 setShowStudent(false);
 
 }}
@@ -359,7 +415,7 @@ setShowStudent(false);
 
 <Text style={{
 color:"#fff",
-padding:8
+padding:10
 }}>
 {item.first_name} {item.last_name}
 </Text>
@@ -374,13 +430,8 @@ padding:8
 
 )}
 
-
-
 {/* TITLE */}
-
-<Text style={styles.label}>
-Behaviour Title
-</Text>
+<Text style={styles.label}>Behaviour Title</Text>
 
 <TextInput
 style={styles.input}
@@ -390,47 +441,34 @@ placeholder="Enter behaviour title"
 placeholderTextColor="#94a3b8"
 />
 
-
-
 {/* DESCRIPTION */}
-
-<Text style={[styles.label,{marginTop:15}]}>
-Description
-</Text>
+<Text style={styles.label}>Description</Text>
 
 <TextInput
 style={[
 styles.input,
 {
 height:120,
-textAlignVertical:"top",
-paddingTop:15
+textAlignVertical:"top"
 }
 ]}
-multiline={true}
+multiline
 value={description}
 onChangeText={setDescription}
 placeholder="Enter behaviour description"
 placeholderTextColor="#94a3b8"
 />
 
-
-
 {/* STATUS */}
-
-<Text style={[styles.label,{marginTop:15}]}>
-Status
-</Text>
+<Text style={styles.label}>Status</Text>
 
 <TextInput
 style={styles.input}
 value={status}
 onChangeText={setStatus}
-placeholder="Example: Good / Warning / Excellent"
+placeholder="Good / Warning / Excellent"
 placeholderTextColor="#94a3b8"
 />
-
-
 
 <Animated.View style={{
 transform:[{scale:scaleAnim}],
@@ -441,6 +479,7 @@ marginTop:25
 onPressIn={pressIn}
 onPressOut={pressOut}
 onPress={createBehaviour}
+activeOpacity={0.9}
 >
 
 <LinearGradient
@@ -462,22 +501,30 @@ Save Behaviour
 
 </BlurView>
 
-</ScrollView>
-
-
+</Animated.ScrollView>
 
 {loading &&(
 
 <View style={styles.loader}>
 
-<View style={styles.loaderCard}>
+<View style={[
+styles.loaderCard,
+{
+backgroundColor:"#0f172a",
+borderRadius:20,
+borderWidth:1,
+borderColor:"rgba(148,163,184,0.15)"
+}
+]}>
 
-<ActivityIndicator
-size="large"
-color="#2563eb"
-/>
+<ActivityIndicator size="large" color="#3b82f6"/>
 
-<Text style={styles.loadingText}>
+<Text style={{
+color:"#fff",
+marginTop:15,
+fontSize:16,
+fontWeight:"600"
+}}>
 Saving behaviour...
 </Text>
 

@@ -25,6 +25,7 @@ import {EndPoint} from "../../components/links";
 import Header from "../../components/Header";
 
 import {useRouter} from "expo-router";
+import {Ionicons,MaterialCommunityIcons} from "@expo/vector-icons";
 
 export default function AllSubjects(){
 
@@ -41,7 +42,7 @@ export default function AllSubjects(){
   // Animation
   const pressIn=()=>{
     Animated.spring(scaleAnim,{
-      toValue:0.95,
+      toValue:0.96,
       useNativeDriver:true
     }).start();
   }
@@ -49,6 +50,8 @@ export default function AllSubjects(){
   const pressOut=()=>{
     Animated.spring(scaleAnim,{
       toValue:1,
+      friction:4,
+      tension:40,
       useNativeDriver:true
     }).start();
   }
@@ -126,22 +129,47 @@ export default function AllSubjects(){
   }
 
   const openSubject=(item)=>{
-    // unaweza ku-navigate details page kama unataka
     console.log("Selected Subject => ",item);
   }
 
   return(
     <LinearGradient
-      colors={["#020617","#0f172a","#1e293b"]}
+      colors={["#020617","#0f172a","#111827","#1e293b"]}
       style={styles.container}
     >
 
       <Image
         source={{
-          uri:"https://images.unsplash.com/photo-1588072432836-e10032774350"
+          uri:"https://images.unsplash.com/photo-1524995997946-a1c2e315a42f"
         }}
-        style={styles.bg}
+        style={[
+          styles.bg,
+          {
+            opacity:0.18
+          }
+        ]}
+        blurRadius={2}
       />
+
+      <View style={{
+        position:"absolute",
+        top:-120,
+        right:-80,
+        width:260,
+        height:260,
+        borderRadius:200,
+        backgroundColor:"rgba(37,99,235,0.18)"
+      }}/>
+
+      <View style={{
+        position:"absolute",
+        bottom:-100,
+        left:-80,
+        width:240,
+        height:240,
+        borderRadius:200,
+        backgroundColor:"rgba(56,189,248,0.12)"
+      }}/>
 
       <Header
         title="School Dashboard"
@@ -150,130 +178,407 @@ export default function AllSubjects(){
 
       <ScrollView
         contentContainerStyle={{
-          padding:10,
-          paddingBottom:300
+          paddingHorizontal:14,
+          paddingTop:10,
+          paddingBottom:160
         }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
 
-      <BlurView intensity={40} tint="dark" style={styles.blur}>
+      <BlurView
+        intensity={60}
+        tint="dark"
+        style={[
+          styles.blur,
+          {
+            overflow:"hidden",
+            borderRadius:30,
+            padding:0,
+            backgroundColor:"rgba(15,23,42,0.55)",
+            borderWidth:1,
+            borderColor:"rgba(255,255,255,0.08)"
+          }
+        ]}
+      >
 
-        <Text style={styles.title}>
-          All Subjects
-        </Text>
+        <LinearGradient
+          colors={[
+            "rgba(255,255,255,0.08)",
+            "rgba(255,255,255,0.02)"
+          ]}
+          start={{x:0,y:0}}
+          end={{x:1,y:1}}
+          style={{
+            padding:22,
+            borderRadius:30
+          }}
+        >
 
-        <Text style={styles.subtitle}>
-          Available subjects in your school
-        </Text>
+          <View style={{
+            flexDirection:"row",
+            alignItems:"center",
+            justifyContent:"space-between"
+          }}>
 
-        <View style={{marginTop:20}}>
+            <View style={{flex:1,paddingRight:10}}>
 
-          <TextInput
-            value={search}
-            onChangeText={handleSearch}
-            placeholder="Search subject..."
-            placeholderTextColor="#94a3b8"
-            style={{
-              backgroundColor:"#0f172a",
-              borderWidth:1,
-              borderColor:"#334155",
-              borderRadius:10,
-              padding:12,
-              color:"#fff",
-              marginBottom:20
-            }}
-          />
+              <Text style={{
+                color:"#ffffff",
+                fontSize:30,
+                fontWeight:"900",
+                letterSpacing:0.5
+              }}>
+                All Subjects
+              </Text>
 
-          {filteredSubjects.length === 0 && !loading &&(
-            <Text style={{
-              color:"#94a3b8",
-              textAlign:"center",
-              marginTop:30
-            }}>
-              No subjects found
-            </Text>
-          )}
+              <Text style={{
+                color:"#94a3b8",
+                marginTop:8,
+                fontSize:15,
+                lineHeight:22
+              }}>
+                Available subjects in your school
+              </Text>
 
-          {filteredSubjects.map((item,index)=>(
+            </View>
 
-            <Animated.View
-              key={item.id}
+            <LinearGradient
+              colors={["#2563eb","#38bdf8"]}
               style={{
-                transform:[{scale:scaleAnim}],
-                marginBottom:15
+                width:65,
+                height:65,
+                borderRadius:22,
+                justifyContent:"center",
+                alignItems:"center",
+                shadowColor:"#38bdf8",
+                shadowOpacity:0.5,
+                shadowRadius:12,
+                elevation:10
+              }}
+            >
+              <MaterialCommunityIcons
+                name="book-education"
+                size={30}
+                color="#fff"
+              />
+            </LinearGradient>
+
+          </View>
+
+          <View style={{
+            flexDirection:"row",
+            marginTop:25,
+            gap:12
+          }}>
+
+            <LinearGradient
+              colors={["rgba(37,99,235,0.25)","rgba(59,130,246,0.08)"]}
+              style={{
+                flex:1,
+                borderRadius:22,
+                padding:16,
+                borderWidth:1,
+                borderColor:"rgba(96,165,250,0.25)"
               }}
             >
 
-              <TouchableOpacity
-                onPressIn={pressIn}
-                onPressOut={pressOut}
-                onPress={()=>openSubject(item)}
-                activeOpacity={0.9}
-              >
+              <Text style={{
+                color:"#93c5fd",
+                fontSize:13,
+                marginBottom:6
+              }}>
+                Total Subjects
+              </Text>
 
-                <LinearGradient
-                  colors={["#1e293b","#0f172a"]}
-                  style={{
-                    padding:18,
-                    borderRadius:14,
-                    borderWidth:1,
-                    borderColor:"#334155"
+              <Text style={{
+                color:"#fff",
+                fontSize:24,
+                fontWeight:"900"
+              }}>
+                {subjects.length}
+              </Text>
+
+            </LinearGradient>
+
+            <LinearGradient
+              colors={["rgba(16,185,129,0.25)","rgba(16,185,129,0.06)"]}
+              style={{
+                flex:1,
+                borderRadius:22,
+                padding:16,
+                borderWidth:1,
+                borderColor:"rgba(52,211,153,0.25)"
+              }}
+            >
+
+              <Text style={{
+                color:"#6ee7b7",
+                fontSize:13,
+                marginBottom:6
+              }}>
+                Search Results
+              </Text>
+
+              <Text style={{
+                color:"#fff",
+                fontSize:24,
+                fontWeight:"900"
+              }}>
+                {filteredSubjects.length}
+              </Text>
+
+            </LinearGradient>
+
+          </View>
+
+          <View style={{marginTop:25}}>
+
+            <View style={{
+              flexDirection:"row",
+              alignItems:"center",
+              backgroundColor:"rgba(15,23,42,0.85)",
+              borderWidth:1,
+              borderColor:"rgba(148,163,184,0.15)",
+              borderRadius:20,
+              paddingHorizontal:16,
+              height:60
+            }}>
+
+              <Ionicons
+                name="search"
+                size={22}
+                color="#94a3b8"
+              />
+
+              <TextInput
+                value={search}
+                onChangeText={handleSearch}
+                placeholder="Search subject..."
+                placeholderTextColor="#94a3b8"
+                style={{
+                  flex:1,
+                  color:"#fff",
+                  marginLeft:12,
+                  fontSize:15
+                }}
+              />
+
+              {search !== "" &&(
+
+                <TouchableOpacity
+                  onPress={()=>{
+                    setSearch("");
+                    setFilteredSubjects(subjects);
                   }}
                 >
 
-                  <View style={{
-                    flexDirection:"row",
-                    justifyContent:"space-between",
-                    alignItems:"center"
-                  }}>
+                  <Ionicons
+                    name="close-circle"
+                    size={22}
+                    color="#94a3b8"
+                  />
 
-                    <View>
+                </TouchableOpacity>
 
-                      <Text style={{
-                        color:"#ffffff",
-                        fontSize:18,
-                        fontWeight:"bold"
-                      }}>
-                        {item.name}
-                      </Text>
+              )}
 
-                      <Text style={{
-                        color:"#94a3b8",
-                        marginTop:4
-                      }}>
-                        Subject
-                      </Text>
+            </View>
 
-                    </View>
+          </View>
+
+          {filteredSubjects.length === 0 && !loading &&(
+
+            <View style={{
+              justifyContent:"center",
+              alignItems:"center",
+              paddingVertical:50
+            }}>
+
+              <MaterialCommunityIcons
+                name="book-search-outline"
+                size={75}
+                color="#475569"
+              />
+
+              <Text style={{
+                color:"#cbd5e1",
+                fontSize:20,
+                fontWeight:"700",
+                marginTop:15
+              }}>
+                No Subjects Found
+              </Text>
+
+              <Text style={{
+                color:"#94a3b8",
+                textAlign:"center",
+                marginTop:8,
+                lineHeight:22
+              }}>
+                Try searching using another subject name
+              </Text>
+
+            </View>
+
+          )}
+
+          <View style={{marginTop:22}}>
+
+            {filteredSubjects.map((item,index)=>(
+
+              <Animated.View
+                key={item.id}
+                style={{
+                  transform:[{scale:scaleAnim}],
+                  marginBottom:18
+                }}
+              >
+
+                <TouchableOpacity
+                  onPressIn={pressIn}
+                  onPressOut={pressOut}
+                  onPress={()=>openSubject(item)}
+                  activeOpacity={0.9}
+                >
+
+                  <LinearGradient
+                    colors={[
+                      "rgba(30,41,59,0.95)",
+                      "rgba(15,23,42,0.95)"
+                    ]}
+                    start={{x:0,y:0}}
+                    end={{x:1,y:1}}
+                    style={{
+                      borderRadius:26,
+                      padding:18,
+                      borderWidth:1,
+                      borderColor:"rgba(148,163,184,0.12)",
+                      overflow:"hidden"
+                    }}
+                  >
 
                     <View style={{
-                      backgroundColor:"#2563eb",
-                      paddingHorizontal:12,
-                      paddingVertical:6,
-                      borderRadius:8
+                      position:"absolute",
+                      top:-20,
+                      right:-20,
+                      width:100,
+                      height:100,
+                      borderRadius:100,
+                      backgroundColor:"rgba(37,99,235,0.12)"
+                    }}/>
+
+                    <View style={{
+                      flexDirection:"row",
+                      alignItems:"center"
                     }}>
 
-                      <Text style={{
-                        color:"#ffffff",
-                        fontWeight:"bold"
+                      <LinearGradient
+                        colors={["#2563eb","#38bdf8"]}
+                        style={{
+                          width:70,
+                          height:70,
+                          borderRadius:22,
+                          justifyContent:"center",
+                          alignItems:"center",
+                          marginRight:16
+                        }}
+                      >
+
+                        <MaterialCommunityIcons
+                          name="book-open-page-variant"
+                          size={32}
+                          color="#fff"
+                        />
+
+                      </LinearGradient>
+
+                      <View style={{flex:1}}>
+
+                        <Text style={{
+                          color:"#ffffff",
+                          fontSize:20,
+                          fontWeight:"900",
+                          marginBottom:6
+                        }}>
+                          {item.name}
+                        </Text>
+
+                        <View style={{
+                          flexDirection:"row",
+                          alignItems:"center"
+                        }}>
+
+                          <View style={{
+                            width:8,
+                            height:8,
+                            borderRadius:20,
+                            backgroundColor:"#22c55e",
+                            marginRight:8
+                          }}/>
+
+                          <Text style={{
+                            color:"#94a3b8",
+                            fontSize:14
+                          }}>
+                            Subject Available
+                          </Text>
+
+                        </View>
+
+                        <View style={{
+                          flexDirection:"row",
+                          alignItems:"center",
+                          marginTop:10
+                        }}>
+
+                          <View style={{
+                            backgroundColor:"rgba(37,99,235,0.18)",
+                            paddingHorizontal:12,
+                            paddingVertical:7,
+                            borderRadius:12
+                          }}>
+
+                            <Text style={{
+                              color:"#93c5fd",
+                              fontWeight:"700",
+                              fontSize:12
+                            }}>
+                              SUBJECT ID {item.id}
+                            </Text>
+
+                          </View>
+
+                        </View>
+
+                      </View>
+
+                      <View style={{
+                        justifyContent:"center",
+                        alignItems:"center"
                       }}>
-                        ID {item.id}
-                      </Text>
+
+                        <Ionicons
+                          name="chevron-forward-circle"
+                          size={34}
+                          color="#60a5fa"
+                        />
+
+                      </View>
 
                     </View>
 
-                  </View>
+                  </LinearGradient>
 
-                </LinearGradient>
+                </TouchableOpacity>
 
-              </TouchableOpacity>
+              </Animated.View>
 
-            </Animated.View>
+            ))}
 
-          ))}
+          </View>
 
-        </View>
+        </LinearGradient>
 
       </BlurView>
 
@@ -281,17 +586,95 @@ export default function AllSubjects(){
 
       {loading &&(
         <View style={styles.loader}>
-          <View style={styles.loaderCard}>
+
+          <BlurView
+            intensity={80}
+            tint="dark"
+            style={{
+              width:220,
+              paddingVertical:30,
+              borderRadius:30,
+              justifyContent:"center",
+              alignItems:"center",
+              overflow:"hidden",
+              borderWidth:1,
+              borderColor:"rgba(255,255,255,0.08)",
+              backgroundColor:"rgba(15,23,42,0.75)"
+            }}
+          >
+
+            <LinearGradient
+              colors={[
+                "rgba(37,99,235,0.25)",
+                "rgba(56,189,248,0.08)"
+              ]}
+              style={{
+                position:"absolute",
+                width:"100%",
+                height:"100%"
+              }}
+            />
+
             <ActivityIndicator
               size="large"
-              color="#2563eb"
+              color="#38bdf8"
             />
-            <Text style={styles.loadingText}>
+
+            <Text style={{
+              color:"#ffffff",
+              marginTop:18,
+              fontSize:16,
+              fontWeight:"700"
+            }}>
               Fetching subjects...
             </Text>
-          </View>
+
+            <Text style={{
+              color:"#94a3b8",
+              marginTop:8,
+              fontSize:13
+            }}>
+              Please wait a moment
+            </Text>
+
+          </BlurView>
+
         </View>
       )}
+
+      <TouchableOpacity
+        activeOpacity={0.9}
+        style={{
+          position:"absolute",
+          bottom:35,
+          right:20
+        }}
+      >
+
+        <LinearGradient
+          colors={["#2563eb","#38bdf8"]}
+          style={{
+            width:68,
+            height:68,
+            borderRadius:24,
+            justifyContent:"center",
+            alignItems:"center",
+            elevation:10,
+            shadowColor:"#38bdf8",
+            shadowOpacity:0.4,
+            shadowRadius:10
+          }}
+        >
+
+          <Ionicons
+            name="book"
+            size={30}
+            color="#fff"
+          />
+
+        </LinearGradient>
+
+      </TouchableOpacity>
 
       <Toast/>
 

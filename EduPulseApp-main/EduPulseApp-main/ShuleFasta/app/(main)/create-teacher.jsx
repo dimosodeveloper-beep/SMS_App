@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useRef} from "react";
 
 import{
 View,
@@ -44,15 +44,35 @@ const[showUsers,setShowUsers] = useState(false);
 const[loading,setLoading] = useState(false);
 const[token,setToken] = useState(null);
 
-const scaleAnim = new Animated.Value(1);
+const fadeAnim = useRef(new Animated.Value(0)).current;
+const slideAnim = useRef(new Animated.Value(30)).current;
+const scaleAnim = useRef(new Animated.Value(1)).current;
 
 const pressIn=()=>{
-Animated.spring(scaleAnim,{toValue:0.95,useNativeDriver:true}).start();
+Animated.spring(scaleAnim,{toValue:0.96,useNativeDriver:true}).start();
+Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 }
 
 const pressOut=()=>{
 Animated.spring(scaleAnim,{toValue:1,useNativeDriver:true}).start();
 }
+
+useEffect(()=>{
+
+Animated.parallel([
+Animated.timing(fadeAnim,{
+toValue:1,
+duration:800,
+useNativeDriver:true
+}),
+Animated.timing(slideAnim,{
+toValue:0,
+duration:800,
+useNativeDriver:true
+})
+]).start();
+
+},[]);
 
 useEffect(()=>{
 const loadToken = async()=>{
@@ -161,20 +181,72 @@ text1:"Failed"
 
 return(
 
-<LinearGradient colors={["#020617","#0f172a","#1e293b"]} style={styles.container}>
+<LinearGradient colors={["#020617","#0f172a","#111827","#1e293b"]} style={styles.container}>
 
 <Image
 source={{uri:"https://images.unsplash.com/photo-1577896851231-70ef18881754"}}
-style={[styles.bg,{opacity:0.25}]}
+style={[styles.bg,{opacity:0.18}]}
 />
+
+<View style={{
+position:"absolute",
+top:-120,
+right:-90,
+width:220,
+height:220,
+borderRadius:200,
+backgroundColor:"rgba(59,130,246,0.18)"
+}}/>
+
+<View style={{
+position:"absolute",
+bottom:-120,
+left:-80,
+width:220,
+height:220,
+borderRadius:200,
+backgroundColor:"rgba(14,165,233,0.12)"
+}}/>
 
 <Header title="School Dashboard" subtitle="Management System"/>
 
-<ScrollView contentContainerStyle={{padding:10,paddingBottom:500}}>
+<Animated.ScrollView
+contentContainerStyle={{
+padding:14,
+paddingBottom:500
+}}
+showsVerticalScrollIndicator={false}
+style={{
+opacity:fadeAnim,
+transform:[{translateY:slideAnim}]
+}}
+>
 
-<BlurView intensity={40} tint="dark" style={styles.blur}>
+<BlurView
+intensity={60}
+tint="dark"
+style={[
+styles.blur,
+{
+borderRadius:28,
+overflow:"hidden",
+padding:20,
+borderWidth:1,
+borderColor:"rgba(255,255,255,0.08)",
+backgroundColor:"rgba(15,23,42,0.75)"
+}
+]}
+>
 
-<Text style={styles.title}>Register Teacher</Text>
+<Text style={{
+color:"#fff",
+fontSize:26,
+fontWeight:"bold",
+textAlign:"center",
+marginBottom:25
+}}>
+Register Teacher
+</Text>
 
 <View style={styles.form}>
 
@@ -183,12 +255,12 @@ style={[styles.bg,{opacity:0.25}]}
 <TouchableOpacity
 onPress={()=>setShowUsers(!showUsers)}
 style={{
-backgroundColor:"#0f172a",
-padding:12,
-borderRadius:10,
+backgroundColor:"rgba(15,23,42,0.9)",
+padding:14,
+borderRadius:14,
 borderWidth:1,
-borderColor:"#334155",
-marginBottom:10
+borderColor:"rgba(148,163,184,0.2)",
+marginBottom:12
 }}
 >
 <Text style={{color:"#fff"}}>
@@ -200,9 +272,11 @@ marginBottom:10
 <LinearGradient
 colors={["#1e293b","#020617"]}
 style={{
-borderRadius:10,
+borderRadius:14,
 padding:10,
-marginBottom:15
+marginBottom:15,
+borderWidth:1,
+borderColor:"rgba(148,163,184,0.15)"
 }}
 >
 {users.map((item)=>(
@@ -213,9 +287,9 @@ setUser(item.id);
 setShowUsers(false);
 }}
 style={{
-padding:10,
+padding:12,
 borderBottomWidth:1,
-borderBottomColor:"#334155"
+borderBottomColor:"#1e293b"
 }}
 >
 <Text style={{color:"#fff"}}>{item.username}</Text>
@@ -227,7 +301,15 @@ borderBottomColor:"#334155"
 <Text style={styles.label}>Phone</Text>
 
 <TextInput
-style={styles.input}
+style={{
+backgroundColor:"rgba(15,23,42,0.9)",
+borderWidth:1,
+borderColor:"rgba(148,163,184,0.2)",
+borderRadius:14,
+padding:12,
+color:"#fff",
+marginBottom:15
+}}
 value={phone}
 onChangeText={setPhone}
 placeholder="Phone"
@@ -240,23 +322,41 @@ placeholderTextColor="#94a3b8"
 <TouchableOpacity
 key={item.id}
 onPress={()=>toggleSubject(item.id)}
-style={{flexDirection:"row",alignItems:"center",marginBottom:10}}
+style={{flexDirection:"row",alignItems:"center",marginBottom:12}}
 >
 <Text style={{color:"#fff",fontSize:18}}>
 {subjectsSelected.includes(item.id) ? "☑":"☐"}
 </Text>
-<Text style={{color:"#fff",marginLeft:10}}>
+<Text style={{color:"#e2e8f0",marginLeft:10}}>
 {item.name}
 </Text>
 </TouchableOpacity>
 ))}
 
-<Animated.View style={{transform:[{scale:scaleAnim}]}}>
+<Animated.View style={{transform:[{scale:scaleAnim}],marginTop:20}}>
 
-<TouchableOpacity onPressIn={pressIn} onPressOut={pressOut} onPress={createTeacher}>
+<TouchableOpacity onPressIn={pressIn} onPressOut={pressOut} onPress={createTeacher} activeOpacity={0.9}>
 
-<LinearGradient colors={["#2563eb","#38bdf8"]} style={styles.button}>
-<Text style={styles.buttonText}>Create Teacher</Text>
+<LinearGradient
+colors={["#2563eb","#38bdf8","#0ea5e9"]}
+start={{x:0,y:0}}
+end={{x:1,y:1}}
+style={{
+height:55,
+borderRadius:18,
+justifyContent:"center",
+alignItems:"center"
+}}
+>
+
+<Text style={{
+color:"#fff",
+fontWeight:"bold",
+fontSize:16
+}}>
+Create Teacher
+</Text>
+
 </LinearGradient>
 
 </TouchableOpacity>
@@ -267,13 +367,15 @@ style={{flexDirection:"row",alignItems:"center",marginBottom:10}}
 
 </BlurView>
 
-</ScrollView>
+</Animated.ScrollView>
 
 {loading &&(
 <View style={styles.loader}>
-<View style={styles.loaderCard}>
-<ActivityIndicator size="large" color="#2563eb"/>
-<Text style={styles.loadingText}>Creating teacher...</Text>
+<View style={[styles.loaderCard,{borderRadius:20}]}>
+<ActivityIndicator size="large" color="#3b82f6"/>
+<Text style={{color:"#fff",marginTop:10,fontWeight:"600"}}>
+Creating teacher...
+</Text>
 </View>
 </View>
 )}

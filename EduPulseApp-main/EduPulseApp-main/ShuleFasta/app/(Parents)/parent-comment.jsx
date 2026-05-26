@@ -150,43 +150,6 @@ Send Comment
 
 </BlurView>
 
-{/* ================= COMMENTS LIST ================= */}
-<Text style={{
-color:"#94a3b8",
-marginBottom:10,
-fontSize:13
-}}>
-Recent Comments
-</Text>
-
-{data.map((i,index)=>(
-<View key={index} style={{
-backgroundColor:"#0f172a",
-padding:12,
-borderRadius:15,
-marginBottom:10,
-borderWidth:1,
-borderColor:"rgba(255,255,255,0.06)"
-}}>
-
-{/* HEADER */}
-<View style={{flexDirection:"row",alignItems:"center",marginBottom:5}}>
-<Ionicons name="person-circle-outline" size={18} color="#38bdf8" />
-<Text style={{color:"#38bdf8",marginLeft:6,fontWeight:"bold"}}>
-{i.parent}
-</Text>
-</View>
-
-{/* COMMENT TEXT */}
-<Text style={{
-color:"#e2e8f0",
-lineHeight:20
-}}>
-{i.comment}
-</Text>
-
-</View>
-))}
 
 </ScrollView>
 
