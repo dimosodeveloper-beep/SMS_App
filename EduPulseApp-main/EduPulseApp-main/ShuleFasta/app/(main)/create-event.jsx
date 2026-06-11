@@ -27,7 +27,7 @@ import {
   Ionicons,
   MaterialCommunityIcons
 } from "@expo/vector-icons";
-
+//route
 export default function CreateEvent() {
   const [token, setToken] = useState(null);
   const [title, setTitle] = useState("");

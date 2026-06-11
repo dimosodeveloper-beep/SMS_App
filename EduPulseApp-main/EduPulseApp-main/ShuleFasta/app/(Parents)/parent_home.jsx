@@ -38,7 +38,7 @@ export default function ParentHome() {
   const [logoutModal, setLogoutModal] = useState(false);
   const [langModal, setLangModal] = useState(false);
   const [selectedLang, setSelectedLang] = useState("en");
-
+//logout
   const [statsData, setStatsData] = useState({
     results_count: 0,
     attendance_count: 0,

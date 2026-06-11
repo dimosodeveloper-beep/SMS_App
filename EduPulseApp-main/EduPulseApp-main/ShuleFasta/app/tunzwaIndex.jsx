@@ -1,439 +1,385 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import {
-View,
-Text,
-StyleSheet,
-ScrollView,
-TouchableOpacity,
-StatusBar,
-Image
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  Animated,
+  ActivityIndicator,
+  Modal,
+  KeyboardAvoidingView,
+  ScrollView,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Platform
 } from "react-native";
 
-import { Ionicons, MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
+import { EventRegister } from "react-native-event-listeners";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 
-import Animated,
-{
-useSharedValue,
-useAnimatedStyle,
-withSpring,
-withRepeat,
-withTiming
-} from "react-native-reanimated";
+import { LinearGradient } from "expo-linear-gradient";
+import { BlurView } from "expo-blur";
+import Toast from "react-native-toast-message";
 
-import Header from "../components/Header";
+import * as LocalAuthentication from "expo-local-authentication";
+import * as Haptics from "expo-haptics";
 
-export default function Home(){
+import { Ionicons } from "@expo/vector-icons";
+import styles from "../components/LoginStyles";
+import { EndPoint } from "../components/links";
+
+import i18n from "../components/translations";
+import { LanguageContext } from "../components/LanguageContext";
+
+export default function Login() {
 
 const router = useRouter();
+const { changeLanguage } = useContext(LanguageContext);
 
-const stats = [
-{ id:1,title:"Students",value:"1,245",icon:"people"},
-{ id:2,title:"Teachers",value:"86",icon:"school"},
-{ id:3,title:"Classes",value:"32",icon:"class"},
-{ id:4,title:"Subjects",value:"18",icon:"menu-book"},
-];
+const [username, setUsername] = useState("");
+const [password, setPassword] = useState("");
+const [loading, setLoading] = useState(false);
+const [showPassword, setShowPassword] = useState(false);
+const [langModalVisible, setLangModalVisible] = useState(false);
+const [selectedLang, setSelectedLang] = useState(null);
 
-const actions = [
-{ id:1,title:"Add Student",icon:"user-plus"},
-{ id:2,title:"Add Teacher",icon:"chalkboard-teacher"},
-{ id:3,title:"Create Class",icon:"school"},
-{ id:4,title:"View Reports",icon:"chart-bar"},
-];
+// 🔥 FIX: prevent double click
+const isSubmitting = useRef(false);
 
+const shakeAnim = useRef(new Animated.Value(0)).current;
+const floatAnim = useRef(new Animated.Value(0)).current;
+const fadeAnim = useRef(new Animated.Value(0)).current;
+const buttonScale = useRef(new Animated.Value(1)).current;
+const glowAnim = useRef(new Animated.Value(0)).current;
 
-const AnimatedCard = ({children})=>{
+/* =========================
+ANIMATIONS
+========================= */
 
-const scale = useSharedValue(1);
-const float = useSharedValue(0);
+useEffect(() => {
+Animated.loop(
+Animated.sequence([
+Animated.timing(floatAnim, {
+toValue: 1,
+duration: 3000,
+useNativeDriver: true,
+}),
+Animated.timing(floatAnim, {
+toValue: 0,
+duration: 3000,
+useNativeDriver: true,
+}),
+])
+).start();
 
-React.useEffect(()=>{
+Animated.timing(fadeAnim, {
+toValue: 1,
+duration: 1000,
+useNativeDriver: true,
+}).start();
 
-float.value = withRepeat(
-withTiming(-5,{duration:2000}),
--1,
-true
-);
+Animated.loop(
+Animated.sequence([
+Animated.timing(glowAnim, {
+toValue: 1,
+duration: 1500,
+useNativeDriver: false,
+}),
+Animated.timing(glowAnim, {
+toValue: 0,
+duration: 1500,
+useNativeDriver: false,
+}),
+])
+).start();
+}, []);
 
-},[]);
-
-const animatedStyle = useAnimatedStyle(()=>{
-
-return{
-transform:[
-{scale:scale.value},
-{translateY:float.value}
-]
-};
-
+const floatInterpolate = floatAnim.interpolate({
+inputRange: [0, 1],
+outputRange: [0, -10],
 });
 
-return(
+/* =========================
+BUTTON ANIMATION
+========================= */
+const pressIn = () => {
+Animated.spring(buttonScale, {
+toValue: 0.96,
+useNativeDriver: true,
+}).start();
+};
 
-<Animated.View style={[styles.card,animatedStyle]}>
+const pressOut = () => {
+Animated.spring(buttonScale, {
+toValue: 1,
+useNativeDriver: true,
+}).start();
+};
 
-<TouchableOpacity
-activeOpacity={0.8}
-onPressIn={()=> scale.value = withSpring(0.95)}
-onPressOut={()=> scale.value = withSpring(1)}
+/* =========================
+SHAKE
+========================= */
+const shake = () => {
+Animated.sequence([
+Animated.timing(shakeAnim, { toValue: 10, duration: 50, useNativeDriver: true }),
+Animated.timing(shakeAnim, { toValue: -10, duration: 50, useNativeDriver: true }),
+Animated.timing(shakeAnim, { toValue: 6, duration: 50, useNativeDriver: true }),
+Animated.timing(shakeAnim, { toValue: 0, duration: 50, useNativeDriver: true }),
+]).start();
+};
+
+/* =========================
+LOGIN (FIXED DOUBLE CLICK)
+========================= */
+
+const loginUser = async () => {
+
+// 🔥 prevent multiple taps
+if (loading || isSubmitting.current) return;
+isSubmitting.current = true;
+
+Keyboard.dismiss();
+
+if (!username || !password) {
+shake();
+Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+
+Toast.show({
+type: "error",
+text1: i18n.t("missing_fields"),
+text2: i18n.t("fill_all_fields"),
+});
+
+isSubmitting.current = false;
+return;
+}
+
+setLoading(true);
+
+try {
+
+const response = await axios.post(
+EndPoint + "/Account/login_user/",
+{ username, password }
+);
+
+const token = response.data.token;
+
+await AsyncStorage.setItem("userToken", token);
+
+const userResponse = await axios.get(
+EndPoint + "/Account/user_data/",
+{
+headers: { Authorization: `Token ${token}` }
+}
+);
+
+const userData = userResponse.data;
+
+await AsyncStorage.setItem("userData", JSON.stringify(userData));
+
+EventRegister.emit("updateUserToken", token);
+
+Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+Toast.show({
+type: "success",
+text1: i18n.t("login_success"),
+});
+
+if (userData.role === "parent") {
+router.replace("/(Parents)/parent_home");
+} else {
+router.replace("/(main)/home");
+}
+
+} catch (error) {
+
+shake();
+Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+
+Toast.show({
+type: "error",
+text1: i18n.t("login_failed"),
+text2: i18n.t("invalid_credentials"),
+});
+
+} finally {
+setLoading(false);
+isSubmitting.current = false;
+}
+};
+
+/* =========================
+BIOMETRIC LOGIN
+========================= */
+const biometricLogin = async () => {
+const result = await LocalAuthentication.authenticateAsync({
+promptMessage: i18n.t("biometric_login"),
+});
+
+if (result.success) {
+const userData = await AsyncStorage.getItem("userData");
+
+if (userData) {
+const parsed = JSON.parse(userData);
+
+Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+if (parsed.role === "parent") {
+router.replace("/(Parents)/parent_home");
+} else {
+router.replace("/(main)/home");
+}
+}
+}
+};
+
+/* =========================
+LANGUAGE
+========================= */
+const openLanguageModal = (lang) => {
+setSelectedLang(lang);
+setLangModalVisible(true);
+};
+
+const confirmLanguage = async () => {
+await changeLanguage(selectedLang);
+setLangModalVisible(false);
+};
+
+/* =========================
+UI
+========================= */
+
+return (
+
+<LinearGradient
+colors={["#020617", "#0f172a", "#1e3a8a"]}
+style={{ flex: 1 }}
 >
 
-{children}
+{/* FIX: KEYBOARD HANDLING WRAPPER */}
+<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+<KeyboardAvoidingView
+style={{ flex: 1 }}
+behavior={Platform.OS === "ios" ? "padding" : "height"}
+>
 
+<ScrollView
+keyboardShouldPersistTaps="handled"
+contentContainerStyle={{
+flexGrow: 1,
+justifyContent: "center",
+alignItems: "center",
+}}
+>
+
+{/* BACKGROUND */}
+<Image
+source={{ uri: "https://images.unsplash.com/photo-1588072432836-e10032774350" }}
+style={{ position: "absolute", width: "100%", height: "100%" }}
+blurRadius={4}
+/>
+
+<View style={{
+position: "absolute",
+width: "100%",
+height: "100%",
+backgroundColor: "rgba(0,0,0,0.68)"
+}} />
+
+{/* LOGIN CARD */}
+<Animated.View
+style={{
+transform: [
+{ translateY: floatInterpolate },
+{ translateX: shakeAnim }
+],
+opacity: fadeAnim,
+width: "90%",
+}}
+>
+
+<BlurView intensity={70} tint="dark" style={{
+borderRadius: 30,
+padding: 26,
+backgroundColor: "rgba(15,23,42,0.45)"
+}}>
+
+{/* USERNAME */}
+<TextInput
+placeholder={i18n.t("username")}
+placeholderTextColor="#94a3b8"
+value={username}
+onChangeText={setUsername}
+style={{
+backgroundColor: "rgba(255,255,255,0.08)",
+padding: 16,
+borderRadius: 14,
+color: "#fff",
+marginBottom: 15
+}}
+/>
+
+{/* PASSWORD */}
+<TextInput
+placeholder={i18n.t("password")}
+placeholderTextColor="#94a3b8"
+secureTextEntry={!showPassword}
+value={password}
+onChangeText={setPassword}
+style={{
+backgroundColor: "rgba(255,255,255,0.08)",
+padding: 16,
+borderRadius: 14,
+color: "#fff"
+}}
+/>
+
+{/* LOGIN BUTTON */}
+<TouchableOpacity
+onPress={loginUser}
+disabled={loading || isSubmitting.current}
+style={{
+marginTop: 25,
+opacity: loading ? 0.7 : 1
+}}
+>
+<LinearGradient
+colors={["#2563eb", "#38bdf8"]}
+style={{
+padding: 16,
+borderRadius: 18,
+alignItems: "center"
+}}
+>
+
+{loading ? (
+<ActivityIndicator color="#fff" />
+) : (
+<Text style={{ color: "#fff", fontWeight: "700" }}>
+{i18n.t("login")}
+</Text>
+)}
+
+</LinearGradient>
 </TouchableOpacity>
+
+</BlurView>
 
 </Animated.View>
 
-);
-
-};
-
-
-return(
-
-<LinearGradient
-colors={["#000000","#0d0d0d","#1a1a1a","#000000"]}
-style={styles.container}
->
-
-<StatusBar barStyle="light-content"/>
-
-{/* HEADER */}
-<Header
-title="School Dashboard"
-subtitle="Management System"
-/>
-
-<ScrollView showsVerticalScrollIndicator={false}>
-
-
-{/* HERO IMAGE */}
-
-<View style={styles.heroContainer}>
-
-<Image
-source={{uri:"https://images.unsplash.com/photo-1523240795612-9a054b0db644"}}
-style={styles.heroImage}
-/>
-
-<View style={styles.heroOverlay}>
-<Text style={styles.heroTitle}>Welcome Back</Text>
-<Text style={styles.heroText}>
-Manage students, teachers and classes easily with your dashboard
-</Text>
-
-{/* BUTTONS */}
-
-<View style={styles.heroButtons}>
-
-<TouchableOpacity
-style={styles.createBtn}
-onPress={()=>router.push("/create-school")}
->
-
-<Text style={styles.btnText}>Create School</Text>
-
-</TouchableOpacity>
-
-<TouchableOpacity
-style={styles.loginBtn}
-onPress={()=>router.push("/login")}
->
-
-<Text style={styles.btnText}>Login</Text>
-
-</TouchableOpacity>
-
-</View>
-
-</View>
-
-</View>
-
-
-
-{/* STATS */}
-
-<View style={styles.statsContainer}>
-
-{stats.map((item)=>(
-
-<AnimatedCard key={item.id}>
-
-<MaterialIcons name={item.icon} size={30} color="#4A6CF7"/>
-
-<Text style={styles.cardNumber}>{item.value}</Text>
-
-<Text style={styles.cardTitle}>{item.title}</Text>
-
-</AnimatedCard>
-
-))}
-
-</View>
-
-
-
-{/* ACTIONS */}
-
-<Text style={styles.sectionTitle}>Quick Actions</Text>
-
-<View style={styles.actionsContainer}>
-
-{actions.map((item)=>(
-
-<TouchableOpacity key={item.id} style={styles.actionCard}>
-
-<LinearGradient
-colors={["#4A6CF7","#6A8DFF"]}
-style={styles.iconBox}
->
-
-<FontAwesome5 name={item.icon} size={16} color="#fff"/>
-
-</LinearGradient>
-
-<Text style={styles.actionText}>{item.title}</Text>
-
-</TouchableOpacity>
-
-))}
-
-</View>
-
-
-
-{/* ACTIVITIES */}
-
-<Text style={styles.sectionTitle}>Recent Activities</Text>
-
-<View style={styles.activityCard}>
-<Text style={styles.activityText}>
-New student registered in Form One.
-</Text>
-<Text style={styles.activityTime}>2 minutes ago</Text>
-</View>
-
-<View style={styles.activityCard}>
-<Text style={styles.activityText}>
-Mathematics exam results uploaded.
-</Text>
-<Text style={styles.activityTime}>30 minutes ago</Text>
-</View>
-
-<View style={styles.activityCard}>
-<Text style={styles.activityText}>
-Teacher meeting scheduled for tomorrow.
-</Text>
-<Text style={styles.activityTime}>1 hour ago</Text>
-</View>
-
-<View style={{height:40}}/>
-
 </ScrollView>
 
-</LinearGradient>
+</KeyboardAvoidingView>
+</TouchableWithoutFeedback>
 
+<Toast />
+
+</LinearGradient>
 );
 }
-
-
-
-const styles = StyleSheet.create({
-
-container:{
-flex:1,
-},
-
-header:{
-paddingTop:60,
-paddingBottom:20,
-paddingHorizontal:20,
-flexDirection:"row",
-alignItems:"center",
-justifyContent:"space-between",
-},
-
-title:{
-color:"#fff",
-fontSize:20,
-fontWeight:"bold"
-},
-
-subtitle:{
-color:"#aaa",
-fontSize:12
-},
-
-profile:{
-width:36,
-height:36,
-borderRadius:20
-},
-
-
-
-heroContainer:{
-marginHorizontal:15,
-marginBottom:15,
-borderRadius:18,
-overflow:"hidden",
-borderWidth:1,
-borderColor:"#2b2b2b"
-},
-
-heroImage:{
-height:170,
-width:"100%"
-},
-
-heroOverlay:{
-position:"absolute",
-bottom:0,
-width:"100%",
-backgroundColor:"rgba(0,0,0,0.6)",
-padding:15
-},
-
-heroTitle:{
-color:"#fff",
-fontSize:20,
-fontWeight:"bold"
-},
-
-heroText:{
-color:"#ccc",
-marginTop:4
-},
-
-heroButtons:{
-flexDirection:"row",
-marginTop:12
-},
-
-createBtn:{
-backgroundColor:"#4A6CF7",
-paddingVertical:8,
-paddingHorizontal:14,
-borderRadius:8,
-marginRight:10
-},
-
-loginBtn:{
-backgroundColor:"#2ecc71",
-paddingVertical:8,
-paddingHorizontal:14,
-borderRadius:8
-},
-
-btnText:{
-color:"#fff",
-fontWeight:"bold"
-},
-
-
-
-statsContainer:{
-flexDirection:"row",
-flexWrap:"wrap",
-justifyContent:"space-between",
-padding:15
-},
-
-card:{
-width:"47%",
-backgroundColor:"#111",
-borderRadius:16,
-padding:20,
-marginBottom:15,
-alignItems:"center",
-borderWidth:1,
-borderColor:"#2a2a2a",
-shadowColor:"#000",
-shadowOpacity:0.4,
-shadowRadius:8,
-elevation:6
-},
-
-cardNumber:{
-color:"#fff",
-fontSize:24,
-fontWeight:"bold",
-marginTop:10
-},
-
-cardTitle:{
-color:"#aaa",
-marginTop:4
-},
-
-
-
-sectionTitle:{
-color:"#fff",
-fontSize:18,
-fontWeight:"bold",
-marginLeft:15,
-marginBottom:10
-},
-
-
-
-actionsContainer:{
-flexDirection:"row",
-flexWrap:"wrap",
-justifyContent:"space-between",
-paddingHorizontal:15
-},
-
-actionCard:{
-width:"47%",
-backgroundColor:"#111",
-borderRadius:16,
-padding:15,
-marginBottom:15,
-flexDirection:"row",
-alignItems:"center",
-borderWidth:1,
-borderColor:"#2a2a2a"
-},
-
-iconBox:{
-width:38,
-height:38,
-borderRadius:10,
-justifyContent:"center",
-alignItems:"center",
-marginRight:10
-},
-
-actionText:{
-color:"#fff",
-fontSize:14
-},
-
-
-
-activityCard:{
-backgroundColor:"#111",
-marginHorizontal:15,
-marginBottom:12,
-padding:15,
-borderRadius:16,
-borderWidth:1,
-borderColor:"#2a2a2a"
-},
-
-activityText:{
-color:"#fff",
-fontSize:15
-},
-
-activityTime:{
-color:"#777",
-marginTop:5,
-fontSize:12
-}
-
-});

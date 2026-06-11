@@ -8,6 +8,11 @@ import {
   Animated,
   ActivityIndicator,
   Modal,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Keyboard,
+  Platform,
+  ScrollView,
 } from "react-native";
 
 import { EventRegister } from "react-native-event-listeners";
@@ -343,13 +348,26 @@ return (
 <LinearGradient
 colors={["#020617", "#0f172a", "#1e3a8a"]}
 style={{
-flex: 1,
+// flex: 1,
+// justifyContent: "center",
+// alignItems: "center",
+}}
+>
+
+<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+<KeyboardAvoidingView
+style={{ flex: 1 }}
+behavior={Platform.OS === "ios" ? "padding" : "height"}
+>
+
+<ScrollView
+keyboardShouldPersistTaps="handled"
+contentContainerStyle={{
+flexGrow: 1,
 justifyContent: "center",
 alignItems: "center",
 }}
 >
-
-{/* BACKGROUND IMAGE */}
 
 <Image
 source={{
@@ -726,49 +744,29 @@ fontSize:15
 
 
 
-{/* BIOMETRIC */}
-
 <TouchableOpacity
-onPress={biometricLogin}
+onPress={() => router.push("/(Account)/forgot-password")}
 style={{
-marginTop: 24,
-alignItems: "center"
-}}
-disabled={loading}
->
-
-<View
-style={{
-width:60,
-height:60,
-borderRadius:100,
-backgroundColor:"rgba(56,189,248,0.12)",
-justifyContent:"center",
-alignItems:"center",
-borderWidth:1,
-borderColor:"rgba(56,189,248,0.2)"
+marginTop: 20,
+flexDirection: "row",
+alignItems: "center",
+justifyContent: "center"
 }}
 >
 
-<Ionicons
-name="finger-print"
-size={32}
-color="#38bdf8"
-/>
+<Ionicons name="key-outline" size={18} color="#38bdf8" />
 
-</View>
-
-<Text
-style={{
-color:"#94a3b8",
-marginTop:8,
-fontSize:13
-}}
->
-{i18n.t("biometric_login")}
+<Text style={{
+color:"#38bdf8",
+marginLeft:6,
+fontSize:13,
+fontWeight:"600"
+}}>
+Forgot Password?
 </Text>
 
 </TouchableOpacity>
+
 
 </BlurView>
 
@@ -988,7 +986,14 @@ Confirm
 
 </Modal>
 
+
+
 <Toast />
+
+</ScrollView>
+
+</KeyboardAvoidingView>
+</TouchableWithoutFeedback>
 
 </LinearGradient>
 
