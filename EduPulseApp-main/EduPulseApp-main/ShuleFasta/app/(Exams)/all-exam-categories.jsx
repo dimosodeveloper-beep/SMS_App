@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useContext} from "react";
 import{
 View,
 Text,
@@ -9,7 +9,7 @@ ActivityIndicator,
 Animated,
 ScrollView
 } from "react-native";
-
+//item.name
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -27,7 +27,11 @@ import Header from "../../components/Header";
 import {useRouter} from "expo-router";
 import {Ionicons} from "@expo/vector-icons";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function AllExamCategories(){
+    //For changing language
+ const { language } = useContext(LanguageContext);
 
 const router = useRouter();
 
@@ -120,9 +124,18 @@ setFilteredCategories(categories);
 return;
 }
 
-const filtered = categories.filter((item)=>
-item.name.toLowerCase().includes(text.toLowerCase())
-);
+const filtered = categories.filter((item)=>{
+
+const categoryName =
+language === "sw"
+? (item.name_SW || item.name)
+: item.name;
+
+return categoryName
+.toLowerCase()
+.includes(text.toLowerCase());
+
+});
 
 setFilteredCategories(filtered);
 
@@ -164,11 +177,19 @@ keyboardShouldPersistTaps="handled"
 <BlurView intensity={40} tint="dark" style={styles.blur}>
 
 <Text style={styles.title}>
-Exam Categories
+{
+language === "sw"
+? "Aina za Mitihani"
+: "Exam Categories"
+}
 </Text>
 
 <Text style={styles.subtitle}>
-Available exam categories
+{
+language === "sw"
+? "Aina zote za mitihani zilizopo"
+: "Available exam categories"
+}
 </Text>
 
 <View style={{marginTop:20}}>
@@ -176,7 +197,11 @@ Available exam categories
 <TextInput
 value={search}
 onChangeText={handleSearch}
-placeholder="Search category..."
+placeholder={
+language === "sw"
+? "Tafuta aina ya mtihani..."
+: "Search category..."
+}
 placeholderTextColor="#94a3b8"
 style={{
 backgroundColor:"#0f172a",
@@ -195,7 +220,12 @@ color:"#94a3b8",
 textAlign:"center",
 marginTop:30
 }}>
-No categories found
+
+{
+language === "sw"
+? "Hakuna Category iliyopo"
+: "No categories found"
+}
 </Text>
 )}
 
@@ -238,14 +268,22 @@ color:"#ffffff",
 fontSize:18,
 fontWeight:"bold"
 }}>
-{item.name}
+{
+language === "sw"
+? (item.name_SW || item.name)
+: item.name
+}
 </Text>
 
 <Text style={{
 color:"#94a3b8",
 marginTop:4
 }}>
-Exam Category
+{
+language === "sw"
+? "Aina ya Mtihani"
+: "Exam Category"
+}
 </Text>
 
 </View>
@@ -282,37 +320,6 @@ ID {item.id}
 
 </ScrollView>
 
-{/* FLOATING BUTTON */}
-<TouchableOpacity
-onPress={goToCreate}
-activeOpacity={0.9}
-style={{
-position:"absolute",
-bottom:100,
-right:20
-}}
->
-
-<LinearGradient
-colors={["#2563eb","#38bdf8"]}
-style={{
-width:65,
-height:65,
-borderRadius:35,
-justifyContent:"center",
-alignItems:"center",
-elevation:10,
-shadowColor:"#000",
-shadowOpacity:0.3,
-shadowRadius:10
-}}
->
-
-<Ionicons name="add" size={30} color="#fff"/>
-
-</LinearGradient>
-
-</TouchableOpacity>
 
 {loading &&(
 

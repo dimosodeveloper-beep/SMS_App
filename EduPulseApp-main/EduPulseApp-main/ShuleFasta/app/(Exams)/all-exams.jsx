@@ -1,4 +1,4 @@
-import React,{useState,useEffect,useRef} from "react";
+import React,{useState,useEffect,useRef,useContext} from "react";
 
 import{
 View,
@@ -28,7 +28,11 @@ import Header from "../../components/Header";
 import {useRouter} from "expo-router";
 import {Ionicons} from "@expo/vector-icons";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function AllExams(){
+
+const { language } = useContext(LanguageContext);
 
 const router = useRouter();
 
@@ -127,7 +131,10 @@ setLoading(false);
 
 Toast.show({
 type:"error",
-text1:"Error fetching exams",
+text1:
+language === "sw"
+? "Hitilafu kupata mitihani"
+: "Error fetching exams",
 text2:JSON.stringify(error.response?.data)
 });
 
@@ -145,9 +152,18 @@ setFilteredExams(exams);
 return;
 }
 
-const filtered = exams.filter((item)=>
-item.name.toLowerCase().includes(text.toLowerCase())
-);
+const filtered = exams.filter((item)=>{
+
+const examName =
+language === "sw"
+? (item.name_SW || item.name)
+: item.name;
+
+return examName
+.toLowerCase()
+.includes(text.toLowerCase());
+
+});
 
 setFilteredExams(filtered);
 
@@ -198,8 +214,16 @@ backgroundColor:"rgba(56,189,248,0.12)"
 }}/>
 
 <Header
-title="Exams"
-subtitle="School Management System"
+title={
+language === "sw"
+? "Mitihani"
+: "Exams"
+}
+subtitle={
+language === "sw"
+? "Mfumo wa Usimamizi wa Shule"
+: "School Management System"
+}
 />
 
 <Animated.View
@@ -245,7 +269,11 @@ fontWeight:"900",
 color:"#ffffff",
 letterSpacing:0.5
 }}>
-All Exams
+{
+language === "sw"
+? "Mitihani Yote"
+: "All Exams"
+}
 </Text>
 
 <Text style={{
@@ -254,7 +282,11 @@ fontSize:15,
 marginTop:8,
 lineHeight:22
 }}>
-Manage all exams in your school
+{
+language === "sw"
+? "Simamia mitihani yote katika shule yako"
+: "Manage all exams in your school"
+}
 </Text>
 
 </View>
@@ -284,7 +316,11 @@ style={{marginRight:10}}
 <TextInput
 value={search}
 onChangeText={handleSearch}
-placeholder="Search exam..."
+placeholder={
+language === "sw"
+? "Tafuta mtihani..."
+: "Search exam..."
+}
 placeholderTextColor="#64748b"
 style={{
 flex:1,
@@ -333,7 +369,11 @@ color:"#bfdbfe",
 fontWeight:"700",
 fontSize:13
 }}>
-TOTAL EXAMS : {filteredExams.length}
+{
+language === "sw"
+? `JUMLA YA MITIHANI : ${filteredExams.length}`
+: `TOTAL EXAMS : ${filteredExams.length}`
+}
 </Text>
 
 </View>
@@ -356,7 +396,11 @@ color:"#86efac",
 fontSize:13,
 fontWeight:"700"
 }}>
-Active
+{
+language === "sw"
+? "Inaendelea"
+: "Active"
+}
 </Text>
 
 </View>
@@ -384,7 +428,11 @@ marginTop:15,
 fontSize:17,
 fontWeight:"700"
 }}>
-No exams found
+{
+language === "sw"
+? "Hakuna mitihani iliyopatikana"
+: "No exams found"
+}
 </Text>
 
 <Text style={{
@@ -392,7 +440,11 @@ color:"#64748b",
 textAlign:"center",
 marginTop:6
 }}>
-Try searching with another keyword
+{
+language === "sw"
+? "Jaribu kutafuta kwa jina lingine"
+: "Try searching with another keyword"
+}
 </Text>
 
 </View>
@@ -459,7 +511,11 @@ fontSize:20,
 fontWeight:"900",
 lineHeight:28
 }}>
-{item.name}
+{
+language === "sw"
+? (item.name_SW || item.name)
+: item.name
+}
 </Text>
 
 <Text style={{
@@ -468,7 +524,11 @@ fontSize:14,
 marginTop:6,
 fontWeight:"700"
 }}>
-{item.classroom?.name || item.classroom}
+{
+language === "sw"
+? (item.classroom?.name_SW || item.classroom?.name || item.classroom)
+: (item.classroom?.name || item.classroom)
+}
 </Text>
 
 </View>
@@ -532,7 +592,11 @@ color:"#64748b",
 fontSize:12,
 fontWeight:"700"
 }}>
-EXAM DATE
+{
+language === "sw"
+? "TAREHE YA MTIHANI"
+: "EXAM DATE"
+}
 </Text>
 
 <Text style={{
@@ -579,7 +643,11 @@ color:"#64748b",
 fontSize:12,
 fontWeight:"700"
 }}>
-CLASSROOM
+{
+language === "sw"
+? "DARASA"
+: "CLASSROOM"
+}
 </Text>
 
 <Text style={{
@@ -588,7 +656,11 @@ fontSize:15,
 fontWeight:"700",
 marginTop:2
 }}>
-{item.classroom?.name || item.classroom}
+{
+language === "sw"
+? (item.classroom?.name_SW || item.classroom?.name || item.classroom)
+: (item.classroom?.name || item.classroom)
+}
 </Text>
 
 </View>
@@ -625,7 +697,11 @@ color:"#64748b",
 fontSize:12,
 fontWeight:"700"
 }}>
-CATEGORY
+{
+language === "sw"
+? "CATEGORY"
+: "CATEGORY"
+}
 </Text>
 
 <Text style={{
@@ -634,7 +710,11 @@ fontSize:15,
 fontWeight:"700",
 marginTop:2
 }}>
-{item.category?.name || item.category}
+{
+language === "sw"
+? (item.category?.name_SW || item.category?.name || item.category)
+: (item.category?.name || item.category)
+}
 </Text>
 
 </View>
@@ -657,39 +737,6 @@ marginTop:2
 
 </Animated.View>
 
-{/* FLOAT BUTTON */}
-<TouchableOpacity
-onPress={goToCreate}
-activeOpacity={0.9}
-style={{
-position:"absolute",
-bottom:35,
-right:25
-}}
->
-
-<LinearGradient
-colors={["#2563eb","#38bdf8","#0ea5e9"]}
-start={{x:0,y:0}}
-end={{x:1,y:1}}
-style={{
-width:72,
-height:72,
-borderRadius:40,
-justifyContent:"center",
-alignItems:"center",
-shadowColor:"#2563eb",
-shadowOpacity:0.5,
-shadowRadius:15,
-elevation:12
-}}
->
-
-<Ionicons name="add" size={34} color="#fff"/>
-
-</LinearGradient>
-
-</TouchableOpacity>
 
 {loading &&(
 
@@ -729,7 +776,11 @@ fontWeight:"700",
 color:"#e2e8f0"
 }
 ]}>
-Fetching exams...
+{
+language === "sw"
+? "Inapakua mitihani..."
+: "Fetching exams..."
+}
 </Text>
 
 </BlurView>

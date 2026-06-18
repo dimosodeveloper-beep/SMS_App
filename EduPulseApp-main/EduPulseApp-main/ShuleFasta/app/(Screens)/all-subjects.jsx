@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useContext} from "react";
 import{
   View,
   Text,
@@ -27,9 +27,13 @@ import Header from "../../components/Header";
 import {useRouter} from "expo-router";
 import {Ionicons,MaterialCommunityIcons} from "@expo/vector-icons";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function AllSubjects(){
 
   const router = useRouter();
+
+  const { language } = useContext(LanguageContext);
 
   const [subjects,setSubjects] = useState([]);
   const [filteredSubjects,setFilteredSubjects] = useState([]);
@@ -106,7 +110,9 @@ export default function AllSubjects(){
 
       Toast.show({
         type:"error",
-        text1:"Error fetching subjects",
+        text1: language === "sw"
+        ? "Hitilafu kupata masomo"
+        : "Error fetching subjects",
         text2:JSON.stringify(error.response?.data)
       });
 
@@ -121,9 +127,18 @@ export default function AllSubjects(){
       return;
     }
 
-    const filtered = subjects.filter((item)=>
-      item.name.toLowerCase().includes(text.toLowerCase())
-    );
+    const filtered = subjects.filter((item)=>{
+
+      const subjectName =
+      language === "sw"
+      ? (item.name_SW || item.name)
+      : item.name;
+
+      return subjectName
+      .toLowerCase()
+      .includes(text.toLowerCase());
+
+    });
 
     setFilteredSubjects(filtered);
   }
@@ -172,8 +187,16 @@ export default function AllSubjects(){
       }}/>
 
       <Header
-        title="School Dashboard"
-        subtitle="Management System"
+        title={
+          language === "sw"
+          ? "Dashibodi ya Shule"
+          : "School Dashboard"
+        }
+        subtitle={
+          language === "sw"
+          ? "Mfumo wa Usimamizi"
+          : "Management System"
+        }
       />
 
       <ScrollView
@@ -229,7 +252,11 @@ export default function AllSubjects(){
                 fontWeight:"900",
                 letterSpacing:0.5
               }}>
-                All Subjects
+                {
+                  language === "sw"
+                  ? "Masomo Yote"
+                  : "All Subjects"
+                }
               </Text>
 
               <Text style={{
@@ -238,7 +265,11 @@ export default function AllSubjects(){
                 fontSize:15,
                 lineHeight:22
               }}>
-                Available subjects in your school
+                {
+                  language === "sw"
+                  ? "Masomo yote yaliyopo shuleni"
+                  : "Available subjects in your school"
+                }
               </Text>
 
             </View>
@@ -288,7 +319,11 @@ export default function AllSubjects(){
                 fontSize:13,
                 marginBottom:6
               }}>
-                Total Subjects
+                {
+                  language === "sw"
+                  ? "Jumla ya Masomo"
+                  : "Total Subjects"
+                }
               </Text>
 
               <Text style={{
@@ -317,7 +352,11 @@ export default function AllSubjects(){
                 fontSize:13,
                 marginBottom:6
               }}>
-                Search Results
+                {
+                  language === "sw"
+                  ? "Matokeo ya Utafutaji"
+                  : "Search Results"
+                }
               </Text>
 
               <Text style={{
@@ -354,7 +393,11 @@ export default function AllSubjects(){
               <TextInput
                 value={search}
                 onChangeText={handleSearch}
-                placeholder="Search subject..."
+                placeholder={
+                  language === "sw"
+                  ? "Tafuta somo..."
+                  : "Search subject..."
+                }
                 placeholderTextColor="#94a3b8"
                 style={{
                   flex:1,
@@ -407,7 +450,11 @@ export default function AllSubjects(){
                 fontWeight:"700",
                 marginTop:15
               }}>
-                No Subjects Found
+                {
+                  language === "sw"
+                  ? "Hakuna Masomo Yaliyopatikana"
+                  : "No Subjects Found"
+                }
               </Text>
 
               <Text style={{
@@ -416,7 +463,11 @@ export default function AllSubjects(){
                 marginTop:8,
                 lineHeight:22
               }}>
-                Try searching using another subject name
+                {
+                  language === "sw"
+                  ? "Jaribu kutafuta kwa jina jingine la somo"
+                  : "Try searching using another subject name"
+                }
               </Text>
 
             </View>
@@ -501,7 +552,11 @@ export default function AllSubjects(){
                           fontWeight:"900",
                           marginBottom:6
                         }}>
-                          {item.name}
+                          {
+                            language === "sw"
+                            ? (item.name_SW || item.name)
+                            : item.name
+                          }
                         </Text>
 
                         <View style={{
@@ -521,7 +576,11 @@ export default function AllSubjects(){
                             color:"#94a3b8",
                             fontSize:14
                           }}>
-                            Subject Available
+                            {
+                              language === "sw"
+                              ? "Somo Linapatikana"
+                              : "Subject Available"
+                            }
                           </Text>
 
                         </View>
@@ -544,7 +603,11 @@ export default function AllSubjects(){
                               fontWeight:"700",
                               fontSize:12
                             }}>
-                              SUBJECT ID {item.id}
+                              {
+                                language === "sw"
+                                ? `ID YA SOMO ${item.id}`
+                                : `SUBJECT ID ${item.id}`
+                              }
                             </Text>
 
                           </View>
@@ -626,7 +689,11 @@ export default function AllSubjects(){
               fontSize:16,
               fontWeight:"700"
             }}>
-              Fetching subjects...
+              {
+                language === "sw"
+                ? "Inapakua masomo..."
+                : "Fetching subjects..."
+              }
             </Text>
 
             <Text style={{
@@ -634,7 +701,11 @@ export default function AllSubjects(){
               marginTop:8,
               fontSize:13
             }}>
-              Please wait a moment
+              {
+                language === "sw"
+                ? "Tafadhali subiri kidogo"
+                : "Please wait a moment"
+              }
             </Text>
 
           </BlurView>

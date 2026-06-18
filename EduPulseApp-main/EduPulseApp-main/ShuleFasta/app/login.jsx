@@ -8,11 +8,6 @@ import {
   Animated,
   ActivityIndicator,
   Modal,
-  TouchableWithoutFeedback,
-  KeyboardAvoidingView,
-  Keyboard,
-  Platform,
-  ScrollView,
 } from "react-native";
 
 import { EventRegister } from "react-native-event-listeners";
@@ -348,26 +343,13 @@ return (
 <LinearGradient
 colors={["#020617", "#0f172a", "#1e3a8a"]}
 style={{
-// flex: 1,
-// justifyContent: "center",
-// alignItems: "center",
-}}
->
-
-<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-<KeyboardAvoidingView
-style={{ flex: 1 }}
-behavior={Platform.OS === "ios" ? "padding" : "height"}
->
-
-<ScrollView
-keyboardShouldPersistTaps="handled"
-contentContainerStyle={{
-flexGrow: 1,
+flex: 1,
 justifyContent: "center",
 alignItems: "center",
 }}
 >
+
+{/* BACKGROUND IMAGE */}
 
 <Image
 source={{
@@ -986,14 +968,7 @@ Confirm
 
 </Modal>
 
-
-
 <Toast />
-
-</ScrollView>
-
-</KeyboardAvoidingView>
-</TouchableWithoutFeedback>
 
 </LinearGradient>
 

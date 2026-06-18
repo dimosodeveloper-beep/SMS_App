@@ -240,7 +240,7 @@ export default function MainLayout() {
                     style={styles.avatar}
                   />
 
-                  <Text style={styles.roleTitle}>{roleLabel}</Text>
+                  <Text style={styles.roleTitle}>{userData?.school.name}</Text>
                   <Text style={styles.welcome}>{t("welcome")}</Text>
                   <Text style={styles.username}>{userData?.username}</Text>
                 </View>

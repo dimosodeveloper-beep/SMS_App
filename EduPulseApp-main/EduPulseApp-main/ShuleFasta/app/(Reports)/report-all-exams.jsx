@@ -771,45 +771,6 @@ color="#60a5fa"
 FLOATING BUTTON
 ========================= */}
 
-<TouchableOpacity
-onPress={goToCreate}
-activeOpacity={0.9}
-style={{
-position:"absolute",
-bottom:100,
-right:20
-}}
->
-
-<LinearGradient
-colors={["#2563eb","#38bdf8","#0ea5e9"]}
-start={{x:0,y:0}}
-end={{x:1,y:1}}
-style={{
-width:74,
-height:74,
-borderRadius:40,
-justifyContent:"center",
-alignItems:"center",
-elevation:15,
-shadowColor:"#38bdf8",
-shadowOpacity:0.5,
-shadowRadius:15,
-shadowOffset:{
-width:0,
-height:8
-},
-borderWidth:2,
-borderColor:"rgba(255,255,255,0.15)"
-}}
->
-
-<Ionicons name="add" size={34} color="#fff"/>
-
-</LinearGradient>
-
-</TouchableOpacity>
-
 {/* =========================
 LOADING
 ========================= */}

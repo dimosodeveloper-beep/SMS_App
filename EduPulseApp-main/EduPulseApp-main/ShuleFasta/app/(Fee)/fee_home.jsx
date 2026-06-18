@@ -24,11 +24,13 @@ import styles from "../../components/LoginStyles";
 import * as Animatable from "react-native-animatable";
 
 import { UserContext } from "../../components/UserContext";
+import { LanguageContext } from "../../components/LanguageContext";
 
 export default function FeeDashboardOptions() {
 
   const router = useRouter();
   const { userData } = useContext(UserContext);
+  const { language } = useContext(LanguageContext);
 
   const role = userData?.role;
 
@@ -51,17 +53,16 @@ export default function FeeDashboardOptions() {
   const getGreeting = () => {
     const hour = new Date().getHours();
 
-    if (hour < 12) return "Good Morning ☀️";
-    if (hour < 18) return "Good Afternoon 🌤️";
-    return "Good Evening 🌙";
+    if (hour < 12) return language === "sw" ? "Habari za Asubuhi ☀️" : "Good Morning ☀️";
+    if (hour < 18) return language === "sw" ? "Habari za Mchana 🌤️" : "Good Afternoon 🌤️";
+    return language === "sw" ? "Habari za Jioni 🌙" : "Good Evening 🌙";
   };
 
-  /* ================= FEES OPTIONS ================= */
   const options = [
 
     /* ADMIN / STAFF FUNCTIONS */
     {
-      title: "Create Fee Structure",
+      title: language === "sw" ? "Tengeneza Mfumo wa Ada" : "Create Fee Structure",
       icon: <Ionicons name="create" size={24} color="#fff" />,
       route: "(Fee)/create-fee-structure",
       colors: ["#22c55e", "#4ade80", "#16a34a"],
@@ -69,16 +70,16 @@ export default function FeeDashboardOptions() {
     },
 
     {
-      title: "Create Fee Payment",
+      title: language === "sw" ? "Tengeneza Malipo ya Ada" : "Create Fee Payment",
       icon: <MaterialIcons name="payment" size={24} color="#fff" />,
       route: "(Fee)/create-fee-payment",
       colors: ["#3b82f6", "#60a5fa", "#2563eb"],
       adminOnly: true
     },
 
-    /* ALL USERS (ADMIN + TEACHER + PARENT CAN SEE) */
+    /* ALL USERS */
     {
-      title: "All Fee Structures",
+      title: language === "sw" ? "Mifumo Yote ya Ada" : "All Fee Structures",
       icon: <FontAwesome5 name="list-alt" size={22} color="#fff" />,
       route: "(Fee)/all-fee-structure",
       colors: ["#9333ea", "#c084fc", "#7e22ce"],
@@ -86,18 +87,16 @@ export default function FeeDashboardOptions() {
     },
 
     {
-      title: "All Fee Payments",
+      title: language === "sw" ? "Malipo Yote ya Ada" : "All Fee Payments",
       icon: <Ionicons name="cash" size={24} color="#fff" />,
       route: "(Fee)/all-fee-years",
       colors: ["#f59e0b", "#fbbf24", "#d97706"],
       adminOnly: false
     },
 
-
-
     /* ADMIN + TEACHER ONLY */
     {
-      title: "Fee Reports",
+      title: language === "sw" ? "Ripoti za Ada" : "Fee Reports",
       icon: <Ionicons name="document-text" size={24} color="#fff" />,
       route: "(Fee)/fee-reports",
       colors: ["#06b6d4", "#22d3ee", "#0891b2"],
@@ -106,13 +105,10 @@ export default function FeeDashboardOptions() {
 
   ];
 
-  /* ================= ROLE FILTER LOGIC ================= */
   const filteredOptions = options.filter(item => {
 
-    // ADMIN → anaona kila kitu
     if (role === "admin") return true;
 
-    // PARENT → haoni adminOnly items + create items + reports
     if (role === "parent") {
       if (
         item.title === "Create Fee Structure" ||
@@ -124,7 +120,6 @@ export default function FeeDashboardOptions() {
       return true;
     }
 
-    // TEACHER / OTHER ROLES
     if (role === "teacher") {
       if (
         item.title === "Create Fee Structure" ||
@@ -152,8 +147,8 @@ export default function FeeDashboardOptions() {
       />
 
       <Header
-        title="Fee Management System"
-        subtitle="School Finance Dashboard"
+        title={language === "sw" ? "Mfumo wa Ada" : "Fee Management System"}
+        subtitle={language === "sw" ? "Dashibodi ya Fedha za Shule" : "School Finance Dashboard"}
       />
 
       <ScrollView
@@ -167,7 +162,9 @@ export default function FeeDashboardOptions() {
           </Text>
 
           <Text style={styles.greetingSubtitle}>
-            Manage school fees easily & professionally 💰
+            {language === "sw"
+              ? "Simamia ada za shule kwa urahisi na kitaalamu 💰"
+              : "Manage school fees easily & professionally 💰"}
           </Text>
         </BlurView>
 
@@ -232,7 +229,9 @@ export default function FeeDashboardOptions() {
 
         <BlurView intensity={30} tint="dark" style={styles.footer}>
           <Text style={styles.footerText}>
-            Shule Fasta 🚀 | Fee Management System
+            {language === "sw"
+              ? "Shule Fasta 🚀 | Mfumo wa Usimamizi wa Ada"
+              : "Shule Fasta 🚀 | Fee Management System"}
           </Text>
         </BlurView>
 

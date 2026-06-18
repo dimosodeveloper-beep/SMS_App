@@ -59,7 +59,7 @@ export default function DashboardOptions() {
 
   const allOptions = [
     {
-      title:"Holistic Student Development",
+      title:"Student Development",
       icon:<Ionicons name="checkmark-done" size={24} color="#fff" />,
       route:"/(Screens)/get-all-behaviour-students",
       colors:["rgb(2, 23, 10)","#0f1210","#16a34a"]

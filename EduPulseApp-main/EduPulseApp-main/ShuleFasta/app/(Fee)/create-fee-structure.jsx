@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import {
 View,
 Text,
@@ -26,7 +26,11 @@ import styles from "../../components/LoginStyles";
 import { EndPoint } from "../../components/links";
 import Header from "../../components/Header";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function CreateFeeStructure() {
+
+const { language } = useContext(LanguageContext);
 
 const [classrooms, setClassrooms] = useState([]);
 const [filteredClassrooms, setFilteredClassrooms] = useState([]);
@@ -110,7 +114,7 @@ setClassSearch(item.name);
 setFilteredClassrooms([]);
 };
 
-/* YEAR PICKER (FIXED LIKE CREATE FEE PAYMENT) */
+/* YEAR PICKER */
 const onChangeYear = (event, selectedDate) => {
 setShowYearPicker(Platform.OS === "ios");
 
@@ -125,8 +129,8 @@ const createFeeStructure = async () => {
 if (!classroom || !amount || !term || !year) {
 Toast.show({
 type: "error",
-text1: "Missing fields",
-text2: "Please fill all fields"
+text1: language === "sw" ? "Taarifa hazijakamilika" : "Missing fields",
+text2: language === "sw" ? "Tafadhali jaza sehemu zote" : "Please fill all fields"
 });
 return;
 }
@@ -152,8 +156,8 @@ Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
 Toast.show({
 type: "success",
-text1: "Success",
-text2: "Fee structure created"
+text1: language === "sw" ? "Mafanikio" : "Success",
+text2: language === "sw" ? "Muundo wa ada umeundwa" : "Fee structure created"
 });
 
 setAmount("");
@@ -166,7 +170,7 @@ setClassroom(null);
 
 Toast.show({
 type: "error",
-text1: "Error",
+text1: language === "sw" ? "Hitilafu" : "Error",
 text2: JSON.stringify(error.response?.data)
 });
 
@@ -183,24 +187,35 @@ source={{ uri: "https://images.unsplash.com/photo-1588072432836-e10032774350" }}
 style={styles.bg}
 />
 
-<Header title="School Dashboard" subtitle="Fee Management" />
+<Header
+title={language === "sw" ? "Mfumo wa Ada" : "School Dashboard"}
+subtitle={language === "sw" ? "Usimamizi wa Ada" : "Fee Management"}
+/>
 
 <ScrollView contentContainerStyle={{ padding: 10, paddingBottom: 300 }}>
 
 <BlurView intensity={40} tint="dark" style={styles.blur}>
 
-<Text style={styles.title}>Create Fee Structure</Text>
+<Text style={styles.title}>
+{language === "sw" ? "Tengeneza Muundo wa Ada" : "Create Fee Structure"}
+</Text>
 
 <View style={styles.form}>
 
-{/* CLASSROOM SEARCH (UNCHANGED) */}
-<Text style={styles.label}>Search Classroom</Text>
+{/* CLASSROOM SEARCH */}
+<Text style={styles.label}>
+{language === "sw" ? "Tafuta Darasa" : "Search Classroom"}
+</Text>
 
 <TextInput
 style={styles.input}
 value={classSearch}
 onChangeText={handleClassSearch}
-placeholder="Type classroom name..."
+placeholder={
+language === "sw"
+? "Andika jina la darasa..."
+: "Type classroom name..."
+}
 placeholderTextColor="#94a3b8"
 />
 
@@ -230,7 +245,10 @@ borderBottomColor: "#1e293b"
 )}
 
 {/* AMOUNT */}
-<Text style={styles.label}>Amount</Text>
+<Text style={styles.label}>
+{language === "sw" ? "Kiasi" : "Amount"}
+</Text>
+
 <TextInput
 style={styles.input}
 value={amount}
@@ -240,7 +258,10 @@ keyboardType="numeric"
 />
 
 {/* TERM */}
-<Text style={styles.label}>Term</Text>
+<Text style={styles.label}>
+{language === "sw" ? "Muhula" : "Term"}
+</Text>
+
 <TextInput
 style={styles.input}
 value={term}
@@ -248,13 +269,15 @@ onChangeText={setTerm}
 placeholderTextColor="#fff"
 />
 
-{/* YEAR PICKER (NEW - SAME STYLE AS PAYMENT PAGE) */}
-<Text style={styles.label}>Year</Text>
+{/* YEAR */}
+<Text style={styles.label}>
+{language === "sw" ? "Mwaka" : "Year"}
+</Text>
 
 <TouchableOpacity onPress={() => setShowYearPicker(true)}>
 <View style={styles.input}>
 <Text style={{ color: "#fff" }}>
-{year || "Select Year"}
+{year || (language === "sw" ? "Chagua mwaka" : "Select Year")}
 </Text>
 </View>
 </TouchableOpacity>
@@ -276,7 +299,9 @@ onPressOut={pressOut}
 onPress={createFeeStructure}
 >
 <LinearGradient colors={["#2563eb", "#38bdf8"]} style={styles.button}>
-<Text style={styles.buttonText}>Create Fee Structure</Text>
+<Text style={styles.buttonText}>
+{language === "sw" ? "Tengeneza Ada" : "Create Fee Structure"}
+</Text>
 </LinearGradient>
 </TouchableOpacity>
 </Animated.View>
@@ -291,7 +316,9 @@ onPress={createFeeStructure}
 <View style={styles.loader}>
 <View style={styles.loaderCard}>
 <ActivityIndicator size="large" color="#2563eb" />
-<Text style={styles.loadingText}>Processing...</Text>
+<Text style={styles.loadingText}>
+{language === "sw" ? "Inachakata..." : "Processing..."}
+</Text>
 </View>
 </View>
 )}

@@ -1,4 +1,4 @@
-import React,{useState,useEffect,useRef} from "react";
+import React,{useState,useEffect,useRef,useContext} from "react";
 import{
 View,
 Text,
@@ -23,9 +23,13 @@ import Header from "../../components/Header";
 
 import {useLocalSearchParams} from "expo-router";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function TeacherView(){
 
 const {id} = useLocalSearchParams();
+
+const { language } = useContext(LanguageContext);
 
 const[token,setToken] = useState(null);
 const[data,setData] = useState(null);
@@ -142,7 +146,11 @@ marginTop:15,
 fontSize:16,
 fontWeight:"600"
 }}>
-Loading Teacher Profile...
+{
+language === "sw"
+? "Inapakia Wasifu wa Mwalimu..."
+: "Loading Teacher Profile..."
+}
 </Text>
 
 </View>
@@ -193,7 +201,11 @@ backgroundColor:"rgba(14,165,233,0.08)"
 }}/>
 
 <Header
-title="Teacher Profile"
+title={
+language === "sw"
+? "Wasifu wa Mwalimu"
+: "Teacher Profile"
+}
 subtitle={data.user_name}
 />
 
@@ -315,7 +327,11 @@ color:"#38bdf8",
 fontSize:12,
 fontWeight:"700"
 }}>
-TOTAL SUBJECTS
+{
+language === "sw"
+? "JUMLA YA MASOMO"
+: "TOTAL SUBJECTS"
+}
 </Text>
 
 <Text style={{
@@ -346,7 +362,11 @@ color:"#22c55e",
 fontSize:12,
 fontWeight:"700"
 }}>
-STATUS
+{
+language === "sw"
+? "HALI"
+: "STATUS"
+}
 </Text>
 
 <Text style={{
@@ -355,7 +375,11 @@ fontSize:22,
 fontWeight:"bold",
 marginTop:10
 }}>
-ACTIVE
+{
+language === "sw"
+? "ANAENDELEA"
+: "ACTIVE"
+}
 </Text>
 
 </LinearGradient>
@@ -399,14 +423,22 @@ color:"#ffffff",
 fontSize:20,
 fontWeight:"bold"
 }}>
-Subjects Teaching
+{
+language === "sw"
+? "Masomo Anayofundisha"
+: "Subjects Teaching"
+}
 </Text>
 
 <Text style={{
 color:"#94a3b8",
 marginTop:4
 }}>
-Academic teaching subjects
+{
+language === "sw"
+? "Masomo ya kitaaluma anayofundisha"
+: "Academic teaching subjects"
+}
 </Text>
 
 </View>
@@ -426,7 +458,11 @@ borderColor:"rgba(59,130,246,0.2)"
 color:"#38bdf8",
 fontWeight:"bold"
 }}>
-{data.subjects.length} Subjects
+{data.subjects.length} {
+language === "sw"
+? "Masomo"
+: "Subjects"
+}
 </Text>
 
 </View>
@@ -517,7 +553,11 @@ color:"#ffffff",
 fontSize:18,
 fontWeight:"bold"
 }}>
-{item.name}
+{
+language === "sw"
+? (item.name_SW || item.name)
+: item.name
+}
 </Text>
 
 <Text style={{
@@ -525,7 +565,11 @@ color:"#94a3b8",
 marginTop:5,
 fontSize:13
 }}>
-Teaching Subject
+{
+language === "sw"
+? "Somo Analofundisha"
+: "Teaching Subject"
+}
 </Text>
 
 </View>
@@ -585,7 +629,11 @@ fontSize:17,
 fontWeight:"bold",
 marginLeft:10
 }}>
-Teacher Summary
+{
+language === "sw"
+? "Muhtasari wa Mwalimu"
+: "Teacher Summary"
+}
 </Text>
 
 </View>
@@ -596,7 +644,11 @@ marginTop:12,
 lineHeight:24,
 fontSize:14
 }}>
-This teacher is currently assigned to teach {data.subjects.length} subject{data.subjects.length > 1 ? "s" : ""} within the school academic system.
+{
+language === "sw"
+? `Mwalimu huyu kwa sasa anafundisha somo${data.subjects.length > 1 ? " mbalimbali" : ""} ${data.subjects.length} ndani ya mfumo wa kitaaluma wa shule.`
+: `This teacher is currently assigned to teach ${data.subjects.length} subject${data.subjects.length > 1 ? "s" : ""} within the school academic system.`
+}
 </Text>
 
 </View>

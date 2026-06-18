@@ -22,6 +22,7 @@ import * as Haptics from "expo-haptics";
 import styles from "../../components/LoginStyles";
 
 import { UserContext } from "../../components/UserContext";
+import { LanguageContext } from "../../components/LanguageContext";
 
 export default function DashboardOptions() {
 
@@ -29,6 +30,7 @@ export default function DashboardOptions() {
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const { userData } = useContext(UserContext);
+  const { language } = useContext(LanguageContext);
 
   const role = userData?.role || "user";
 
@@ -48,6 +50,13 @@ export default function DashboardOptions() {
 
   const getGreeting = () => {
     const hour = new Date().getHours();
+
+    if (language === "sw") {
+      if (hour < 12) return "Habari za Asubuhi ☀️";
+      if (hour < 18) return "Habari za Mchana 🌤️";
+      return "Habari za Jioni 🌙";
+    }
+
     if (hour < 12) return "Good Morning ☀️";
     if (hour < 18) return "Good Afternoon 🌤️";
     return "Good Evening 🌙";
@@ -56,31 +65,62 @@ export default function DashboardOptions() {
   /* ================= OPTIONS ================= */
   const options = [
     {
-      title: "Exams Categories",
+      title:
+        language === "sw"
+          ? "Category za Mitihani"
+          : "Exams Categories",
+
       icon: <Ionicons name="checkmark-done" size={24} color="#fff" />,
+
       route: "/(Exams)/all-exam-categories",
+
       colors: ["#22c55e", "#4ade80", "#16a34a"],
+
       type: "view"
     },
+
     {
-      title: "Add New Category",
+      title:
+        language === "sw"
+          ? "Ongeza Category Mpya"
+          : "Add New Category",
+
       icon: <MaterialIcons name="add-circle" size={24} color="#fff" />,
+
       route: "/(Exams)/create-exam-category",
+
       colors: ["#3b82f6", "#60a5fa", "#2563eb"],
+
       type: "admin"
     },
+
     {
-      title: "All Exams",
+      title:
+        language === "sw"
+          ? "Mitihani Yote"
+          : "All Exams",
+
       icon: <MaterialIcons name="assignment" size={24} color="#fff" />,
+
       route: "(Exams)/all-exams",
+
       colors: ["#8b5cf6", "#60a5fa", "#2563eb"],
+
       type: "view"
     },
+
     {
-      title: "Add New Exam",
+      title:
+        language === "sw"
+          ? "Ongeza Mtihani Mpya"
+          : "Add New Exam",
+
       icon: <MaterialIcons name="add" size={24} color="#fff" />,
+
       route: "(Exams)/create-exam",
+
       colors: ["#ef4444", "#f97316", "#dc2626"],
+
       type: "admin"
     }
   ];
@@ -89,7 +129,7 @@ export default function DashboardOptions() {
   const filteredOptions = useMemo(() => {
     if (role === "admin") return options;
     return options.filter(item => item.type !== "admin");
-  }, [role]);
+  }, [role, language]);
 
   return (
     <LinearGradient
@@ -105,8 +145,16 @@ export default function DashboardOptions() {
       />
 
       <Header
-        title="School Dashboard"
-        subtitle="Management System"
+        title={
+          language === "sw"
+            ? "Dashibodi ya Shule"
+            : "School Dashboard"
+        }
+        subtitle={
+          language === "sw"
+            ? "Mfumo wa Usimamizi"
+            : "Management System"
+        }
       />
 
       <ScrollView
@@ -121,7 +169,11 @@ export default function DashboardOptions() {
           </Text>
 
           <Text style={styles.greetingSubtitle}>
-            Manage your school easily & professionally 🚀
+            {
+              language === "sw"
+                ? "Simamia shule yako kwa urahisi na kitaalamu 🚀"
+                : "Manage your school easily & professionally 🚀"
+            }
           </Text>
         </BlurView>
 
@@ -188,7 +240,11 @@ export default function DashboardOptions() {
         {/* FOOTER */}
         <BlurView intensity={30} tint="dark" style={styles.footer}>
           <Text style={styles.footerText}>
-            Shule Fasta 🚀 | Smart School System
+            {
+              language === "sw"
+                ? "Shule Fasta 🚀 | Mfumo Bora wa Shule"
+                : "Shule Fasta 🚀 | Smart School System"
+            }
           </Text>
         </BlurView>
 

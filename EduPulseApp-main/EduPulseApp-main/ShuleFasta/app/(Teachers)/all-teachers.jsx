@@ -1,4 +1,4 @@
-import React,{useState,useEffect,useRef} from "react";
+import React,{useState,useEffect,useRef,useContext} from "react";
 import{
 View,
 Text,
@@ -28,9 +28,13 @@ import Header from "../../components/Header";
 
 import {useRouter} from "expo-router";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function AllTeachers(){
 
 const router = useRouter();
+
+const { language } = useContext(LanguageContext);
 
 const[token,setToken] = useState(null);
 const[teachers,setTeachers] = useState([]);
@@ -114,8 +118,14 @@ console.log(e);
 
 Toast.show({
 type:"error",
-text1:"Error fetching teachers",
-text2:"Failed to load teachers list"
+text1:
+language === "sw"
+? "Hitilafu kupata walimu"
+: "Error fetching teachers",
+text2:
+language === "sw"
+? "Imeshindikana kupakia orodha ya walimu"
+: "Failed to load teachers list"
 });
 
 }
@@ -180,8 +190,16 @@ backgroundColor:"rgba(14,165,233,0.08)"
 }}/>
 
 <Header
-title="Teachers"
-subtitle="All Teachers"
+title={
+language === "sw"
+? "Walimu"
+: "Teachers"
+}
+subtitle={
+language === "sw"
+? "Walimu Wote"
+: "All Teachers"
+}
 />
 
 <Animated.View
@@ -229,7 +247,11 @@ fontSize:28,
 fontWeight:"bold",
 letterSpacing:0.5
 }}>
-Teachers List
+{
+language === "sw"
+? "Orodha ya Walimu"
+: "Teachers List"
+}
 </Text>
 
 <Text style={{
@@ -237,7 +259,11 @@ color:"#94a3b8",
 marginTop:6,
 fontSize:14
 }}>
-Manage all teachers in your school
+{
+language === "sw"
+? "Simamia walimu wote wa shule yako"
+: "Manage all teachers in your school"
+}
 </Text>
 
 </View>
@@ -284,7 +310,11 @@ color="#38bdf8"
 <TextInput
 value={search}
 onChangeText={handleSearch}
-placeholder="Search teacher..."
+placeholder={
+language === "sw"
+? "Tafuta mwalimu..."
+: "Search teacher..."
+}
 placeholderTextColor="#64748b"
 style={{
 flex:1,
@@ -333,7 +363,11 @@ color:"#38bdf8",
 fontSize:13,
 fontWeight:"600"
 }}>
-TOTAL TEACHERS
+{
+language === "sw"
+? "JUMLA YA WALIMU"
+: "TOTAL TEACHERS"
+}
 </Text>
 
 <Text style={{
@@ -364,7 +398,11 @@ color:"#22c55e",
 fontSize:13,
 fontWeight:"600"
 }}>
-ACTIVE STAFF
+{
+language === "sw"
+? "WALIMU HAI"
+: "ACTIVE STAFF"
+}
 </Text>
 
 <Text style={{
@@ -398,7 +436,11 @@ color:"#94a3b8",
 marginTop:15,
 fontSize:16
 }}>
-No teachers found
+{
+language === "sw"
+? "Hakuna walimu waliopatikana"
+: "No teachers found"
+}
 </Text>
 
 </View>
@@ -573,7 +615,11 @@ fontSize:12,
 marginBottom:5,
 fontWeight:"600"
 }}>
-SUBJECTS
+{
+language === "sw"
+? "MASOMO"
+: "SUBJECTS"
+}
 </Text>
 
 <Text style={{
@@ -581,7 +627,15 @@ color:"#e2e8f0",
 lineHeight:22,
 fontSize:14
 }}>
-{item.subjects.map(s=>s.name).join(", ")}
+{
+item.subjects
+.map(s=>
+language === "sw"
+? (s.name_SW || s.name)
+: s.name
+)
+.join(", ")
+}
 </Text>
 
 </View>
@@ -608,7 +662,11 @@ color:"#22c55e",
 fontWeight:"600",
 marginRight:6
 }}>
-View Profile
+{
+language === "sw"
+? "Tazama Wasifu"
+: "View Profile"
+}
 </Text>
 
 <Ionicons
@@ -660,7 +718,11 @@ marginTop:12,
 color:"#fff"
 }
 ]}>
-Loading teachers...
+{
+language === "sw"
+? "Inapakia walimu..."
+: "Loading teachers..."
+}
 </Text>
 
 </View>

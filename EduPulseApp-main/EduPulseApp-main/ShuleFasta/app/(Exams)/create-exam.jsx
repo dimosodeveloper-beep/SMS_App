@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useContext} from "react";
 
 import{
 View,
@@ -27,7 +27,11 @@ import styles from "../../components/LoginStyles";
 import {EndPoint} from "../../components/links";
 import Header from "../../components/Header";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function CreateExam(){
+
+const { language } = useContext(LanguageContext);
 
 const[name,setName] = useState("");
 const[date,setDate] = useState("");
@@ -129,8 +133,14 @@ if(!name || !date || selectedClassrooms.length === 0 || !selectedCategory){
 
 Toast.show({
 type:"error",
-text1:"Missing Fields",
-text2:"Fill all fields"
+text1:
+language === "sw"
+? "Sehemu haijakamilika"
+: "Missing Fields",
+text2:
+language === "sw"
+? "Jaza sehemu zote"
+: "Fill all fields"
 });
 return;
 }
@@ -165,8 +175,14 @@ Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
 Toast.show({
 type:"success",
-text1:"Exam Created",
-text2:"Saved successfully"
+text1:
+language === "sw"
+? "Mtihani Umeundwa"
+: "Exam Created",
+text2:
+language === "sw"
+? "Imehifadhiwa kwa mafanikio"
+: "Saved successfully"
 });
 
 setName("");
@@ -184,7 +200,10 @@ console.log("ERROR FULL => ", error.response?.data);
 
 Toast.show({
 type:"error",
-text1:"Error",
+text1:
+language === "sw"
+? "Hitilafu"
+: "Error",
 text2:JSON.stringify(error.response?.data)
 });
 
@@ -200,32 +219,41 @@ source={{uri:"https://images.unsplash.com/photo-1588072432836-e10032774350"}}
 style={styles.bg}
 />
 
-<Header title="Create Exam" subtitle="School Management System"/>
+<Header 
+title={language === "sw" ? "Tengeneza Mtihani" : "Create Exam"} 
+subtitle={language === "sw" ? "Mfumo wa Usimamizi wa Shule" : "School Management System"} 
+/>
 
 <ScrollView contentContainerStyle={{padding:10,paddingBottom:500}}>
 
 <BlurView intensity={40} tint="dark" style={styles.blur}>
 
-<Text style={styles.title}>Create Exam</Text>
+<Text style={styles.title}>
+{language === "sw" ? "Tengeneza Mtihani" : "Create Exam"}
+</Text>
 
 <View style={styles.form}>
 
-<Text style={styles.label}>Exam Name</Text>
+<Text style={styles.label}>
+{language === "sw" ? "Jina la Mtihani" : "Exam Name"}
+</Text>
 <TextInput
 style={styles.input}
 value={name}
 onChangeText={setName}
-placeholder="Midterm"
+placeholder={language === "sw" ? "Mfano: Midterm" : "Midterm"}
 placeholderTextColor="#94a3b8"
 />
 
-<Text style={styles.label}>Date</Text>
+<Text style={styles.label}>
+{language === "sw" ? "Tarehe" : "Date"}
+</Text>
 
 <TouchableOpacity onPress={()=>setShowDatePicker(true)}>
 <TextInput
 style={styles.input}
 value={date}
-placeholder="Select Date"
+placeholder={language === "sw" ? "Chagua Tarehe" : "Select Date"}
 placeholderTextColor="#94a3b8"
 editable={false}
 />
@@ -236,7 +264,7 @@ editable={false}
 value={date ? new Date(date) : new Date()}
 mode="date"
 display="default"
-minimumDate={new Date()}   // 🔥 hairuhusu past dates
+minimumDate={new Date()}
 onChange={onChangeDate}
 />
 )}
@@ -247,12 +275,13 @@ color:"#38bdf8",
 fontWeight:"bold",
 marginVertical:10
 }}>
-{showClasses ? "Close Classes ▲" : "Put a tick to all classes performing this exam ▼"}
+{showClasses 
+? language === "sw" ? "Funga Madarasa ▲" : "Close Classes ▲" 
+: language === "sw" ? "Weka alama kwenye madarasa yote yanayofanya mtihani huu ▼" : "Put a tick to all classes performing this exam ▼"}
 </Text>
 </TouchableOpacity>
 
 {showClasses && classrooms.map(item=>(
-
 <TouchableOpacity
 key={item.id}
 onPress={()=>toggleClass(item.id)}
@@ -265,13 +294,13 @@ marginVertical:4
 {selectedClassrooms.includes(item.id) ? "☑" : "☐"} {item.name}
 </Text>
 </TouchableOpacity>
-
 ))}
 
-<Text style={styles.label}>Select Category</Text>
+<Text style={styles.label}>
+{language === "sw" ? "Chagua Category" : "Select Category"}
+</Text>
 
 {categories.map(item=>(
-
 <TouchableOpacity
 key={item.id}
 onPress={()=>setSelectedCategory(item.id)}
@@ -280,10 +309,9 @@ onPress={()=>setSelectedCategory(item.id)}
 color:selectedCategory===item.id ? "#00ffcc" : "#fff",
 marginVertical:5
 }}>
-☑ {item.name}
+☑ {language === "sw" ? (item.name_SW || item.name) : item.name}
 </Text>
 </TouchableOpacity>
-
 ))}
 
 <Animated.View style={{transform:[{scale:scaleAnim}]}}>
@@ -295,7 +323,9 @@ onPress={createExam}
 >
 
 <LinearGradient colors={["#2563eb","#38bdf8"]} style={styles.button}>
-<Text style={styles.buttonText}>Create Exam</Text>
+<Text style={styles.buttonText}>
+{language === "sw" ? "Tengeneza Mtihani" : "Create Exam"}
+</Text>
 </LinearGradient>
 
 </TouchableOpacity>
@@ -312,7 +342,9 @@ onPress={createExam}
 <View style={styles.loader}>
 <View style={styles.loaderCard}>
 <ActivityIndicator size="large" color="#2563eb"/>
-<Text style={styles.loadingText}>Creating exam...</Text>
+<Text style={styles.loadingText}>
+{language === "sw" ? "Inatengeneza mtihani..." : "Creating exam..."}
+</Text>
 </View>
 </View>
 )}

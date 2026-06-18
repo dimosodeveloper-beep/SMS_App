@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useContext} from "react";
 
 import{
 View,
@@ -25,7 +25,11 @@ import styles from "../../components/LoginStyles";
 import {EndPoint} from "../../components/links";
 import Header from "../../components/Header";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function CreateExamCategory(){
+
+const { language } = useContext(LanguageContext);
 
 const[name,setName] = useState("");
 
@@ -71,8 +75,14 @@ if(!name){
 
 Toast.show({
 type:"error",
-text1:"Missing Field",
-text2:"Enter category name"
+text1:
+language === "sw"
+? "Kuna sehemu haijajazwa"
+: "Missing Field",
+text2:
+language === "sw"
+? "Weka jina la category"
+: "Enter category name"
 });
 
 return;
@@ -82,8 +92,14 @@ if(!token){
 
 Toast.show({
 type:"error",
-text1:"Authentication Error",
-text2:"Login again"
+text1:
+language === "sw"
+? "Hitilafu ya uthibitisho"
+: "Authentication Error",
+text2:
+language === "sw"
+? "Ingia tena"
+: "Login again"
 });
 
 return;
@@ -118,8 +134,14 @@ setLoading(false);
 
 Toast.show({
 type:"success",
-text1:"Success",
-text2:"Exam category created"
+text1:
+language === "sw"
+? "Imefanikiwa"
+: "Success",
+text2:
+language === "sw"
+? "Category ya mtihani imeundwa"
+: "Exam category created"
 });
 
 setName("");
@@ -132,7 +154,10 @@ console.log("ERROR => ",error.response?.data);
 
 Toast.show({
 type:"error",
-text1:"Error",
+text1:
+language === "sw"
+? "Hitilafu"
+: "Error",
 text2:JSON.stringify(error.response?.data)
 });
 
@@ -155,8 +180,16 @@ style={styles.bg}
 />
 
 <Header
-title="School Dashboard"
-subtitle="Management System"
+title={
+language === "sw"
+? "Dashibodi ya Shule"
+: "School Dashboard"
+}
+subtitle={
+language === "sw"
+? "Mfumo wa Usimamizi"
+: "Management System"
+}
 />
 
 <ScrollView
@@ -171,24 +204,40 @@ keyboardShouldPersistTaps="handled"
 <BlurView intensity={40} tint="dark" style={styles.blur}>
 
 <Text style={styles.title}>
-Create Exam Category
+{
+language === "sw"
+? "Tengeneza Category ya Mtihani"
+: "Create Exam Category"
+}
 </Text>
 
 <Text style={styles.subtitle}>
-School Management System
+{
+language === "sw"
+? "Mfumo wa Usimamizi wa Shule"
+: "School Management System"
+}
 </Text>
 
 <View style={styles.form}>
 
 <Text style={styles.label}>
-Category Name
+{
+language === "sw"
+? "Jina la Category"
+: "Category Name"
+}
 </Text>
 
 <TextInput
 style={styles.input}
 value={name}
 onChangeText={setName}
-placeholder="Example: Midterm"
+placeholder={
+language === "sw"
+? "Mfano: Midterm"
+: "Example: Midterm"
+}
 placeholderTextColor="#94a3b8"
 />
 
@@ -206,7 +255,11 @@ style={styles.button}
 >
 
 <Text style={styles.buttonText}>
-Create Category
+{
+language === "sw"
+? "Tengeneza Category"
+: "Create Category"
+}
 </Text>
 
 </LinearGradient>
@@ -233,7 +286,11 @@ color="#2563eb"
 />
 
 <Text style={styles.loadingText}>
-Creating category...
+{
+language === "sw"
+? "Inatengeneza category..."
+: "Creating category..."
+}
 </Text>
 
 </View>

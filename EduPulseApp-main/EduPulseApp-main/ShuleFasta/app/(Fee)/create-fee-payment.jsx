@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import {
 View,
 Text,
@@ -26,7 +26,11 @@ import styles from "../../components/LoginStyles";
 import { EndPoint } from "../../components/links";
 import Header from "../../components/Header";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function CreateFeePayment() {
+
+const { language } = useContext(LanguageContext);
 
 const [students, setStudents] = useState([]);
 const [filteredStudents, setFilteredStudents] = useState([]);
@@ -71,7 +75,7 @@ console.log(e);
 }
 };
 
-/* SEARCH (RETAINED EXACT LOGIC - IMPORTANT) */
+/* SEARCH */
 const handleStudentSearch = (text) => {
 setStudentSearch(text);
 
@@ -101,7 +105,7 @@ setShowDatePicker(Platform.OS === "ios");
 if (selectedDate) setPaymentDate(selectedDate);
 };
 
-/* YEAR PICKER (KEEP SIMPLE, FIXED) */
+/* YEAR PICKER */
 const onChangeYear = (event, selectedDate) => {
 setShowYearPicker(false);
 
@@ -129,7 +133,10 @@ useNativeDriver: true
 const createFeePayment = async () => {
 
 if (!student || !amountPaid || !paymentDate || !term || !year) {
-Toast.show({ type: "error", text1: "Missing fields" });
+Toast.show({ 
+type: "error", 
+text1: language === "sw" ? "Taarifa hazijakamilika" : "Missing fields" 
+});
 return;
 }
 
@@ -149,7 +156,10 @@ headers: { Authorization: `Token ${token}` }
 
 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
-Toast.show({ type: "success", text1: "Payment saved" });
+Toast.show({ 
+type: "success", 
+text1: language === "sw" ? "Malipo yamethibitishwa" : "Payment saved" 
+});
 
 setAmountPaid("");
 setTerm("");
@@ -159,7 +169,10 @@ setStudent(null);
 setFilteredStudents([]);
 
 } catch (e) {
-Toast.show({ type: "error", text1: "Failed to save payment" });
+Toast.show({ 
+type: "error", 
+text1: language === "sw" ? "Imeshindikana kuhifadhi malipo" : "Failed to save payment" 
+});
 }
 
 setLoading(false);
@@ -173,24 +186,29 @@ source={{ uri: "https://images.unsplash.com/photo-1588072432836-e10032774350" }}
 style={styles.bg}
 />
 
-<Header title="Fee Payment" subtitle="Management" />
+<Header 
+title={language === "sw" ? "Malipo ya Ada" : "Fee Payment"} 
+subtitle={language === "sw" ? "Usimamizi" : "Management"} 
+/>
 
 <ScrollView contentContainerStyle={{ padding: 10 }}>
 
 <BlurView intensity={40} tint="dark" style={styles.blur}>
 
-<Text style={styles.title}>Create Payment</Text>
+<Text style={styles.title}>
+{language === "sw" ? "Tengeneza Malipo" : "Create Payment"}
+</Text>
 
-{/* ================= STUDENT SEARCH (UNCHANGED FUNCTIONALITY) ================= */}
+{/* STUDENT SEARCH */}
 <TextInput
 placeholderTextColor="#fff"
 style={styles.input}
-placeholder="Search student..."
+placeholder={language === "sw" ? "Tafuta mwanafunzi..." : "Search student..."}
 value={studentSearch}
 onChangeText={handleStudentSearch}
 />
 
-{/* AUTO FILTER LIST (RESTORED EXACTLY) */}
+{/* AUTO FILTER LIST */}
 {studentSearch.trim() !== "" && filteredStudents.length > 0 && (
 filteredStudents.map(item => (
 <TouchableOpacity
@@ -204,11 +222,11 @@ onPress={() => selectStudent(item)}
 ))
 )}
 
-{/* AMOUNT (NUMERIC ONLY FIXED) */}
+{/* AMOUNT */}
 <TextInput
 placeholderTextColor="#fff"
 style={styles.input}
-placeholder="Amount Paid"
+placeholder={language === "sw" ? "Kiasi kilicholipwa" : "Amount Paid"}
 value={amountPaid}
 onChangeText={setAmountPaid}
 keyboardType="numeric"
@@ -236,16 +254,16 @@ onChange={onChangeDate}
 <TextInput
 placeholderTextColor="#fff"
 style={styles.input}
-placeholder="Term"
+placeholder={language === "sw" ? "Muhula" : "Term"}
 value={term}
 onChangeText={setTerm}
 />
 
-{/* YEAR PICKER (FIXED WITHOUT CHANGING DESIGN) */}
+{/* YEAR PICKER */}
 <TouchableOpacity onPress={() => setShowYearPicker(true)}>
 <View style={styles.input}>
 <Text style={{ color: "#fff" }}>
-{year || "Select Year"}
+{year || (language === "sw" ? "Chagua mwaka" : "Select Year")}
 </Text>
 </View>
 </TouchableOpacity>
@@ -267,7 +285,9 @@ onPressOut={pressOut}
 onPress={createFeePayment}
 >
 <LinearGradient colors={["#2563eb", "#38bdf8"]} style={styles.button}>
-<Text style={styles.buttonText}>Save Payment</Text>
+<Text style={styles.buttonText}>
+{language === "sw" ? "Hifadhi Malipo" : "Save Payment"}
+</Text>
 </LinearGradient>
 </TouchableOpacity>
 </Animated.View>
@@ -280,7 +300,9 @@ onPress={createFeePayment}
 <View style={styles.loader}>
 <View style={styles.loaderCard}>
 <ActivityIndicator color="#2563eb" size="large" />
-<Text style={styles.loadingText}>Saving...</Text>
+<Text style={styles.loadingText}>
+{language === "sw" ? "Inahifadhi..." : "Saving..."}
+</Text>
 </View>
 </View>
 )}
