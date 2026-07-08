@@ -27,11 +27,13 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
 import { LanguageContext } from "../../components/LanguageContext";
+import { UserContext } from "../../components/UserContext";
 
 export default function AllGradings() {
 
   const router = useRouter();
   const { language } = useContext(LanguageContext);
+  const { userData } = useContext(UserContext);
 
   const [gradings, setGradings] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -39,6 +41,8 @@ export default function AllGradings() {
 
   const [deleteModal, setDeleteModal] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
+
+  const isAdmin = userData?.role === "admin";
 
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
@@ -135,7 +139,9 @@ export default function AllGradings() {
             <Text style={{ color: "#38bdf8", flex: 1 }}>{language === "sw" ? "Daraja" : "Grade"}</Text>
             <Text style={{ color: "#38bdf8", flex: 1 }}>{language === "sw" ? "Chini" : "Min"}</Text>
             <Text style={{ color: "#38bdf8", flex: 1 }}>{language === "sw" ? "Juu" : "Max"}</Text>
-            <Text style={{ color: "#38bdf8", flex: 1 }}>{language === "sw" ? "Hatua" : "Action"}</Text>
+            {isAdmin && (
+                <Text style={{ color: "#38bdf8", flex: 1 }}>{language === "sw" ? "Hatua" : "Action"}</Text>
+            )}
           </View>
 
           {gradings.map((item, index) => (
@@ -152,17 +158,17 @@ export default function AllGradings() {
                 <Text style={{ color: "#94a3b8", flex: 1 }}>{item.min_score}</Text>
                 <Text style={{ color: "#94a3b8", flex: 1 }}>{item.max_score}</Text>
 
-                <View style={{ flexDirection: "row", flex: 1 }}>
+                {isAdmin && (
+                    <View style={{ flexDirection: "row", flex: 1 }}>
+                        <TouchableOpacity onPress={() => goToEdit(item)}>
+                            <Ionicons name="create" size={20} color="#38bdf8" />
+                        </TouchableOpacity>
 
-                  <TouchableOpacity onPress={() => goToEdit(item)}>
-                    <Ionicons name="create" size={20} color="#38bdf8" />
-                  </TouchableOpacity>
-
-                  <TouchableOpacity onPress={() => confirmDelete(item.id)} style={{ marginLeft: 15 }}>
-                    <Ionicons name="trash" size={20} color="#ef4444" />
-                  </TouchableOpacity>
-
-                </View>
+                        <TouchableOpacity onPress={() => confirmDelete(item.id)} style={{ marginLeft: 15 }}>
+                            <Ionicons name="trash" size={20} color="#ef4444" />
+                        </TouchableOpacity>
+                    </View>
+                )}
 
               </LinearGradient>
 

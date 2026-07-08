@@ -129,7 +129,7 @@ export default function EditSubject() {
 
             {/* Input ya Jina la Somo (English) */}
             <Text style={styles.label}>
-              {language === "sw" ? "Jina la Somo (Kiingereza)" : "Subject Name (English)"}
+              {language === "sw" ? "Jina la Somo " : "Subject Name "}
             </Text>
             <TextInput
               style={styles.input}
@@ -140,16 +140,7 @@ export default function EditSubject() {
             />
 
             {/* Input ya Jina la Somo (Swahili) */}
-            <Text style={styles.label}>
-              {language === "sw" ? "Jina la Somo (Kiswahili)" : "Subject Name (Swahili)"}
-            </Text>
-            <TextInput
-              style={styles.input}
-              value={nameSW}
-              onChangeText={setNameSW}
-              placeholder={language === "sw" ? "mfano: Hisabati" : "e.g. Hisabati"}
-              placeholderTextColor="#475569"
-            />
+        
 
             <Animated.View style={{ transform: [{ scale: scaleAnim }], marginTop: 30 }}>
               <TouchableOpacity onPressIn={pressIn} onPressOut={pressOut} onPress={updateSubject}>
