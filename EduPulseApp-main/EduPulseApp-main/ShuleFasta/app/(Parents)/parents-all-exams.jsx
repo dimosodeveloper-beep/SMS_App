@@ -1,4 +1,4 @@
-import React,{useState,useEffect,useRef} from "react";
+import React,{useState,useEffect,useRef,useContext} from "react";
 //classname
 import{
 View,
@@ -28,10 +28,14 @@ import Header from "../../components/Header";
 import {useRouter,useLocalSearchParams} from "expo-router";
 import {Ionicons,MaterialIcons,FontAwesome5} from "@expo/vector-icons";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function ResultsAllExams(){
 
 const router = useRouter();
 const {categoryId,categoryName} = useLocalSearchParams();
+
+const { language } = useContext(LanguageContext);
 
 const [exams,setExams] = useState([]);
 const [filteredExams,setFilteredExams] = useState([]);
@@ -128,7 +132,10 @@ setLoading(false);
 
 Toast.show({
 type:"error",
-text1:"Error fetching exams",
+text1:
+language === "sw"
+? "Hitilafu kupata mitihani"
+: "Error fetching exams",
 text2:JSON.stringify(error.response?.data)
 });
 
@@ -199,8 +206,12 @@ backgroundColor:"rgba(14,165,233,0.10)"
 }}/>
 
 <Header
-title={categoryName || "Exams"}
-subtitle="Filtered by category"
+title={categoryName || (language === "sw" ? "Mitihani" : "Exams")}
+subtitle={
+language === "sw"
+? "Imechujwa kwa kundi"
+: "Filtered by category"
+}
 />
 
 <Animated.ScrollView
@@ -270,7 +281,11 @@ color:"#ffffff",
 fontSize:24,
 fontWeight:"bold"
 }}>
-All Exams
+{
+language === "sw"
+? "Mitihani Yote"
+: "All Exams"
+}
 </Text>
 
 <Text style={{
@@ -278,7 +293,11 @@ color:"#94a3b8",
 marginTop:4,
 fontSize:13
 }}>
-Showing exams for: {categoryName}
+{
+language === "sw"
+? `Inaonesha mitihani ya: ${categoryName}`
+: `Showing exams for: ${categoryName}`
+}
 </Text>
 
 </View>
@@ -308,7 +327,11 @@ fontSize:16
 color:"#cbd5e1",
 fontSize:11
 }}>
-Exams
+{
+language === "sw"
+? "Mitihani"
+: "Exams"
+}
 </Text>
 
 </View>
@@ -337,7 +360,11 @@ color="#38bdf8"
 <TextInput
 value={search}
 onChangeText={handleSearch}
-placeholder="Search exam..."
+placeholder={
+language === "sw"
+? "Tafuta mtihani..."
+: "Search exam..."
+}
 placeholderTextColor="#64748b"
 style={{
 flex:1,
@@ -381,7 +408,11 @@ color:"#38bdf8",
 fontSize:12,
 fontWeight:"bold"
 }}>
-CATEGORY
+{
+language === "sw"
+? "KUNDI"
+: "CATEGORY"
+}
 </Text>
 
 <Text style={{
@@ -409,7 +440,11 @@ color:"#22c55e",
 fontSize:12,
 fontWeight:"bold"
 }}>
-TOTAL EXAMS
+{
+language === "sw"
+? "JUMLA YA MITIHANI"
+: "TOTAL EXAMS"
+}
 </Text>
 
 <Text style={{
@@ -417,7 +452,11 @@ color:"#fff",
 marginTop:8,
 fontWeight:"600"
 }}>
-{filteredExams.length} Available
+{
+language === "sw"
+? `${filteredExams.length} Inapatikana`
+: `${filteredExams.length} Available`
+}
 </Text>
 
 </View>
@@ -465,7 +504,11 @@ color:"#ffffff",
 fontSize:18,
 fontWeight:"bold"
 }}>
-No Exams Found
+{
+language === "sw"
+? "Hakuna Mitihani Iliyopatikana"
+: "No Exams Found"
+}
 </Text>
 
 <Text style={{
@@ -474,7 +517,11 @@ textAlign:"center",
 marginTop:8,
 lineHeight:22
 }}>
-No exams match your current search keyword
+{
+language === "sw"
+? "Hakuna mitihani inayolingana na neno ulilotafuta"
+: "No exams match your current search keyword"
+}
 </Text>
 
 </BlurView>
@@ -581,7 +628,11 @@ color:"#94a3b8",
 marginTop:5,
 fontSize:13
 }}>
-School Examination
+{
+language === "sw"
+? "Mtihani wa Shule"
+: "School Examination"
+}
 </Text>
 
 </View>
@@ -647,7 +698,11 @@ color:"#64748b",
 fontSize:11,
 fontWeight:"bold"
 }}>
-EXAM DATE
+{
+language === "sw"
+? "TAREHE YA MTIHANI"
+: "EXAM DATE"
+}
 </Text>
 
 <Text style={{
@@ -692,7 +747,11 @@ color:"#64748b",
 fontSize:11,
 fontWeight:"bold"
 }}>
-CLASSROOM
+{
+language === "sw"
+? "DARASA"
+: "CLASSROOM"
+}
 </Text>
 
 <Text style={{
@@ -736,7 +795,11 @@ color:"#64748b",
 fontSize:11,
 fontWeight:"bold"
 }}>
-CATEGORY
+{
+language === "sw"
+? "KUNDI"
+: "CATEGORY"
+}
 </Text>
 
 <Text style={{
@@ -781,7 +844,11 @@ color:"#22c55e",
 fontWeight:"600",
 fontSize:13
 }}>
-Results Available
+{
+language === "sw"
+? "Matokeo Yapo"
+: "Results Available"
+}
 </Text>
 
 </View>
@@ -796,7 +863,11 @@ color:"#38bdf8",
 fontWeight:"bold",
 marginRight:6
 }}>
-View Reports
+{
+language === "sw"
+? "Tazama Ripoti"
+: "View Reports"
+}
 </Text>
 
 <Ionicons
@@ -881,7 +952,11 @@ marginTop:16,
 fontSize:16,
 fontWeight:"600"
 }}>
-Fetching exams...
+{
+language === "sw"
+? "Inapakia mitihani..."
+: "Fetching exams..."
+}
 </Text>
 
 <Text style={{
@@ -889,7 +964,11 @@ color:"#94a3b8",
 marginTop:6,
 fontSize:13
 }}>
-Please wait a moment
+{
+language === "sw"
+? "Tafadhali subiri kidogo"
+: "Please wait a moment"
+}
 </Text>
 
 </BlurView>

@@ -1,6 +1,6 @@
 // app/(Screens)/all-fee-payments.jsx
 
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useContext} from "react";
 import{
 View,
 Text,
@@ -24,7 +24,11 @@ import styles from "../../components/LoginStyles";
 import {EndPoint} from "../../components/links";
 import Header from "../../components/Header";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function AllFeePayments(){
+
+const { language } = useContext(LanguageContext);
 
 const [payments,setPayments] = useState([]);
 const [filtered,setFiltered] = useState([]);
@@ -73,8 +77,14 @@ Haptics.NotificationFeedbackType.Success
 
 Toast.show({
 type:"error",
-text1:"Error",
-text2:JSON.stringify(error.response?.data)
+text1:
+language === "sw"
+? "Hitilafu"
+: "Error",
+text2:
+language === "sw"
+? "Imeshindikana kupakia malipo"
+: "Failed to load payments"
 });
 
 }
@@ -111,8 +121,16 @@ style={styles.bg}
 />
 
 <Header
-title="School Dashboard"
-subtitle="Fee Payments"
+title={
+language === "sw"
+? "Dashibodi ya Shule"
+: "School Dashboard"
+}
+subtitle={
+language === "sw"
+? "Malipo ya Ada"
+: "Fee Payments"
+}
 />
 
 <ScrollView
@@ -125,17 +143,29 @@ paddingBottom:300
 <BlurView intensity={40} tint="dark" style={styles.blur}>
 
 <Text style={styles.title}>
-All Fee Payments
+{
+language === "sw"
+? "Malipo Yote ya Ada"
+: "All Fee Payments"
+}
 </Text>
 
 <Text style={styles.subtitle}>
-Student payment records
+{
+language === "sw"
+? "Kumbukumbu za malipo ya wanafunzi"
+: "Student payment records"
+}
 </Text>
 
 <TextInput
 value={search}
 onChangeText={handleSearch}
-placeholder="Search student..."
+placeholder={
+language === "sw"
+? "Tafuta mwanafunzi..."
+: "Search student..."
+}
 placeholderTextColor="#94a3b8"
 style={{
 backgroundColor:"#0f172a",
@@ -155,7 +185,11 @@ color:"#94a3b8",
 textAlign:"center",
 marginTop:30
 }}>
-No payments found
+{
+language === "sw"
+? "Hakuna malipo yaliyopatikana"
+: "No payments found"
+}
 </Text>
 )}
 
@@ -188,11 +222,19 @@ fontWeight:"bold"
 </Text>
 
 <Text style={{color:"#94a3b8",marginTop:6}}>
-Class: {item.classroom_name}
+{
+language === "sw"
+? `Darasa: ${item.classroom_name_SW || item.classroom_name}`
+: `Class: ${item.classroom_name}`
+}
 </Text>
 
 <Text style={{color:"#94a3b8"}}>
-Stream: {item.stream_name}
+{
+language === "sw"
+? `Mkondo: ${item.stream_name_SW || item.stream_name}`
+: `Stream: ${item.stream_name}`
+}
 </Text>
 
 <Text style={{
@@ -201,14 +243,22 @@ fontSize:18,
 fontWeight:"bold",
 marginTop:10
 }}>
-Paid: TZS {item.amount_paid}
+{
+language === "sw"
+? `Kiasi: TZS ${item.amount_paid}`
+: `Paid: TZS ${item.amount_paid}`
+}
 </Text>
 
 <Text style={{
 color:"#94a3b8",
 marginTop:5
 }}>
-Date: {item.payment_date}
+{
+language === "sw"
+? `Tarehe: ${item.payment_date}`
+: `Date: ${item.payment_date}`
+}
 </Text>
 
 </LinearGradient>
@@ -225,7 +275,11 @@ Date: {item.payment_date}
 <View style={styles.loaderCard}>
 <ActivityIndicator size="large" color="#2563eb"/>
 <Text style={styles.loadingText}>
-Loading payments...
+{
+language === "sw"
+? "Inapakia malipo..."
+: "Loading payments..."
+}
 </Text>
 </View>
 </View>

@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useContext} from "react";
 
 import{
 View,
@@ -24,7 +24,11 @@ import styles from "../../components/LoginStyles";
 import {EndPoint} from "../../components/links";
 import Header from "../../components/Header";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function AddResult(){
+
+const { language } = useContext(LanguageContext);
 
 const[students,setStudents] = useState([]);
 const[subjects,setSubjects] = useState([]);
@@ -61,8 +65,14 @@ const savedToken = await AsyncStorage.getItem("userToken");
 if(!savedToken){
 Toast.show({
 type:"error",
-text1:"Authentication Error",
-text2:"Login again"
+text1:
+language === "sw"
+? "Hitilafu ya Uthibitishaji"
+: "Authentication Error",
+text2:
+language === "sw"
+? "Ingia tena kwenye mfumo"
+: "Login again"
 });
 return;
 }
@@ -109,7 +119,7 @@ const filteredStudents = students.filter(x =>
 );
 
 const filteredSubjects = subjects.filter(x =>
-x.name.toLowerCase().includes(searchSubject.toLowerCase())
+(language === "sw" ? (x.name_SW || x.name) : x.name).toLowerCase().includes(searchSubject.toLowerCase())
 );
 
 const filteredExams = exams.filter(x =>
@@ -120,12 +130,24 @@ x.name.toLowerCase().includes(searchExam.toLowerCase())
 const createResult = async()=>{
 
 if(!student || !subject || !exam || !marks){
-Toast.show({type:"error",text1:"Fill all fields"});
+Toast.show({
+type:"error",
+text1:
+language === "sw"
+? "Jaza sehemu zote"
+: "Fill all fields"
+});
 return;
 }
 
 if(!token){
-Toast.show({type:"error",text1:"Token missing"});
+Toast.show({
+type:"error",
+text1:
+language === "sw"
+? "Token haipatikani"
+: "Token missing"
+});
 return;
 }
 
@@ -160,7 +182,10 @@ Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
 Toast.show({
 type:"success",
-text1:"Result Saved"
+text1:
+language === "sw"
+? "Matokeo Yamehifadhiwa"
+: "Result Saved"
 });
 
 setStudent(null);
@@ -182,7 +207,10 @@ console.log("ERROR => ",error.response?.data || error.message);
 
 Toast.show({
 type:"error",
-text1:"Error",
+text1:
+language === "sw"
+? "Hitilafu"
+: "Error",
 text2:JSON.stringify(error.response?.data)
 });
 
@@ -198,23 +226,50 @@ source={{uri:"https://images.unsplash.com/photo-1588072432836-e10032774350"}}
 style={styles.bg}
 />
 
-<Header title="Add Result" subtitle="School System"/>
+<Header 
+title={
+language === "sw"
+? "Weka Matokeo"
+: "Add Result"
+} 
+subtitle={
+language === "sw"
+? "Mfumo wa Shule"
+: "School System"
+}
+/>
 
 <ScrollView contentContainerStyle={{padding:10,paddingBottom:300}}>
 
 <BlurView intensity={40} tint="dark" style={styles.blur}>
 
-<Text style={styles.title}>Add Result</Text>
+<Text style={styles.title}>
+{
+language === "sw"
+? "Weka Matokeo"
+: "Add Result"
+}
+</Text>
 
 <View style={styles.form}>
 
 {/* STUDENT */}
-<Text style={styles.label}>Student</Text>
+<Text style={styles.label}>
+{
+language === "sw"
+? "Mwanafunzi"
+: "Student"
+}
+</Text>
 
 <TouchableOpacity onPress={()=>setShowStudent(true)}>
 <TextInput
 style={styles.input}
-placeholder="Select student"
+placeholder={
+language === "sw"
+? "Mchague mwanafunzi"
+: "Select student"
+}
 value={searchStudent}
 editable={false}
 />
@@ -230,7 +285,11 @@ maxHeight:200
 }}>
 
 <TextInput
-placeholder="Search..."
+placeholder={
+language === "sw"
+? "Tafuta..."
+: "Search..."
+}
 placeholderTextColor="#94a3b8"
 style={[styles.input,{marginBottom:10}]}
 value={searchStudent}
@@ -258,12 +317,22 @@ setShowStudent(false);
 )}
 
 {/* SUBJECT */}
-<Text style={styles.label}>Subject</Text>
+<Text style={styles.label}>
+{
+language === "sw"
+? "Somo"
+: "Subject"
+}
+</Text>
 
 <TouchableOpacity onPress={()=>setShowSubject(true)}>
 <TextInput
 style={styles.input}
-placeholder="Select subject"
+placeholder={
+language === "sw"
+? "Chagua somo"
+: "Select subject"
+}
 value={searchSubject}
 editable={false}
 />
@@ -279,7 +348,11 @@ maxHeight:200
 }}>
 
 <TextInput
-placeholder="Search..."
+placeholder={
+language === "sw"
+? "Tafuta..."
+: "Search..."
+}
 placeholderTextColor="#94a3b8"
 style={[styles.input,{marginBottom:10}]}
 value={searchSubject}
@@ -292,12 +365,12 @@ onChangeText={setSearchSubject}
 key={item.id}
 onPress={()=>{
 setSubject(item.id);
-setSearchSubject(item.name);
+setSearchSubject(language === "sw" ? (item.name_SW || item.name) : item.name);
 setShowSubject(false);
 }}
 >
 <Text style={{color:"#fff",padding:8}}>
-{item.name}
+{language === "sw" ? (item.name_SW || item.name) : item.name}
 </Text>
 </TouchableOpacity>
 ))}
@@ -307,12 +380,22 @@ setShowSubject(false);
 )}
 
 {/* EXAM */}
-<Text style={styles.label}>Exam</Text>
+<Text style={styles.label}>
+{
+language === "sw"
+? "Mtihani"
+: "Exam"
+}
+</Text>
 
 <TouchableOpacity onPress={()=>setShowExam(true)}>
 <TextInput
 style={styles.input}
-placeholder="Select exam"
+placeholder={
+language === "sw"
+? "Chagua mtihani"
+: "Select exam"
+}
 value={searchExam}
 editable={false}
 />
@@ -328,7 +411,11 @@ maxHeight:200
 }}>
 
 <TextInput
-placeholder="Search..."
+placeholder={
+language === "sw"
+? "Tafuta..."
+: "Search..."
+}
 placeholderTextColor="#94a3b8"
 style={[styles.input,{marginBottom:10}]}
 value={searchExam}
@@ -356,7 +443,13 @@ setShowExam(false);
 )}
 
 {/* MARKS */}
-<Text style={styles.label}>Marks</Text>
+<Text style={styles.label}>
+{
+language === "sw"
+? "Alama"
+: "Marks"
+}
+</Text>
 
 <TextInput
 style={styles.input}
@@ -374,7 +467,13 @@ onPress={createResult}
 >
 
 <LinearGradient colors={["#2563eb","#38bdf8"]} style={styles.button}>
-<Text style={styles.buttonText}>Save Result</Text>
+<Text style={styles.buttonText}>
+{
+language === "sw"
+? "Hifadhi Matokeo"
+: "Save Result"
+}
+</Text>
 </LinearGradient>
 
 </TouchableOpacity>
@@ -391,7 +490,13 @@ onPress={createResult}
 <View style={styles.loader}>
 <View style={styles.loaderCard}>
 <ActivityIndicator size="large" color="#2563eb"/>
-<Text style={styles.loadingText}>Saving...</Text>
+<Text style={styles.loadingText}>
+{
+language === "sw"
+? "Inahifadhi..."
+: "Saving..."
+}
+</Text>
 </View>
 </View>
 )}

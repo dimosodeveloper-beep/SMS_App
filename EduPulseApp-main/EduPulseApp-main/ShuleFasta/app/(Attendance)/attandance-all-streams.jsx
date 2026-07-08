@@ -1,4 +1,4 @@
-import React,{useState,useEffect,useRef} from "react";
+import React,{useState,useEffect,useRef,useContext} from "react";
 
 import{
 View,
@@ -29,11 +29,15 @@ import {useLocalSearchParams,useRouter} from "expo-router";
 
 import {Ionicons} from "@expo/vector-icons";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function AttandanceStreams(){
 
 const router = useRouter();
 
 const {classId,className} = useLocalSearchParams();
+
+const { language } = useContext(LanguageContext);
 
 const[streams,setStreams] = useState([]);
 const[filteredStreams,setFilteredStreams] = useState([]);
@@ -174,7 +178,10 @@ console.log("ERROR => ",error.response?.data);
 
 Toast.show({
 type:"error",
-text1:"Error fetching streams",
+text1:
+language === "sw"
+? "Hitilafu kupata mikondo"
+: "Error fetching streams",
 text2:JSON.stringify(error.response?.data)
 });
 
@@ -261,8 +268,16 @@ backgroundColor:"rgba(14,165,233,0.12)"
 }}/>
 
 <Header
-title="School Dashboard"
-subtitle="Management System"
+title={
+language === "sw"
+? "Dashibodi ya Shule"
+: "School Dashboard"
+}
+subtitle={
+language === "sw"
+? "Mfumo wa Usimamizi"
+: "Management System"
+}
 />
 
 <Animated.ScrollView
@@ -320,7 +335,11 @@ fontWeight:"900",
 color:"#ffffff",
 letterSpacing:0.5
 }}>
-Streams {className}
+{
+language === "sw"
+? `Mikondo ${className}`
+: `Streams ${className}`
+}
 </Text>
 
 <Text style={{
@@ -329,7 +348,11 @@ color:"#cbd5e1",
 marginTop:10,
 lineHeight:22
 }}>
-Browse and manage all streams available in this classroom quickly and easily.
+{
+language === "sw"
+? "Vinjari na usimamie mikondo yote inayopatikana katika darasa hili haraka na kwa urahisi."
+: "Browse and manage all streams available in this classroom quickly and easily."
+}
 </Text>
 
 <View style={{
@@ -353,7 +376,7 @@ color:"#dbeafe",
 fontWeight:"700",
 fontSize:13
 }}>
-Total: {filteredStreams.length}
+{language === "sw" ? "Jumla" : "Total"}: {filteredStreams.length}
 </Text>
 
 </View>
@@ -372,7 +395,11 @@ color:"#bbf7d0",
 fontWeight:"700",
 fontSize:13
 }}>
-Class {className}
+{
+language === "sw"
+? `Darasa ${className}`
+: `Class ${className}`
+}
 </Text>
 
 </View>
@@ -442,7 +469,11 @@ style={{marginRight:10}}
 <TextInput
 value={search}
 onChangeText={handleSearch}
-placeholder="Search stream..."
+placeholder={
+language === "sw"
+? "Tafuta mkondo..."
+: "Search stream..."
+}
 placeholderTextColor="#94a3b8"
 style={{
 flex:1,
@@ -501,7 +532,11 @@ fontSize:18,
 fontWeight:"700",
 marginTop:15
 }}>
-No Streams Found
+{
+language === "sw"
+? "Hakuna Mikondo Iliyopatikana"
+: "No Streams Found"
+}
 </Text>
 
 <Text style={{
@@ -510,7 +545,11 @@ textAlign:"center",
 marginTop:8,
 lineHeight:22
 }}>
-Try searching using another keyword or check available classroom streams.
+{
+language === "sw"
+? "Jaribu kutafuta kwa kutumia neno lingine au angalia mikondo ya madarasa inayopatikana."
+: "Try searching using another keyword or check available classroom streams."
+}
 </Text>
 
 </BlurView>
@@ -608,7 +647,11 @@ fontSize:19,
 fontWeight:"800",
 letterSpacing:0.3
 }}>
-Stream {item.name}
+{
+language === "sw"
+? `Mkondo ${item.name}`
+: `Stream ${item.name}`
+}
 </Text>
 
 <Text style={{
@@ -616,7 +659,11 @@ color:"#94a3b8",
 marginTop:6,
 fontSize:14
 }}>
-Class {className}
+{
+language === "sw"
+? `Darasa ${className}`
+: `Class ${className}`
+}
 </Text>
 
 <View style={{
@@ -638,7 +685,11 @@ color:"#bbf7d0",
 fontSize:12,
 fontWeight:"700"
 }}>
-Available
+{
+language === "sw"
+? "Inapatikana"
+: "Available"
+}
 </Text>
 
 </View>
@@ -741,7 +792,11 @@ fontSize:16,
 fontWeight:"700",
 marginTop:16
 }}>
-Fetching streams...
+{
+language === "sw"
+? "Inapakia mikondo..."
+: "Fetching streams..."
+}
 </Text>
 
 <Text style={{
@@ -749,7 +804,11 @@ color:"#94a3b8",
 marginTop:6,
 fontSize:13
 }}>
-Please wait a moment
+{
+language === "sw"
+? "Tafadhali subiri kidogo"
+: "Please wait a moment"
+}
 </Text>
 
 </BlurView>

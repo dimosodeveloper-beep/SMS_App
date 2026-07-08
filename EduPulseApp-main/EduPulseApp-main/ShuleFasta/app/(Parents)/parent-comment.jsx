@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useContext} from "react";
 import{
 View,Text,TextInput,TouchableOpacity,
 ScrollView,ActivityIndicator
@@ -16,7 +16,11 @@ import {EndPoint} from "../../components/links";
 
 import {Ionicons} from "@expo/vector-icons";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function ParentComments(){
+
+const { language } = useContext(LanguageContext);
 
 const[comment,setComment] = useState("");
 const[data,setData] = useState([]);
@@ -41,7 +45,13 @@ setData(res.data);
 const submit = async()=>{
 
 if(!comment){
-Toast.show({type:"error",text1:"Write comment"});
+Toast.show({
+type:"error",
+text1:
+language === "sw"
+? "Andika maoni"
+: "Write comment"
+});
 return;
 }
 
@@ -55,12 +65,24 @@ EndPoint+"/parent-comment/create/",
 {headers:{Authorization:`Token ${token}`}}
 );
 
-Toast.show({type:"success",text1:"Sent successfully"});
+Toast.show({
+type:"success",
+text1:
+language === "sw"
+? "Imetumwa kwa mafanikio"
+: "Sent successfully"
+});
 setComment("");
 fetchData();
 
 }catch(e){
-Toast.show({type:"error",text1:"Failed to send"});
+Toast.show({
+type:"error",
+text1:
+language === "sw"
+? "Imeshindikana kutuma"
+: "Failed to send"
+});
 }
 
 setLoading(false);
@@ -69,7 +91,18 @@ setLoading(false);
 return(
 <LinearGradient colors={["#020617","#0f172a","#1e293b"]} style={{flex:1}}>
 
-<Header title="Parent Comments" subtitle="Feedback System"/>
+<Header 
+title={
+language === "sw"
+? "Maoni ya Wazazi"
+: "Parent Comments"
+} 
+subtitle={
+language === "sw"
+? "Mfumo wa Maoni"
+: "Feedback System"
+}
+/>
 
 <ScrollView contentContainerStyle={{padding:15,paddingBottom:100}}>
 
@@ -86,7 +119,11 @@ marginBottom:20
 <View style={{flexDirection:"row",alignItems:"center",marginBottom:10}}>
 <Ionicons name="chatbubble-ellipses-outline" size={20} color="#38bdf8" />
 <Text style={{color:"#fff",fontSize:16,fontWeight:"bold",marginLeft:8}}>
-Write Your Comment
+{
+language === "sw"
+? "Andika Maoni Yako"
+: "Write Your Comment"
+}
 </Text>
 </View>
 
@@ -100,7 +137,11 @@ borderColor:"rgba(255,255,255,0.1)"
 }}>
 
 <TextInput
-placeholder="Type your feedback, suggestion or complaint here..."
+placeholder={
+language === "sw"
+? "Andika maoni, mapendekezo au malalamiko yako hapa..."
+: "Type your feedback, suggestion or complaint here..."
+}
 placeholderTextColor="#94a3b8"
 value={comment}
 onChangeText={setComment}
@@ -141,7 +182,11 @@ alignItems:"center"
 color:"#fff",
 fontWeight:"bold"
 }}>
-Send Comment
+{
+language === "sw"
+? "Tuma Maoni"
+: "Send Comment"
+}
 </Text>
 
 </LinearGradient>
@@ -163,7 +208,11 @@ backgroundColor:"rgba(0,0,0,0.5)"
 }}>
 <ActivityIndicator size="large" color="#38bdf8"/>
 <Text style={{color:"#fff",marginTop:10}}>
-Sending...
+{
+language === "sw"
+? "Inatuma..."
+: "Sending..."
+}
 </Text>
 </View>
 )}

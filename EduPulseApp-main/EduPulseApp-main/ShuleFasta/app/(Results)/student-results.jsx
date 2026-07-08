@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useRef,useContext} from "react";
 import{
 View,
 Text,
@@ -23,9 +23,13 @@ import Header from "../../components/Header";
 
 import {useLocalSearchParams} from "expo-router";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function StudentResults(){
 
 const {studentId,examId,year} = useLocalSearchParams();
+
+const { language } = useContext(LanguageContext);
 
 const[token,setToken] = useState(null);
 const[loading,setLoading] = useState(false);
@@ -82,7 +86,10 @@ Haptics.NotificationFeedbackType.Success
 
 Toast.show({
 type:"error",
-text1:"Error",
+text1:
+language === "sw"
+? "Hitilafu"
+: "Error",
 text2:JSON.stringify(e.response?.data)
 });
 
@@ -96,7 +103,13 @@ if(loading || !data){
 return(
 <View style={[styles.container,{justifyContent:"center",alignItems:"center"}]}>
 <ActivityIndicator size="large" color="#2563eb"/>
-<Text style={{color:"#fff",marginTop:10}}>Loading results...</Text>
+<Text style={{color:"#fff",marginTop:10}}>
+{
+language === "sw"
+? "Inapakia matokeo..."
+: "Loading results..."
+}
+</Text>
 </View>
 );
 }
@@ -110,14 +123,31 @@ source={{uri:"https://images.unsplash.com/photo-1588072432836-e10032774350"}}
 style={styles.bg}
 />
 
-<Header title="Student Results" subtitle="Performance Overview"/>
+<Header 
+title={
+language === "sw"
+? "Matokeo ya Mwanafunzi"
+: "Student Results"
+} 
+subtitle={
+language === "sw"
+? "Mwenendo wa Ufaulu"
+: "Performance Overview"
+}
+/>
 
 <ScrollView contentContainerStyle={{padding:15,paddingBottom:200}}>
 
 {/* ================= SUMMARY ================= */}
 <BlurView intensity={40} tint="dark" style={[styles.blur,{padding:20}]}>
 
-<Text style={styles.title}>Summary</Text>
+<Text style={styles.title}>
+{
+language === "sw"
+? "Muhtasari"
+: "Summary"
+}
+</Text>
 
 <View style={{flexDirection:"row",justifyContent:"space-between",marginTop:15}}>
 
@@ -130,7 +160,13 @@ padding:15,
 borderRadius:12,
 alignItems:"center"
 }}>
-<Text style={{color:"#94a3b8"}}>Average</Text>
+<Text style={{color:"#94a3b8"}}>
+{
+language === "sw"
+? "Wastani"
+: "Average"
+}
+</Text>
 <Text style={{color:"#22c55e",fontSize:20,fontWeight:"bold"}}>
 {data.average}
 </Text>
@@ -145,7 +181,13 @@ padding:15,
 borderRadius:12,
 alignItems:"center"
 }}>
-<Text style={{color:"#94a3b8"}}>Grade</Text>
+<Text style={{color:"#94a3b8"}}>
+{
+language === "sw"
+? "Daraja"
+: "Grade"
+}
+</Text>
 <Text style={{
 color:getGradeColor(data.grade),
 fontSize:20,
@@ -164,7 +206,13 @@ padding:15,
 borderRadius:12,
 alignItems:"center"
 }}>
-<Text style={{color:"#94a3b8"}}>Total</Text>
+<Text style={{color:"#94a3b8"}}>
+{
+language === "sw"
+? "Jumla"
+: "Total"
+}
+</Text>
 <Text style={{color:"#38bdf8",fontSize:20,fontWeight:"bold"}}>
 {data.total_marks}
 </Text>
@@ -175,7 +223,11 @@ alignItems:"center"
 {/* ================= PROGRESS ================= */}
 <View style={{marginTop:20}}>
 <Text style={{color:"#94a3b8",marginBottom:5}}>
-Performance Level
+{
+language === "sw"
+? "Kiwango cha Ufaulu"
+: "Performance Level"
+}
 </Text>
 
 <View style={{
@@ -200,11 +252,21 @@ backgroundColor:"#22c55e"
 {/* ================= SUBJECTS ================= */}
 <BlurView intensity={40} tint="dark" style={[styles.blur,{marginTop:15}]}>
 
-<Text style={styles.title}>Subjects</Text>
+<Text style={styles.title}>
+{
+language === "sw"
+? "Masomo"
+: "Subjects"
+}
+</Text>
 
 {data.details.length === 0 &&(
 <Text style={{color:"#94a3b8",marginTop:20}}>
-No results found
+{
+language === "sw"
+? "Hakuna matokeo yaliyopatikana"
+: "No results found"
+}
 </Text>
 )}
 
@@ -276,7 +338,7 @@ color:"#fff",
 fontSize:22,
 fontWeight:"bold"
 }}>
-{item.marks} Marks
+{item.marks} {language === "sw" ? "Alama" : "Marks"}
 </Text>
 
 </View>

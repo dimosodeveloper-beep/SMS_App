@@ -24,11 +24,13 @@ import styles from "../../components/LoginStyles";
 import * as Animatable from "react-native-animatable";
 
 import { UserContext } from "../../components/UserContext";
+import { LanguageContext } from "../../components/LanguageContext";
 
 export default function DashboardOptions() {
 
   const router = useRouter();
   const { userData } = useContext(UserContext);
+  const { language } = useContext(LanguageContext);
 
   const role = userData?.role;
 
@@ -51,6 +53,12 @@ export default function DashboardOptions() {
   const getGreeting = () => {
     const hour = new Date().getHours();
 
+    if (language === "sw") {
+      if (hour < 12) return "Habari za Asubuhi ☀️";
+      if (hour < 18) return "Habari za Mchana 🌤️";
+      return "Habari za Jioni 🌙";
+    }
+
     if (hour < 12) return "Good Morning ☀️";
     if (hour < 18) return "Good Afternoon 🌤️";
     return "Good Evening 🌙";
@@ -59,28 +67,28 @@ export default function DashboardOptions() {
   /* ================= ROLE BASED OPTIONS ================= */
   const options = [
     {
-      title: "Get Results",
+      title: language === "sw" ? "Pata Matokeo" : "Get Results",
       icon: <Ionicons name="checkmark-done" size={24} color="#fff" />,
       route: "(Results)/get-exams-categories",
       colors: ["#22c55e", "#4ade80", "#16a34a"],
       adminOnly: false
     },
     {
-      title: "Add Single Results",
+      title: language === "sw" ? "Ongeza Matokeo Mmoja" : "Add Single Results",
       icon: <MaterialIcons name="history" size={24} color="#fff" />,
       route: "(Results)/add-single-results",
       colors: ["#3b82f6", "#60a5fa", "#2563eb"],
       adminOnly: true
     },
     {
-      title: "Add Multiple Results",
+      title: language === "sw" ? "Ongeza Matokeo Mengi" : "Add Multiple Results",
       icon: <Ionicons name="people" size={24} color="#fff" />,
       route: "(Results)/add-multiple-results",
       colors: ["#9333ea", "#c084fc", "#7e22ce"],
       adminOnly: true
     },
     {
-      title: "Upload Results",
+      title: language === "sw" ? "Pakia Matokeo" : "Upload Results",
       icon: <FontAwesome5 name="file-alt" size={22} color="#fff" />,
       route: "(Results)/upload-results-excel",
       colors: ["#f59e0b", "#fbbf24", "#d97706"],
@@ -108,8 +116,8 @@ export default function DashboardOptions() {
       />
 
       <Header
-        title="School Dashboard"
-        subtitle="Management System"
+        title={language === "sw" ? "Dashibodi ya Shule" : "School Dashboard"}
+        subtitle={language === "sw" ? "Mfumo wa Usimamizi" : "Management System"}
       />
 
       <ScrollView
@@ -123,7 +131,9 @@ export default function DashboardOptions() {
           </Text>
 
           <Text style={styles.greetingSubtitle}>
-            Manage your school easily & professionally 🚀
+            {language === "sw" 
+              ? "Simamia shule yako kwa urahisi na kitaalamu 🚀" 
+              : "Manage your school easily & professionally 🚀"}
           </Text>
         </BlurView>
 
@@ -188,7 +198,7 @@ export default function DashboardOptions() {
 
         <BlurView intensity={30} tint="dark" style={styles.footer}>
           <Text style={styles.footerText}>
-            Shule Fasta 🚀 | Smart School System
+            Shule Fasta 🚀 | {language === "sw" ? "Mfumo wa Shule Mahiri" : "Smart School System"}
           </Text>
         </BlurView>
 

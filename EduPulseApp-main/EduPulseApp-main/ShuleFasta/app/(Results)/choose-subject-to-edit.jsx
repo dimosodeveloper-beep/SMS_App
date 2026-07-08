@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useContext} from "react";
 
 import{
 View,
@@ -27,10 +27,14 @@ import Header from "../../components/Header";
 
 import {useLocalSearchParams,useRouter} from "expo-router";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function ChooseSubjectToEdit(){
 
 const router = useRouter();
 const {studentId,examId} = useLocalSearchParams();
+
+const { language } = useContext(LanguageContext);
 
 const[subjects,setSubjects] = useState([]);
 const[filteredSubjects,setFilteredSubjects] = useState([]);
@@ -79,7 +83,10 @@ Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 }catch(e){
 Toast.show({
 type:"error",
-text1:"Error",
+text1:
+language === "sw"
+? "Hitilafu"
+: "Error",
 text2:JSON.stringify(e.response?.data)
 });
 }
@@ -89,12 +96,12 @@ setLoading(false);
 /* DELETE SUBJECT RESULT */
 const deleteResult = (resultId)=>{
 Alert.alert(
-"Delete Result",
-"Are you sure you want to delete this subject result?",
+language === "sw" ? "Futa Alama" : "Delete Result",
+language === "sw" ? "Je, una uhakika unataka kufuta alama za somo hili?" : "Are you sure you want to delete this subject result?",
 [
-{ text:"Cancel" },
+{ text: language === "sw" ? "Ghairi" : "Cancel" },
 {
-text:"Delete",
+text: language === "sw" ? "Futa" : "Delete",
 onPress: async()=>{
 try{
 
@@ -107,7 +114,10 @@ headers:{Authorization:`Token ${token}`}
 
 Toast.show({
 type:"success",
-text1:"Deleted successfully"
+text1:
+language === "sw"
+? "Imefutwa kwa mafanikio"
+: "Deleted successfully"
 });
 
 fetchSubjects();
@@ -115,7 +125,10 @@ fetchSubjects();
 }catch(e){
 Toast.show({
 type:"error",
-text1:"Error",
+text1:
+language === "sw"
+? "Hitilafu"
+: "Error",
 text2:JSON.stringify(e.response?.data)
 });
 }
@@ -134,9 +147,10 @@ setFilteredSubjects(subjects);
 return;
 }
 
-const filtered = subjects.filter((item)=>
-item.subject_name.toLowerCase().includes(text.toLowerCase())
-);
+const filtered = subjects.filter((item)=>{
+const sName = language === "sw" ? (item.subject_name_SW || item.subject_name) : item.subject_name;
+return sName.toLowerCase().includes(text.toLowerCase());
+});
 
 setFilteredSubjects(filtered);
 };
@@ -161,18 +175,39 @@ source={{uri:"https://images.unsplash.com/photo-1588072432836-e10032774350"}}
 style={styles.bg}
 />
 
-<Header title="Choose Subject" subtitle="Edit Marks"/>
+<Header 
+title={
+language === "sw"
+? "Chagua Somo"
+: "Choose Subject"
+} 
+subtitle={
+language === "sw"
+? "Hariri Alama"
+: "Edit Marks"
+}
+/>
 
 <ScrollView contentContainerStyle={{padding:10,paddingBottom:300}}>
 
 <BlurView intensity={40} tint="dark" style={styles.blur}>
 
-<Text style={styles.title}>Select Subject</Text>
+<Text style={styles.title}>
+{
+language === "sw"
+? "Chagua Somo"
+: "Select Subject"
+}
+</Text>
 
 <TextInput
 value={search}
 onChangeText={handleSearch}
-placeholder="Search subject..."
+placeholder={
+language === "sw"
+? "Tafuta somo..."
+: "Search subject..."
+}
 placeholderTextColor="#94a3b8"
 style={styles.input}
 />
@@ -193,11 +228,15 @@ onPress={()=>openSubject(item)}
 
 <View>
 <Text style={{color:"#fff",fontSize:16,fontWeight:"bold"}}>
-{item.subject_name}
+{
+language === "sw"
+? (item.subject_name_SW || item.subject_name)
+: item.subject_name
+}
 </Text>
 
 <Text style={{color:"#22c55e",marginTop:5}}>
-Marks: {item.marks}
+{language === "sw" ? "Alama" : "Marks"}: {item.marks}
 </Text>
 </View>
 
@@ -224,7 +263,13 @@ Marks: {item.marks}
 <View style={styles.loader}>
 <View style={styles.loaderCard}>
 <ActivityIndicator size="large" color="#2563eb"/>
-<Text style={styles.loadingText}>Loading...</Text>
+<Text style={styles.loadingText}>
+{
+language === "sw"
+? "Inapakia..."
+: "Loading..."
+}
+</Text>
 </View>
 </View>
 )}

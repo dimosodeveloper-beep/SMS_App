@@ -24,12 +24,14 @@ import styles from "../../components/LoginStyles";
 import * as Animatable from "react-native-animatable";
 
 import { UserContext } from "../../components/UserContext";
+import { LanguageContext } from "../../components/LanguageContext";
 
 export default function DashboardOptions() {
 
   const router = useRouter();
 
   const { userData } = useContext(UserContext);
+  const { language } = useContext(LanguageContext);
 
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
@@ -52,49 +54,55 @@ export default function DashboardOptions() {
   const getGreeting = () => {
     const hour = new Date().getHours();
 
-    if(hour < 12) return "Good Morning ☀️";
-    if(hour < 18) return "Good Afternoon 🌤️";
-    return "Good Evening 🌙";
+    if (language === "sw") {
+        if(hour < 12) return "Habari za Asubuhi ☀️";
+        if(hour < 18) return "Habari za Mchana 🌤️";
+        return "Habari za Jioni 🌙";
+    } else {
+        if(hour < 12) return "Good Morning ☀️";
+        if(hour < 18) return "Good Afternoon 🌤️";
+        return "Good Evening 🌙";
+    }
   };
 
   const allOptions = [
     {
-      title:"Student Development",
+      title: language === "sw" ? "Maendeleo ya Mwanafunzi" : "Student Development",
       icon:<Ionicons name="checkmark-done" size={24} color="#fff" />,
       route:"/(Screens)/get-all-behaviour-students",
       colors:["rgb(2, 23, 10)","#0f1210","#16a34a"]
     },
 
     {
-      title:"Create Teacher Scheme",
+      title: language === "sw" ? "Tengeneza Mpango wa Mwalimu" : "Create Teacher Scheme",
       icon:<Ionicons name="checkmark-done" size={24} color="#fff" />,
       route:"/(Screens)/create-teacher-scheme",
       colors:["#22c55e","#0e78e1","#16a34a"]
     },
 
     {
-      title:"Get Teacher Scheme",
+      title: language === "sw" ? "Pata Mpango wa Mwalimu" : "Get Teacher Scheme",
       icon:<Ionicons name="checkmark-done" size={24} color="#fff" />,
       route:"/(Screens)/get-teacher-schemes",
       colors:["#441bcb","#0e78e1","#ccd30d"]
     },
 
     {
-      title:"Give a Comment",
+      title: language === "sw" ? "Toa Maoni" : "Give a Comment",
       icon:<Ionicons name="checkmark-done" size={24} color="#fff" />,
       route:"/(Parents)/parent-comment",
       colors:["#373a38","#4ade80","#d41a93"]
     },
 
     {
-      title:"Get  Comments",
+      title: language === "sw" ? "Pata Maoni" : "Get Comments",
       icon:<Ionicons name="checkmark-done" size={24} color="#fff" />,
       route:"/(Parents)/get-comments",
       colors:["#373a38","#4ade80","#d41a93"]
     },
 
     {
-      title:"About ShuleFasta",
+      title: language === "sw" ? "Kuhusu ShuleFasta" : "About ShuleFasta",
       icon:<MaterialIcons name="history" size={24} color="#fff" />,
       route:"/(Screens)/AboutApp",
       colors:["#3b82f6","#60a5fa","#2563eb"]
@@ -113,7 +121,7 @@ export default function DashboardOptions() {
   else if(role === "teacher"){
 
     options = allOptions.filter(
-      item => item.title !== "Give a Comment"
+      item => item.title !== (language === "sw" ? "Toa Maoni" : "Give a Comment")
     );
 
   } 
@@ -122,9 +130,9 @@ export default function DashboardOptions() {
 
     options = allOptions.filter(
       item =>
-        item.title === "Holistic Student Development" ||
-        item.title === "Give a Comment" ||
-        item.title === "About ShuleFasta"
+        item.title === (language === "sw" ? "Maendeleo ya Mwanafunzi" : "Student Development") ||
+        item.title === (language === "sw" ? "Toa Maoni" : "Give a Comment") ||
+        item.title === (language === "sw" ? "Kuhusu ShuleFasta" : "About ShuleFasta")
     );
 
   }
@@ -141,8 +149,8 @@ export default function DashboardOptions() {
       />
 
       <Header
-        title="School Dashboard"
-        subtitle="Management System"
+        title={language === "sw" ? "Dashibodi ya Shule" : "School Dashboard"}
+        subtitle={language === "sw" ? "Mfumo wa Usimamizi" : "Management System"}
       />
 
       <ScrollView
@@ -156,7 +164,10 @@ export default function DashboardOptions() {
           </Text>
 
           <Text style={styles.greetingSubtitle}>
-            Manage your school easily & professionally 🚀
+            {language === "sw" 
+                ? "Simamia shule yako kwa urahisi na kitaalamu 🚀" 
+                : "Manage your school easily & professionally 🚀"
+            }
           </Text>
         </BlurView>
 
@@ -223,7 +234,7 @@ export default function DashboardOptions() {
 
         <BlurView intensity={30} tint="dark" style={styles.footer}>
           <Text style={styles.footerText}>
-            Shule Fasta 🚀 | Smart School System
+            Shule Fasta 🚀 | {language === "sw" ? "Mfumo wa Shule Mahiri" : "Smart School System"}
           </Text>
         </BlurView>
 

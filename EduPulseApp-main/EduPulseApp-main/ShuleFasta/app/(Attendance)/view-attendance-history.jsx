@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useContext} from "react";
 
 import{
 View,
@@ -23,9 +23,13 @@ import Header from "../../components/Header";
 
 import {useLocalSearchParams,useRouter} from "expo-router";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function AttendanceHistory(){
 
 const router = useRouter();
+
+const { language } = useContext(LanguageContext);
 
 const {
 streamId,
@@ -75,7 +79,10 @@ console.log("ERROR => ",e.response?.data);
 
 Toast.show({
 type:"error",
-text1:"Error loading data",
+text1:
+language === "sw"
+? "Hitilafu kupakia data"
+: "Error loading data",
 text2:JSON.stringify(e.response?.data)
 });
 
@@ -89,7 +96,14 @@ return(
 
 <LinearGradient colors={["#020617","#0f172a","#1e293b"]} style={styles.container}>
 
-<Header title="Attendance History" subtitle={`${className} ${streamName}`}/>
+<Header 
+title={
+language === "sw"
+? "Historia ya Mahudhurio"
+: "Attendance History"
+} 
+subtitle={`${className} ${streamName}`}
+/>
 
 <ScrollView contentContainerStyle={{padding:10,paddingBottom:200}}>
 
@@ -112,7 +126,11 @@ borderColor:"#334155"
 </Text>
 
 <Text style={{color:"#94a3b8"}}>
-Adm: {item.admission_number}
+{
+language === "sw"
+? `Namba ya Usajili: ${item.admission_number}`
+: `Adm: ${item.admission_number}`
+}
 </Text>
 
 </View>
@@ -135,7 +153,11 @@ borderRadius:10,
 marginRight:5
 }}>
 <Text style={{color:"#fff",textAlign:"center"}}>
-Present: {item.present}
+{
+language === "sw"
+? `Wapo: ${item.present}`
+: `Present: ${item.present}`
+}
 </Text>
 </View>
 
@@ -146,7 +168,11 @@ padding:10,
 borderRadius:10
 }}>
 <Text style={{color:"#fff",textAlign:"center"}}>
-Absent: {item.absent}
+{
+language === "sw"
+? `Hawapo: ${item.absent}`
+: `Absent: ${item.absent}`
+}
 </Text>
 </View>
 
@@ -160,7 +186,11 @@ padding:8,
 borderRadius:8
 }}>
 <Text style={{color:"#38bdf8",textAlign:"center"}}>
-Attendance: {item.percentage}%
+{
+language === "sw"
+? `Mahudhurio: ${item.percentage}%`
+: `Attendance: ${item.percentage}%`
+}
 </Text>
 </View>
 
@@ -174,7 +204,11 @@ borderWidth:1,
 borderColor:"#334155"
 }}>
 <Text style={{color:"#94a3b8",textAlign:"center"}}>
-Year: {item.year}
+{
+language === "sw"
+? `Mwaka: ${item.year}`
+: `Year: ${item.year}`
+}
 </Text>
 </View>
 
@@ -192,7 +226,13 @@ padding:10,
 borderRadius:10,
 alignItems:"center"
 }}>
-<Text style={{color:"#fff"}}>View Full Statistics</Text>
+<Text style={{color:"#fff"}}>
+{
+language === "sw"
+? "Angalia Takwimu Kamili"
+: "View Full Statistics"
+}
+</Text>
 </LinearGradient>
 
 </TouchableOpacity>

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useContext } from "react";
 import {
   View,
   Text,
@@ -23,76 +23,84 @@ import styles from "../../components/LoginStyles";
 
 import * as Animatable from "react-native-animatable";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function DashboardOptions() {
 
   const router = useRouter();
+  const { language } = useContext(LanguageContext);
 
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const pressIn = () => {
-    Animated.spring(scaleAnim,{
-      toValue:0.95,
-      useNativeDriver:true
+    Animated.spring(scaleAnim, {
+      toValue: 0.95,
+      useNativeDriver: true
     }).start();
   };
 
   const pressOut = () => {
-    Animated.spring(scaleAnim,{
-      toValue:1,
-      useNativeDriver:true
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true
     }).start();
   };
 
   const getGreeting = () => {
     const hour = new Date().getHours();
 
-    if(hour < 12) return "Good Morning ☀️";
-    if(hour < 18) return "Good Afternoon 🌤️";
+    if (language === "sw") {
+      if (hour < 12) return "Habari za Asubuhi ☀️";
+      if (hour < 18) return "Habari za Mchana 🌤️";
+      return "Habari za Jioni 🌙";
+    }
+
+    if (hour < 12) return "Good Morning ☀️";
+    if (hour < 18) return "Good Afternoon 🌤️";
     return "Good Evening 🌙";
   };
 
   const options = [
     {
-      title:"Students in School",
-      icon:<Ionicons name="checkmark-done" size={24} color="#fff" />,
-      route:"/all-school-students",
-      colors:["#22c55e","#4ade80","#16a34a"]
+      title: language === "sw" ? "Wanafunzi Shuleni" : "Students in School",
+      icon: <Ionicons name="checkmark-done" size={24} color="#fff" />,
+      route: "/all-school-students",
+      colors: ["#22c55e", "#4ade80", "#16a34a"]
     },
     {
-      title:"Students in classes",
-      icon:<MaterialIcons name="history" size={24} color="#fff" />,
-      route:"(Screens)/all-classes",
-      colors:["#3b82f6","#60a5fa","#2563eb"]
+      title: language === "sw" ? "Wanafunzi Darasani" : "Students in classes",
+      icon: <MaterialIcons name="history" size={24} color="#fff" />,
+      route: "(Screens)/all-classes",
+      colors: ["#3b82f6", "#60a5fa", "#2563eb"]
     },
     {
-      title:"Add New Students",
-      icon:<Ionicons name="people" size={24} color="#fff" />,
-      route:"create-student",
-      colors:["#9333ea","#c084fc","#7e22ce"]
+      title: language === "sw" ? "Ongeza Wanafunzi" : "Add New Students",
+      icon: <Ionicons name="people" size={24} color="#fff" />,
+      route: "create-student",
+      colors: ["#9333ea", "#c084fc", "#7e22ce"]
     },
     {
-      title:"Classes & Streams",
-      icon:<FontAwesome5 name="file-alt" size={22} color="#fff" />,
-      route:"(Screens)/all-classes",
-      colors:["#f59e0b","#fbbf24","#d97706"]
+      title: language === "sw" ? "Madarasa na Mikondo" : "Classes & Streams",
+      icon: <FontAwesome5 name="file-alt" size={22} color="#fff" />,
+      route: "(Screens)/all-classes",
+      colors: ["#f59e0b", "#fbbf24", "#d97706"]
     },
-    
   ];
 
-  return(
+  return (
     <LinearGradient
-      colors={["#020617","#0f172a","#1e293b"]}
+      colors={["#020617", "#0f172a", "#1e293b"]}
       style={styles.container}
     >
 
       <Image
-        source={{uri:"https://images.unsplash.com/photo-1577896851231-70ef18881754"}}
+        source={{ uri: "https://images.unsplash.com/photo-1577896851231-70ef18881754" }}
         style={styles.bg}
       />
 
       <Header
-        title="School Dashboard"
-        subtitle="Management System"
+        title={language === "sw" ? "Dashibodi ya Shule" : "School Dashboard"}
+        subtitle={language === "sw" ? "Mfumo wa Usimamizi" : "Management System"}
       />
 
       <ScrollView
@@ -106,18 +114,20 @@ export default function DashboardOptions() {
           </Text>
 
           <Text style={styles.greetingSubtitle}>
-            Manage your school easily & professionally 🚀
+            {language === "sw" 
+              ? "Simamia shule yako kwa urahisi na kitaalamu 🚀" 
+              : "Manage your school easily & professionally 🚀"}
           </Text>
         </BlurView>
 
         <View style={styles.optionsContainer}>
 
-          {options.map((item,index)=>(
+          {options.map((item, index) => (
             <Animated.View
               key={index}
               style={[
                 styles.cardWrapper,
-                {transform:[{scale:scaleAnim}]}
+                { transform: [{ scale: scaleAnim }] }
               ]}
             >
 
@@ -125,7 +135,7 @@ export default function DashboardOptions() {
                 activeOpacity={0.9}
                 onPressIn={pressIn}
                 onPressOut={pressOut}
-                onPress={()=>{
+                onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                   router.push(item.route);
                 }}
@@ -133,8 +143,8 @@ export default function DashboardOptions() {
 
                 <LinearGradient
                   colors={item.colors}
-                  start={{x:0,y:0}}
-                  end={{x:1,y:1}}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
                   style={styles.card}
                 >
 
@@ -167,7 +177,7 @@ export default function DashboardOptions() {
 
         <BlurView intensity={30} tint="dark" style={styles.footer}>
           <Text style={styles.footerText}>
-            Shule Fasta 🚀 | Smart School System
+            Shule Fasta 🚀 | {language === "sw" ? "Mfumo wa Shule Mahiri" : "Smart School System"}
           </Text>
         </BlurView>
 

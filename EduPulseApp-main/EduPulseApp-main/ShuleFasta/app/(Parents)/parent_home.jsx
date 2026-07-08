@@ -25,20 +25,19 @@ import axios from "axios";
 import { EndPoint } from "../../components/links";
 import { useRouter } from "expo-router";
 
-import i18n from "../../components/translations";
-import { LanguageContext } from "../../components/LanguageContext"; // 🔥 ADDED
+import { LanguageContext } from "../../components/LanguageContext";
 
 export default function ParentHome() {
   const router = useRouter();
 
   const { setUserData, setUserToken } = useContext(UserContext);
-  const { changeLanguage } = useContext(LanguageContext); // 🔥 ADDED
+  const { language, changeLanguage } = useContext(LanguageContext);
 
   const [token, setToken] = useState(null);
   const [logoutModal, setLogoutModal] = useState(false);
   const [langModal, setLangModal] = useState(false);
   const [selectedLang, setSelectedLang] = useState("en");
-//logout
+
   const [statsData, setStatsData] = useState({
     results_count: 0,
     attendance_count: 0,
@@ -74,37 +73,37 @@ export default function ParentHome() {
 
   const menu = [
     {
-      title: i18n.t("results"),
+      title: language === "sw" ? "Matokeo" : "Results",
       icon: "assessment",
       route: "/(Parents)/parents-exam-categories",
       color: ["#4f46e5", "#06b6d4"],
     },
     {
-      title: i18n.t("attendance"),
+      title: language === "sw" ? "Mahudhurio" : "Attendance",
       icon: "how-to-reg",
       route: "/(Screens)/attendance-homepage",
       color: ["#f97316", "#ef4444"],
     },
     {
-      title: i18n.t("all_events"),
+      title: language === "sw" ? "Matukio Yote" : "All Events",
       icon: "event",
       route: "/(Calender)/events-calender",
       color: ["#22c55e", "#16a34a"],
     },
     {
-      title: i18n.t("Fee"),
+      title: language === "sw" ? "Ada" : "Fee",
       icon: "bar-chart",
       route: "/(Fee)/fee_home",
       color: ["#a855f7", "#ec4899"],
     },
     {
-      title: i18n.t("timetable"),
+      title: language === "sw" ? "Ratiba" : "Timetable",
       icon: "schedule",
       route: "/(Timetable)/timetable-class",
       color: ["#0ea5e9", "#2563eb"],
     },
     {
-      title: i18n.t("More"),
+      title: language === "sw" ? "Zaidi" : "More",
       icon: "school",
       route: "/(Screens)/other-homepage",
       color: ["#f59e0b", "#ef4444"],
@@ -127,7 +126,6 @@ export default function ParentHome() {
     }
   };
 
-  // 🔥 LANGUAGE CHANGE (SAME AS LOGIN)
   const confirmLanguageChange = async () => {
     await changeLanguage(selectedLang);
     setLangModal(false);
@@ -168,12 +166,20 @@ export default function ParentHome() {
     <LinearGradient colors={["#020617", "#0f172a", "#020617"]} style={styles.container}>
       <StatusBar barStyle="light-content" />
 
-      {/* 🔥 HEADER + LANGUAGE ICONS */}
+      {/* HEADER + LANGUAGE ICONS */}
       <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 15, marginTop: 10 }}>
 
         <ParentHeader
-          title={i18n.t("dashboard")}
-          subtitle={i18n.t("dashboard_description")}
+          title={
+            language === "sw"
+              ? "Dashibodi"
+              : "Dashboard"
+          }
+          subtitle={
+            language === "sw"
+              ? "Maelezo ya Dashibodi"
+              : "Dashboard Description"
+          }
         />
 
         {/* LANGUAGE ICONS */}
@@ -190,9 +196,19 @@ export default function ParentHome() {
       </View>
 
       <LinearGradient colors={["#2563eb", "#7c3aed"]} style={styles.hero}>
-        <Text style={styles.heroTitle}>{i18n.t("welcome")} 👋</Text>
+        <Text style={styles.heroTitle}>
+          {
+            language === "sw"
+              ? "Karibu"
+              : "Welcome"
+          } 👋
+        </Text>
         <Text style={styles.heroText}>
-          {i18n.t("dashboard_description")}
+          {
+            language === "sw"
+              ? "Angalia maendeleo ya mwanafunzi na taarifa za shule"
+              : "Monitor student progress and school information"
+          }
         </Text>
       </LinearGradient>
 
@@ -204,14 +220,20 @@ export default function ParentHome() {
         </View>
 
         <View style={styles.insight}>
-          <Text style={styles.sectionTitle}>{i18n.t("dashboard")}</Text>
+          <Text style={styles.sectionTitle}>
+            {
+              language === "sw"
+                ? "Muhtasari"
+                : "Dashboard"
+            }
+          </Text>
 
           <View style={styles.insightCard}>
-            <Text style={styles.insightText}>📊 {i18n.t("dashboard_description")}</Text>
-            <Text style={styles.insightText}>📅 {i18n.t("attendance")}</Text>
-            <Text style={styles.insightText}>🏆 {i18n.t("results")}</Text>
-            <Text style={styles.insightText}>📩 {i18n.t("recent_activities")}</Text>
-            <Text style={styles.insightText}>🕒 {i18n.t("timetable")}</Text>
+            <Text style={styles.insightText}>📊 {language === "sw" ? "Maelezo ya Dashibodi" : "Dashboard Description"}</Text>
+            <Text style={styles.insightText}>📅 {language === "sw" ? "Mahudhurio" : "Attendance"}</Text>
+            <Text style={styles.insightText}>🏆 {language === "sw" ? "Matokeo" : "Results"}</Text>
+            <Text style={styles.insightText}>📩 {language === "sw" ? "Shughuli za Hivi Karibuni" : "Recent Activities"}</Text>
+            <Text style={styles.insightText}>🕒 {language === "sw" ? "Ratiba" : "Timetable"}</Text>
           </View>
         </View>
 
@@ -219,7 +241,11 @@ export default function ParentHome() {
           <Pressable onPress={() => setLogoutModal(true)} style={styles.logoutBtn}>
             <FontAwesome name="sign-out" size={20} color="#fff" />
             <Text style={{ color: "#fff", marginLeft: 10 }}>
-              {i18n.t("logout")}
+              {
+                language === "sw"
+                  ? "Ondoka"
+                  : "Logout"
+              }
             </Text>
           </Pressable>
         </View>
@@ -233,17 +259,29 @@ export default function ParentHome() {
           <View style={styles.modalBox}>
             <Text style={styles.modalTitle}>
               {selectedLang === "en"
-                ? i18n.t("change_lang_en")
-                : i18n.t("change_lang_sw")}
+                ? "Are you sure you want to change language to English?"
+                : "Je, una uhakika unataka kubadili lugha kuwa Kiswahili?"}
             </Text>
 
             <View style={styles.modalActions}>
               <TouchableOpacity onPress={() => setLangModal(false)}>
-                <Text style={{ color: "#ef4444" }}>{i18n.t("no")}</Text>
+                <Text style={{ color: "#ef4444" }}>
+                  {
+                    language === "sw"
+                      ? "Hapana"
+                      : "No"
+                  }
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity onPress={confirmLanguageChange}>
-                <Text style={{ color: "#22c55e" }}>{i18n.t("yes")}</Text>
+                <Text style={{ color: "#22c55e" }}>
+                  {
+                    language === "sw"
+                      ? "Ndiyo"
+                      : "Yes"
+                  }
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -254,19 +292,41 @@ export default function ParentHome() {
       <Modal transparent visible={logoutModal} animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalBox}>
-            <Text style={styles.modalTitle}>{i18n.t("logout")}</Text>
+            <Text style={styles.modalTitle}>
+              {
+                language === "sw"
+                  ? "Ondoka"
+                  : "Logout"
+              }
+            </Text>
 
             <Text style={styles.modalText}>
-              {i18n.t("confirm_logout")}
+              {
+                language === "sw"
+                  ? "Je, una uhakika unataka kuondoka?"
+                  : "Are you sure you want to logout?"
+              }
             </Text>
 
             <View style={styles.modalActions}>
               <TouchableOpacity onPress={() => setLogoutModal(false)}>
-                <Text style={{ color: "#ef4444" }}>{i18n.t("no")}</Text>
+                <Text style={{ color: "#ef4444" }}>
+                  {
+                    language === "sw"
+                      ? "Hapana"
+                      : "No"
+                  }
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity onPress={handleLogout}>
-                <Text style={{ color: "#22c55e" }}>{i18n.t("yes")}</Text>
+                <Text style={{ color: "#22c55e" }}>
+                  {
+                    language === "sw"
+                      ? "Ndiyo"
+                      : "Yes"
+                  }
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -277,7 +337,6 @@ export default function ParentHome() {
   );
 }
 
-/* styles unchanged */
 const styles = StyleSheet.create({
   container: { flex: 1 },
   hero: { margin: 15, padding: 18, borderRadius: 18 },

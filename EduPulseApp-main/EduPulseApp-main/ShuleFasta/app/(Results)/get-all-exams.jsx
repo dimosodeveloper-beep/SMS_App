@@ -1,4 +1,4 @@
-import React,{useState,useEffect,useRef} from "react";
+import React,{useState,useEffect,useRef,useContext} from "react";
 
 import{
 View,
@@ -33,6 +33,8 @@ MaterialIcons,
 FontAwesome5
 } from "@expo/vector-icons";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function ResultsAllExams(){
 
 const router = useRouter();
@@ -41,6 +43,8 @@ const {
 categoryId,
 categoryName
 } = useLocalSearchParams();
+
+const { language } = useContext(LanguageContext);
 
 const [exams,setExams] = useState([]);
 const [filteredExams,setFilteredExams] = useState([]);
@@ -139,7 +143,10 @@ setLoading(false);
 
 Toast.show({
 type:"error",
-text1:"Error fetching exams",
+text1:
+language === "sw"
+? "Hitilafu kupata mitihani"
+: "Error fetching exams",
 text2:JSON.stringify(error.response?.data)
 });
 
@@ -209,8 +216,12 @@ style={styles.bg}
 />
 
 <Header
-title={categoryName || "Exams"}
-subtitle="Filtered by category"
+title={categoryName || (language === "sw" ? "Mitihani" : "Exams")}
+subtitle={
+language === "sw"
+? "Imechujwa kulingana na kundi"
+: "Filtered by category"
+}
 />
 
 <ScrollView
@@ -276,7 +287,11 @@ fontWeight:"700"
 }}
 numberOfLines={1}
 >
-All Exams
+{
+language === "sw"
+? "Mitihani Yote"
+: "All Exams"
+}
 </Text>
 
 <Text style={{
@@ -286,7 +301,7 @@ marginTop:4
 }}
 numberOfLines={1}
 >
-{categoryName || "Exam Results"}
+{categoryName || (language === "sw" ? "Matokeo ya Mitihani" : "Exam Results")}
 </Text>
 
 </View>
@@ -307,7 +322,7 @@ color:"#38bdf8",
 fontWeight:"700",
 fontSize:13
 }}>
-{filteredExams.length} Exams
+{filteredExams.length} {language === "sw" ? "Mitihani" : "Exams"}
 </Text>
 
 </View>
@@ -339,7 +354,11 @@ color="#94a3b8"
 <TextInput
 value={search}
 onChangeText={handleSearch}
-placeholder="Search exam..."
+placeholder={
+language === "sw"
+? "Tafuta mtihani..."
+: "Search exam..."
+}
 placeholderTextColor="#94a3b8"
 style={{
 flex:1,
@@ -382,7 +401,11 @@ fontSize:17,
 fontWeight:"700",
 marginTop:15
 }}>
-No Exams Found
+{
+language === "sw"
+? "Hakuna Mitihani Iliyopatikana"
+: "No Exams Found"
+}
 </Text>
 
 <Text style={{
@@ -391,7 +414,11 @@ marginTop:8,
 textAlign:"center",
 lineHeight:22
 }}>
-No exams matched your current search
+{
+language === "sw"
+? "Hakuna mitihani iliyolingana na utafutaji wako"
+: "No exams matched your current search"
+}
 </Text>
 
 </View>
@@ -545,7 +572,11 @@ color:"#64748b",
 fontSize:12,
 marginBottom:5
 }}>
-CLASS
+{
+language === "sw"
+? "DARASA"
+: "CLASS"
+}
 </Text>
 
 <Text style={{
@@ -575,7 +606,11 @@ color:"#64748b",
 fontSize:12,
 marginBottom:5
 }}>
-EXAM ID
+{
+language === "sw"
+? "NAMBA YA MTIHANI"
+: "EXAM ID"
+}
 </Text>
 
 <Text style={{
@@ -637,7 +672,11 @@ color:"#ffffff",
 fontWeight:"700",
 fontSize:14
 }}>
-View Results
+{
+language === "sw"
+? "Tazama Matokeo"
+: "View Results"
+}
 </Text>
 
 <Text style={{
@@ -645,7 +684,11 @@ color:"#94a3b8",
 fontSize:12,
 marginTop:2
 }}>
-Open class performance results
+{
+language === "sw"
+? "Fungua matokeo ya ufaulu wa darasa"
+: "Open class performance results"
+}
 </Text>
 
 </View>
@@ -674,7 +717,11 @@ fontWeight:"700",
 marginRight:8,
 fontSize:13
 }}>
-Open
+{
+language === "sw"
+? "Fungua"
+: "Open"
+}
 </Text>
 
 <Ionicons
@@ -768,7 +815,11 @@ marginTop:15,
 fontSize:15,
 fontWeight:"600"
 }}>
-Fetching exams...
+{
+language === "sw"
+? "Inapakia mitihani..."
+: "Fetching exams..."
+}
 </Text>
 
 </View>

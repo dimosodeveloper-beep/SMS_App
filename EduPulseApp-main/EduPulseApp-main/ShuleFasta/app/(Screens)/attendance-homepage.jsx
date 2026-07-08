@@ -22,10 +22,12 @@ import * as Haptics from "expo-haptics";
 import styles from "../../components/LoginStyles";
 
 import { UserContext } from "../../components/UserContext";
+import { LanguageContext } from "../../components/LanguageContext";
 
 export default function DashboardOptions() {
 
   const router = useRouter();
+  const { language } = useContext(LanguageContext);
 
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
@@ -49,23 +51,31 @@ export default function DashboardOptions() {
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-
-    if (hour < 12) return "Good Morning ☀️";
-    if (hour < 18) return "Good Afternoon 🌤️";
-    return "Good Evening 🌙";
+    
+    if (language === "sw") {
+      if (hour < 12) return "Habari za Asubuhi ☀️";
+      if (hour < 18) return "Habari za Mchana 🌤️";
+      return "Habari za Jioni 🌙";
+    } else {
+      if (hour < 12) return "Good Morning ☀️";
+      if (hour < 18) return "Good Afternoon 🌤️";
+      return "Good Evening 🌙";
+    }
   };
 
   /* ================= OPTIONS ================= */
   const options = [
     {
-      title: "All Class Attendances",
+      title_en: "All Class Attendances",
+      title_sw: "Mahudhurio ya Darasa Zima",
       icon: <Ionicons name="checkmark-done" size={24} color="#fff" />,
       route: "(Attendance)/view-attendance-classes",
       colors: ["#22c55e", "#4ade80", "#16a34a"],
       for: ["admin", "teacher", "staff", "parent"]
     },
     {
-      title: "Take Attendance",
+      title_en: "Take Attendance",
+      title_sw: "Chukua Mahudhurio",
       icon: <MaterialIcons name="how-to-reg" size={24} color="#fff" />,
       route: "(Attendance)/attendance-all-classes",
       colors: ["#3b82f6", "#60a5fa", "#2563eb"],
@@ -92,8 +102,8 @@ export default function DashboardOptions() {
       />
 
       <Header
-        title="School Dashboard"
-        subtitle="Management System"
+        title={language === "sw" ? "Dashibodi ya Shule" : "School Dashboard"}
+        subtitle={language === "sw" ? "Mfumo wa Usimamizi" : "Management System"}
       />
 
       <ScrollView
@@ -108,7 +118,9 @@ export default function DashboardOptions() {
           </Text>
 
           <Text style={styles.greetingSubtitle}>
-            Manage attendance easily & professionally 🚀
+            {language === "sw" 
+              ? "Simamia mahudhurio kwa urahisi & kitaalamu 🚀" 
+              : "Manage attendance easily & professionally 🚀"}
           </Text>
         </BlurView>
 
@@ -150,7 +162,7 @@ export default function DashboardOptions() {
                       </View>
 
                       <Text style={styles.cardText}>
-                        {item.title}
+                        {language === "sw" ? item.title_sw : item.title_en}
                       </Text>
                     </View>
 
@@ -175,7 +187,7 @@ export default function DashboardOptions() {
         {/* FOOTER */}
         <BlurView intensity={30} tint="dark" style={styles.footer}>
           <Text style={styles.footerText}>
-            Shule Fasta 🚀 | Smart School System
+            Shule Fasta 🚀 | {language === "sw" ? "Mfumo wa Shule Mtandao" : "Smart School System"}
           </Text>
         </BlurView>
 

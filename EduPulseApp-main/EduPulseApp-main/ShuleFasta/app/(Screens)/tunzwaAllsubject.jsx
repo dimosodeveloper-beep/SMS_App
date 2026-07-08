@@ -7,8 +7,7 @@ import{
   Image,
   ActivityIndicator,
   Animated,
-  ScrollView,
-  Modal
+  ScrollView
 } from "react-native";
 
 import axios from "axios";
@@ -41,10 +40,6 @@ export default function AllSubjects(){
   const [search,setSearch] = useState("");
   const [loading,setLoading] = useState(false);
   const [token,setToken] = useState(null);
-
-  // States za Delete Modal
-  const [deleteModal, setDeleteModal] = useState(false);
-  const [selectedId, setSelectedId] = useState(null);
 
   const scaleAnim = new Animated.Value(1);
 
@@ -81,21 +76,18 @@ export default function AllSubjects(){
     }
   },[token]);
 
-  const fetchSubjects = async(currentToken)=>{
-    const useToken = currentToken || token;
-    if (!useToken) return;
-    
+  const fetchSubjects = async(token)=>{
     setLoading(true);
 
     try{
 
-      console.log("TOKEN => ", useToken);
+      console.log("TOKEN => ", token);
 
       const response = await axios.get(
         EndPoint + "/subjects/",
         {
           headers:{
-            Authorization:`Token ${useToken}`,
+            Authorization:`Token ${token}`,
             "Content-Type":"application/json"
           }
         }
@@ -154,53 +146,6 @@ export default function AllSubjects(){
   const openSubject=(item)=>{
     console.log("Selected Subject => ",item);
   }
-
-  /* FUNCTIONS ZA EDIT NA DELETE KAMA ZA GRADING */
-  
-  // 1. Kufungua Modal ya Kufuta
-  const confirmDelete = (id) => {
-    setSelectedId(id);
-    setDeleteModal(true);
-  };
-
-  // 2. Kufuta Somo (Delete Request)
-  const deleteSubject = async () => {
-    setLoading(true);
-    try {
-      await axios.delete(
-        EndPoint + `/subjects/${selectedId}/`,
-        {
-          headers: { Authorization: `Token ${token}` }
-        }
-      );
-
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-
-      Toast.show({
-        type: "success",
-        text1: language === "sw" ? "Imefutwa kikamilifu" : "Successfully Deleted"
-      });
-
-      setDeleteModal(false);
-      fetchSubjects(token);
-
-    } catch (error) {
-      setLoading(false);
-      console.log("DELETE ERROR => ", error.response?.data);
-      Toast.show({
-        type: "error",
-        text1: language === "sw" ? "Imeshindikana kufuta" : "Delete failed"
-      });
-    }
-  };
-
-  // 3. Kwenda Kwenye Ukurasa wa Edit
-  const goToEdit = (item) => {
-    router.push({
-      pathname: "/(Screens)/edit-subject", // Badilisha hii iende kwenye folda yako sahihi ya edit subject
-      params: item
-    });
-  };
 
   return(
     <LinearGradient
@@ -671,31 +616,14 @@ export default function AllSubjects(){
 
                       </View>
 
-                      {/* ACTION BUTTONS: EDIT & DELETE KAMA KWENYE GRADING */}
                       <View style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        gap: 12,
-                        paddingLeft: 5
+                        justifyContent:"center",
+                        alignItems:"center"
                       }}>
-                        
-                        <TouchableOpacity 
-                          onPress={() => goToEdit(item)}
-                          style={{ padding: 5 }}
-                        >
-                          <Ionicons name="create" size={24} color="#38bdf8" />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity 
-                          onPress={() => confirmDelete(item.id)}
-                          style={{ padding: 5 }}
-                        >
-                          <Ionicons name="trash" size={24} color="#ef4444" />
-                        </TouchableOpacity>
 
                         <Ionicons
                           name="chevron-forward-circle"
-                          size={26}
+                          size={34}
                           color="#60a5fa"
                         />
 
@@ -718,49 +646,6 @@ export default function AllSubjects(){
       </BlurView>
 
       </ScrollView>
-
-      {/* DELETE MODAL (ZINGATIA LUGHA YA SW / EN) */}
-      <Modal visible={deleteModal} transparent animationType="fade">
-        <View style={{
-          flex:1,
-          backgroundColor:"rgba(0,0,0,0.7)",
-          justifyContent:"center",
-          padding:20
-        }}>
-          <View style={{
-            backgroundColor:"#0f172a",
-            padding:24,
-            borderRadius:25,
-            borderWidth:1,
-            borderColor:"rgba(255,255,255,0.08)"
-          }}>
-            <Text style={{color:"#fff", marginBottom:25, fontSize:16, textAlign:"center"}}>
-              {
-                language === "sw"
-                ? "Je, una uhakika unataka kufuta somo hili kabisa?"
-                : "Are you sure you want to delete this subject?"
-              }
-            </Text>
-
-            <View style={{flexDirection:"row", justifyContent:"space-around"}}>
-
-              <TouchableOpacity onPress={()=>setDeleteModal(false)} style={{padding:10}}>
-                <Text style={{color:"#94a3b8", fontSize:16, fontWeight:"600"}}>
-                  {language === "sw" ? "Ghairi" : "Cancel"}
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity onPress={deleteSubject} style={{padding:10}}>
-                <Text style={{color:"#ef4444", fontWeight:"bold", fontSize:16}}>
-                  {language === "sw" ? "Futa" : "Delete"}
-                </Text>
-              </TouchableOpacity>
-
-            </View>
-
-          </View>
-        </View>
-      </Modal>
 
       {loading &&(
         <View style={styles.loader}>

@@ -1,4 +1,4 @@
-import React,{useEffect,useState,useRef} from "react";
+import React,{useEffect,useState,useRef,useContext} from "react";
 
 import{
 View,
@@ -28,7 +28,11 @@ import Header from "../../components/Header";
 import {Ionicons} from "@expo/vector-icons";
 import {useFocusEffect} from "expo-router";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function EventsScreen(){
+
+const { language } = useContext(LanguageContext);
 
 const[token,setToken] = useState(null);
 const[events,setEvents] = useState([]);
@@ -92,8 +96,14 @@ useNativeDriver:true
 
 Toast.show({
 type:"error",
-text1:"Error",
-text2:"Failed to load events"
+text1:
+language === "sw"
+? "Hitilafu"
+: "Error",
+text2:
+language === "sw"
+? "Imeshindikana kupakia matukio"
+: "Failed to load events"
 });
 
 }
@@ -164,8 +174,14 @@ setModalVisible(true);
 }else{
 Toast.show({
 type:"info",
-text1:"No Event",
-text2:"No events for this date"
+text1:
+language === "sw"
+? "Hakuna Tukio"
+: "No Event",
+text2:
+language === "sw"
+? "Hakuna matukio katika tarehe hii"
+: "No events for this date"
 });
 }
 
@@ -195,13 +211,30 @@ source={{uri:"https://images.unsplash.com/photo-1588072432836-e10032774350"}}
 style={styles.bg}
 />
 
-<Header title="Events Calendar" subtitle="School Activities"/>
+<Header 
+title={
+language === "sw"
+? "Kalenda ya Matukio"
+: "Events Calendar"
+} 
+subtitle={
+language === "sw"
+? "Shughuli za Shule"
+: "School Activities"
+}
+/>
 
 <ScrollView contentContainerStyle={{padding:10,paddingBottom:300}}>
 
 <BlurView intensity={40} tint="dark" style={styles.blur}>
 
-<Text style={styles.title}>School Calendar</Text>
+<Text style={styles.title}>
+{
+language === "sw"
+? "Kalenda ya Shule"
+: "School Calendar"
+}
+</Text>
 
 {/* FILTER BUTTONS */}
 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{marginBottom:10}}>
@@ -221,7 +254,11 @@ marginRight:10
 }}
 >
 <Text style={{color:"#fff",fontWeight:"bold"}}>
-{type.toUpperCase()}
+{
+language === "sw"
+? (type === "all" ? "YOTE" : type === "exam" ? "MTIHANI" : type === "holiday" ? "LIKIZO" : type === "meeting" ? "KIKAO" : "SHUGHULI")
+: type.toUpperCase()
+}
 </Text>
 </TouchableOpacity>
 
@@ -294,7 +331,11 @@ color:"#38bdf8",
 fontSize:18,
 fontWeight:"bold"
 }}>
-Events on {selectedDate}
+{
+language === "sw"
+? `Matukio ya tarehe ${selectedDate}`
+: `Events on {selectedDate}`
+}
 </Text>
 
 <TouchableOpacity onPress={()=>setModalVisible(false)}>
@@ -321,7 +362,10 @@ fontSize:16
 </Text>
 
 <Text style={{color:"#94a3b8",marginTop:5}}>
-{item.description || "No description"}
+{
+item.description || 
+(language === "sw" ? "Hakuna maelezo" : "No description")
+}
 </Text>
 
 <Text style={{
@@ -329,7 +373,11 @@ color:getColor(item.event_type),
 marginTop:5,
 fontWeight:"bold"
 }}>
-{item.event_type.toUpperCase()}
+{
+language === "sw"
+? (item.event_type === "exam" ? "MTIHANI" : item.event_type === "holiday" ? "LIKIZO" : item.event_type === "meeting" ? "KIKAO" : "SHUGHULI")
+: item.event_type.toUpperCase()
+}
 </Text>
 
 </View>
@@ -347,7 +395,11 @@ fontWeight:"bold"
 <View style={styles.loaderCard}>
 <ActivityIndicator size="large" color="#2563eb"/>
 <Text style={styles.loadingText}>
-Loading events...
+{
+language === "sw"
+? "Inapakia matukio..."
+: "Loading events..."
+}
 </Text>
 </View>
 </View>

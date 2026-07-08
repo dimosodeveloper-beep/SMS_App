@@ -1,4 +1,4 @@
-import React,{useState,useEffect,useRef} from "react";
+import React,{useState,useEffect,useRef,useContext} from "react";
 
 import{
 View,
@@ -29,9 +29,13 @@ import {useRouter} from "expo-router";
 
 import {Ionicons} from "@expo/vector-icons";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function ViewAttandanceAllClasses(){
 
 const router = useRouter();
+
+const { language } = useContext(LanguageContext);
 
 const [classes,setClasses] = useState([]);
 const [filteredClasses,setFilteredClasses] = useState([]);
@@ -164,7 +168,10 @@ console.log("ERROR => ",error.response?.data);
 
 Toast.show({
 type:"error",
-text1:"Error fetching classes",
+text1:
+language === "sw"
+? "Hitilafu kupata madarasa"
+: "Error fetching classes",
 text2:JSON.stringify(error.response?.data)
 });
 
@@ -249,8 +256,16 @@ backgroundColor:"rgba(14,165,233,0.12)"
 }}/>
 
 <Header
-title="School Dashboard"
-subtitle="Management System"
+title={
+language === "sw"
+? "Dashibodi ya Shule"
+: "School Dashboard"
+}
+subtitle={
+language === "sw"
+? "Mfumo wa Usimamizi"
+: "Management System"
+}
 />
 
 <Animated.ScrollView
@@ -308,7 +323,11 @@ fontWeight:"900",
 color:"#ffffff",
 letterSpacing:0.5
 }}>
-All Classes
+{
+language === "sw"
+? "Madarasa Yote"
+: "All Classes"
+}
 </Text>
 
 <Text style={{
@@ -317,7 +336,11 @@ color:"#cbd5e1",
 marginTop:10,
 lineHeight:22
 }}>
-Browse and view attendance records for all available classrooms in your school.
+{
+language === "sw"
+? "Vinjari na utazame kumbukumbu za mahudhurio ya madarasa yote yaliyopo shuleni kwako."
+: "Browse and view attendance records for all available classrooms in your school."
+}
 </Text>
 
 <View style={{
@@ -341,7 +364,11 @@ color:"#dbeafe",
 fontWeight:"700",
 fontSize:13
 }}>
-Total: {filteredClasses.length}
+{
+language === "sw"
+? `Jumla: ${filteredClasses.length}`
+: `Total: ${filteredClasses.length}`
+}
 </Text>
 
 </View>
@@ -360,7 +387,11 @@ color:"#bbf7d0",
 fontWeight:"700",
 fontSize:13
 }}>
-Attendance
+{
+language === "sw"
+? "Mahudhurio"
+: "Attendance"
+}
 </Text>
 
 </View>
@@ -430,7 +461,11 @@ style={{marginRight:10}}
 <TextInput
 value={search}
 onChangeText={handleSearch}
-placeholder="Search class..."
+placeholder={
+language === "sw"
+? "Tafuta darasa..."
+: "Search class..."
+}
 placeholderTextColor="#94a3b8"
 style={{
 flex:1,
@@ -489,7 +524,11 @@ fontSize:18,
 fontWeight:"700",
 marginTop:15
 }}>
-No Classes Found
+{
+language === "sw"
+? "Hakuna Madarasa Yaliyopatikana"
+: "No Classes Found"
+}
 </Text>
 
 <Text style={{
@@ -498,7 +537,11 @@ textAlign:"center",
 marginTop:8,
 lineHeight:22
 }}>
-Try searching using another keyword or refresh your classroom records.
+{
+language === "sw"
+? "Jaribu kutafuta kwa neno lingine au fanya marekebisho kwenye kumbukumbu za madarasa yako."
+: "Try searching using another keyword or refresh your classroom records."
+}
 </Text>
 
 </BlurView>
@@ -602,7 +645,11 @@ color:"#94a3b8",
 marginTop:6,
 fontSize:14
 }}>
-Classroom
+{
+language === "sw"
+? "Darasa"
+: "Classroom"
+}
 </Text>
 
 <View style={{
@@ -624,7 +671,11 @@ color:"#bbf7d0",
 fontSize:12,
 fontWeight:"700"
 }}>
-Available
+{
+language === "sw"
+? "Lipo"
+: "Available"
+}
 </Text>
 
 </View>
@@ -725,7 +776,11 @@ fontSize:16,
 fontWeight:"700",
 marginTop:16
 }}>
-Fetching classes...
+{
+language === "sw"
+? "Tunapakia madarasa..."
+: "Fetching classes..."
+}
 </Text>
 
 <Text style={{
@@ -733,7 +788,11 @@ color:"#94a3b8",
 marginTop:6,
 fontSize:13
 }}>
-Please wait a moment
+{
+language === "sw"
+? "Tafadhali subiri kidogo"
+: "Please wait a moment"
+}
 </Text>
 
 </BlurView>

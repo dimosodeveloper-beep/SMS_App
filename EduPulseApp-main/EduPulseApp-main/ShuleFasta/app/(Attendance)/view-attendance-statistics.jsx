@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useContext} from "react";
 
 import{
 View,
@@ -21,7 +21,11 @@ import Header from "../../components/Header";
 
 import {useLocalSearchParams} from "expo-router";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function ViewAttendanceStatistics(){
+
+const { language } = useContext(LanguageContext);
 
 const {studentId} = useLocalSearchParams();
 
@@ -64,7 +68,10 @@ setData(res.data);
 
 Toast.show({
 type:"error",
-text1:"Error loading statistics"
+text1:
+language === "sw"
+? "Hitilafu kupakia takwimu"
+: "Error loading statistics"
 });
 
 }
@@ -76,7 +83,18 @@ return(
 
 <LinearGradient colors={["#020617","#0f172a","#1e293b"]} style={styles.container}>
 
-<Header title="Student Statistics" subtitle="Attendance Timeline"/>
+<Header 
+title={
+language === "sw"
+? "Takwimu za Mwanafunzi"
+: "Student Statistics"
+} 
+subtitle={
+language === "sw"
+? "Mstari wa Muda wa Mahudhurio"
+: "Attendance Timeline"
+}
+/>
 
 <ScrollView contentContainerStyle={{padding:10,paddingBottom:200}}>
 
@@ -127,7 +145,11 @@ fontWeight:"bold"
 </Text>
 
 <Text style={{color:"#94a3b8"}}>
-Adm: {data.student?.admission_number || "-"}
+{
+language === "sw"
+? `Namba ya Usajili: ${data.student?.admission_number || "-"}`
+: `Adm: ${data.student?.admission_number || "-"}`
+}
 </Text>
 </View>
 
@@ -141,23 +163,45 @@ marginTop:15
 }}>
 
 <View style={{width:"50%",marginBottom:10}}>
-<Text style={{color:"#64748b",fontSize:12}}>Class</Text>
+<Text style={{color:"#64748b",fontSize:12}}>
+{
+language === "sw"
+? "Darasa"
+: "Class"
+}
+</Text>
 <Text style={{color:"#fff",fontWeight:"600"}}>
 {data.student?.classroom || "-"}
 </Text>
 </View>
 
 <View style={{width:"50%",marginBottom:10}}>
-<Text style={{color:"#64748b",fontSize:12}}>Stream</Text>
+<Text style={{color:"#64748b",fontSize:12}}>
+{
+language === "sw"
+? "Mkondo"
+: "Stream"
+}
+</Text>
 <Text style={{color:"#fff",fontWeight:"600"}}>
 {data.student?.stream || "-"}
 </Text>
 </View>
 
 <View style={{width:"50%"}}>
-<Text style={{color:"#64748b",fontSize:12}}>Gender</Text>
+<Text style={{color:"#64748b",fontSize:12}}>
+{
+language === "sw"
+? "Jinsia"
+: "Gender"
+}
+</Text>
 <Text style={{color:"#fff",fontWeight:"600"}}>
-{data.student?.gender || "-"}
+{
+language === "sw"
+? (data.student?.gender?.toLowerCase() === "male" || data.student?.gender === "ME" ? "Kiume" : data.student?.gender?.toLowerCase() === "female" || data.student?.gender === "KE" ? "Kike" : data.student?.gender || "-")
+: (data.student?.gender || "-")
+}
 </Text>
 </View>
 
@@ -177,7 +221,13 @@ overflow:"hidden",
 marginRight:5
 }}>
 <LinearGradient colors={["#16a34a","#22c55e"]} style={{padding:14}}>
-<Text style={{color:"#dcfce7",fontSize:12}}>Present Days</Text>
+<Text style={{color:"#dcfce7",fontSize:12}}>
+{
+language === "sw"
+? "Siku Alizopo"
+: "Present Days"
+}
+</Text>
 <Text style={{color:"#fff",fontSize:20,fontWeight:"bold"}}>
 {data.present_days || 0}
 </Text>
@@ -191,7 +241,13 @@ overflow:"hidden",
 marginLeft:5
 }}>
 <LinearGradient colors={["#dc2626","#ef4444"]} style={{padding:14}}>
-<Text style={{color:"#fee2e2",fontSize:12}}>Absent Days</Text>
+<Text style={{color:"#fee2e2",fontSize:12}}>
+{
+language === "sw"
+? "Siku Asizopo"
+: "Absent Days"
+}
+</Text>
 <Text style={{color:"#fff",fontSize:20,fontWeight:"bold"}}>
 {data.absent_days || 0}
 </Text>
@@ -208,7 +264,11 @@ color:"#38bdf8",
 fontWeight:"bold",
 marginBottom:10
 }}>
-Attendance Timeline
+{
+language === "sw"
+? "Mstari wa Muda wa Mahudhurio"
+: "Attendance Timeline"
+}
 </Text>
 
 {data.timeline && data.timeline.length > 0 ? (
@@ -243,7 +303,11 @@ backgroundColor:item.status==="present"?"#14532d":"#7f1d1d"
 color:item.status==="present"?"#22c55e":"#ef4444",
 fontWeight:"bold"
 }}>
-{item.status.toUpperCase()}
+{
+language === "sw"
+? (item.status === "present" ? "UPO" : "HAUPO")
+: item.status.toUpperCase()
+}
 </Text>
 </View>
 
@@ -254,7 +318,11 @@ fontWeight:"bold"
 ) : (
 
 <Text style={{color:"#94a3b8",textAlign:"center"}}>
-No attendance records
+{
+language === "sw"
+? "Hakuna kumbukumbu za mahudhurio"
+: "No attendance records"
+}
 </Text>
 
 )}
@@ -264,7 +332,11 @@ No attendance records
 ) : (
 
 <Text style={{color:"#fff",textAlign:"center",marginTop:50}}>
-Loading data...
+{
+language === "sw"
+? "Tunapakia data..."
+: "Loading data..."
+}
 </Text>
 
 )}

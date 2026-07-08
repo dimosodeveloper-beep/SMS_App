@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useRef,useContext} from "react";
 
 import{
 View,
@@ -25,9 +25,13 @@ import Header from "../../components/Header";
 
 import {useLocalSearchParams} from "expo-router";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function ResultsSummary(){
 
 const {classId,examId, year} = useLocalSearchParams();
+
+const { language } = useContext(LanguageContext);
 
 const[data,setData] = useState(null);
 const[loading,setLoading] = useState(false);
@@ -79,7 +83,10 @@ Haptics.NotificationFeedbackType.Success
 
 Toast.show({
 type:"error",
-text1:"Error",
+text1:
+language === "sw"
+? "Hitilafu"
+: "Error",
 text2:JSON.stringify(e.response?.data)
 });
 
@@ -97,18 +104,37 @@ source={{uri:"https://images.unsplash.com/photo-1588072432836-e10032774350"}}
 style={styles.bg}
 />
 
-<Header title="Results Summary" subtitle="Performance Overview"/>
+<Header 
+title={
+language === "sw"
+? "Muhtasari wa Matokeo"
+: "Results Summary"
+} 
+subtitle={
+language === "sw"
+? "Mwenendo wa Ufaulu"
+: "Performance Overview"
+}
+/>
 
 <ScrollView contentContainerStyle={{padding:10,paddingBottom:200}}>
 
 <BlurView intensity={40} tint="dark" style={styles.blur}>
 
 <Text style={styles.title}>
-Results Summary Dashboard
+{
+language === "sw"
+? "Dashibodi ya Muhtasari"
+: "Results Summary Dashboard"
+}
 </Text>
 
 <Text style={{color:"#94a3b8",marginBottom:10}}>
-Overview of class performance
+{
+language === "sw"
+? "Mwenendo wa ufaulu wa darasa"
+: "Overview of class performance"
+}
 </Text>
 
 {/* ===== TABS ===== */}
@@ -124,7 +150,11 @@ borderRadius:10,
 marginRight:5
 }}>
 <Text style={{color:"#fff",textAlign:"center",fontWeight:"bold"}}>
-Top 10
+{
+language === "sw"
+? "10 Bora"
+: "Top 10"
+}
 </Text>
 </TouchableOpacity>
 
@@ -138,7 +168,11 @@ borderRadius:10,
 marginRight:5
 }}>
 <Text style={{color:"#fff",textAlign:"center",fontWeight:"bold"}}>
-Last 10
+{
+language === "sw"
+? "10 Mwisho"
+: "Last 10"
+}
 </Text>
 </TouchableOpacity>
 
@@ -151,7 +185,11 @@ backgroundColor:activeTab==="grades"?"#2563eb":"#0f172a",
 borderRadius:10
 }}>
 <Text style={{color:"#fff",textAlign:"center",fontWeight:"bold"}}>
-Grades
+{
+language === "sw"
+? "Daraja"
+: "Grades"
+}
 </Text>
 </TouchableOpacity>
 
@@ -189,7 +227,7 @@ borderColor:"#334155"
 </Text>
 
 <Text style={{color:"#fff"}}>
-Average: {item.average}
+{language === "sw" ? "Wastani" : "Average"}: {item.average}
 </Text>
 
 </LinearGradient>
@@ -219,7 +257,7 @@ borderColor:"#334155"
 </Text>
 
 <Text style={{color:"#fff"}}>
-Average: {item.average}
+{language === "sw" ? "Wastani" : "Average"}: {item.average}
 </Text>
 
 </LinearGradient>
@@ -240,11 +278,11 @@ borderColor:"#334155"
 }}>
 
 <Text style={{color:"#38bdf8",fontWeight:"bold"}}>
-Grade {g}
+{language === "sw" ? "Daraja" : "Grade"} {g}
 </Text>
 
 <Text style={{color:"#fff"}}>
-Students: {v}
+{language === "sw" ? "Wanafunzi" : "Students"}: {v}
 </Text>
 
 </View>
@@ -261,7 +299,11 @@ Students: {v}
 <View style={styles.loaderCard}>
 <ActivityIndicator size="large" color="#2563eb"/>
 <Text style={styles.loadingText}>
-Loading summary...
+{
+language === "sw"
+? "Inapakia muhtasari..."
+: "Loading summary..."
+}
 </Text>
 </View>
 </View>

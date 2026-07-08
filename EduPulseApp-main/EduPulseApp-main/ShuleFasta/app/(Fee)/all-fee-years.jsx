@@ -1,6 +1,6 @@
 // app/(Fee)/all-fee-years.jsx
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import {
 View,
 Text,
@@ -31,6 +31,8 @@ import { EndPoint } from "../../components/links";
 import Header from "../../components/Header";
 import styles from "../../components/LoginStyles";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function AllFeeYears() {
 
 const [years, setYears] = useState([]);
@@ -40,6 +42,8 @@ const [token, setToken] = useState(null);
 const [search, setSearch] = useState("");
 
 const router = useRouter();
+
+const { language } = useContext(LanguageContext);
 
 const scaleAnim = useRef(new Animated.Value(1)).current;
 
@@ -82,7 +86,10 @@ Haptics.NotificationFeedbackType.Success
 
 Toast.show({
 type: "error",
-text1: "Failed to load years"
+text1:
+language === "sw"
+? "Imeshindikana kupakia miaka"
+: "Failed to load years"
 });
 
 }
@@ -112,7 +119,9 @@ if (!map[item.year]) {
 map[item.year] = new Set();
 }
 
-map[item.year].add(item.classroom_name);
+// Map standard classroom name or Swahili variation if available
+const name = language === "sw" ? (item.classroom_name_SW || item.classroom_name) : item.classroom_name;
+map[item.year].add(name);
 
 });
 
@@ -177,8 +186,16 @@ backgroundColor:"rgba(2,6,23,0.75)"
 }}/>
 
 <Header
-title="Fee Management"
-subtitle="Academic Year Dashboard"
+title={
+language === "sw"
+? "Usimamizi wa Ada"
+: "Fee Management"
+}
+subtitle={
+language === "sw"
+? "Dashibodi ya Mwaka wa Masomo"
+: "Academic Year Dashboard"
+}
 />
 
 <ScrollView
@@ -236,7 +253,11 @@ fontSize:28,
 fontWeight:"900",
 letterSpacing:0.5
 }}>
-Academic Years
+{
+language === "sw"
+? "Miaka ya Masomo"
+: "Academic Years"
+}
 </Text>
 
 <Text style={{
@@ -245,7 +266,11 @@ marginTop:8,
 lineHeight:22,
 fontSize:14
 }}>
-View all academic years and manage fee structures for every classroom easily.
+{
+language === "sw"
+? "Tazama miaka yote ya masomo na usimamie muundo wa ada kwa kila darasa kwa urahisi."
+: "View all academic years and manage fee structures for every classroom easily."
+}
 </Text>
 
 </View>
@@ -285,7 +310,11 @@ fontWeight:"700",
 fontSize:15,
 marginBottom:12
 }}>
-Search Academic Year
+{
+language === "sw"
+? "Tafuta Mwaka wa Masomo"
+: "Search Academic Year"
+}
 </Text>
 
 <View style={{
@@ -308,7 +337,11 @@ color="#94a3b8"
 <TextInput
 value={search}
 onChangeText={setSearch}
-placeholder="Search academic year e.g 2026..."
+placeholder={
+language === "sw"
+? "Tafuta mwaka wa masomo mf. 2026..."
+: "Search academic year e.g 2026..."
+}
 placeholderTextColor="#64748b"
 style={{
 flex:1,
@@ -350,7 +383,11 @@ fontSize:22,
 fontWeight:"900",
 textAlign:"center"
 }}>
-Academic Year Overview
+{
+language === "sw"
+? "Muhtasari wa Mwaka wa Masomo"
+: "Academic Year Overview"
+}
 </Text>
 
 <Text style={{
@@ -359,7 +396,11 @@ textAlign:"center",
 marginTop:8,
 lineHeight:22
 }}>
-Select a year below to explore fee structures and student financial data
+{
+language === "sw"
+? "Chagua mwaka hapo chini ili kuchunguza muundo wa ada na data za kifedha za wanafunzi"
+: "Select a year below to explore fee structures and student financial data"
+}
 </Text>
 
 </View>
@@ -460,7 +501,11 @@ fontWeight:"800",
 marginTop:16,
 letterSpacing:1
 }}>
-ACADEMIC YEAR
+{
+language === "sw"
+? "MWAKA WA MASOMO"
+: "ACADEMIC YEAR"
+}
 </Text>
 
 <Text style={{
@@ -499,7 +544,11 @@ color:"#94a3b8",
 fontSize:12,
 fontWeight:"600"
 }}>
-Assigned Classes
+{
+language === "sw"
+? "Madarasa Yaliyopangwa"
+: "Assigned Classes"
+}
 </Text>
 
 <View style={{
@@ -533,7 +582,7 @@ numberOfLines={4}
 
 {classMap[y]?.length
 ? classMap[y].join(", ")
-: "No classes assigned"}
+: language === "sw" ? "Hakuna madarasa yaliyopangwa" : "No classes assigned"}
 
 </Text>
 
@@ -554,7 +603,11 @@ color:"#38bdf8",
 fontSize:13,
 fontWeight:"700"
 }}>
-Open Dashboard
+{
+language === "sw"
+? "Fungua Dashibodi"
+: "Open Dashboard"
+}
 </Text>
 
 <Ionicons
@@ -598,7 +651,11 @@ marginTop:15,
 fontSize:16,
 fontWeight:"600"
 }}>
-No academic years found
+{
+language === "sw"
+? "Hakuna miaka ya masomo iliyopatikana"
+: "No academic years found"
+}
 </Text>
 
 </View>
@@ -637,7 +694,11 @@ color:"#e2e8f0"
 }
 ]}
 >
-Loading academic years...
+{
+language === "sw"
+? "Inapakia miaka ya masomo..."
+: "Loading academic years..."
+}
 </Text>
 
 </View>

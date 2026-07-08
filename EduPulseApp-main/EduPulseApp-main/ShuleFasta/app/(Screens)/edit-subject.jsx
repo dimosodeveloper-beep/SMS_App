@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
+
 import {
   View,
   Text,
@@ -26,16 +27,15 @@ import Header from "../../components/Header";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { LanguageContext } from "../../components/LanguageContext";
 
-export default function EditGrading() {
+export default function EditSubject() {
 
   const router = useRouter();
   const params = useLocalSearchParams();
   const { language } = useContext(LanguageContext);
 
-  const [grade, setGrade] = useState(params.grade);
-  const [minScore, setMinScore] = useState(String(params.min_score));
-  const [maxScore, setMaxScore] = useState(String(params.max_score));
-  const [remark, setRemark] = useState(params.remark);
+  // States kwa ajili ya data ya somo (English Name na Swahili Name)
+  const [name, setName] = useState(params.name || "");
+  const [nameSW, setNameSW] = useState(params.name_SW || "");
 
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -53,12 +53,12 @@ export default function EditGrading() {
     loadToken();
   }, []);
 
-  const updateGrading = async () => {
+  const updateSubject = async () => {
 
-    if (!grade || !minScore || !maxScore || !remark) {
+    if (!name) {
       Toast.show({
         type: "error",
-        text1: language === "sw" ? "Jaza sehemu zote" : "Fill all fields"
+        text1: language === "sw" ? "Jaza jina la somo" : "Fill subject name"
       });
       return;
     }
@@ -68,16 +68,15 @@ export default function EditGrading() {
     try {
 
       await axios.put(
-        EndPoint + `/grading-system/${params.id}/`,
+        EndPoint + `/subjects/${params.id}/`,
         {
-          grade,
-          min_score: parseInt(minScore),
-          max_score: parseInt(maxScore),
-          remark
+          name: name,
+          name_SW: nameSW
         },
         {
           headers: {
-            Authorization: `Token ${token}`
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json"
           }
         }
       );
@@ -86,7 +85,7 @@ export default function EditGrading() {
 
       Toast.show({
         type: "success",
-        text1: language === "sw" ? "Imesasishwa kwa mafanikio" : "Updated Successfully"
+        text1: language === "sw" ? "Somo Limebadilishwa" : "Updated Successfully"
       });
 
       router.back();
@@ -95,7 +94,7 @@ export default function EditGrading() {
 
       Toast.show({
         type: "error",
-        text1: language === "sw" ? "Hitilafu" : "Error",
+        text1: language === "sw" ? "Hitilafu imetokea" : "Error",
         text2: JSON.stringify(e.response?.data)
       });
 
@@ -107,38 +106,56 @@ export default function EditGrading() {
   return (
     <LinearGradient colors={["#020617", "#0f172a", "#1e293b"]} style={styles.container}>
 
-      <Image source={{ uri: "https://images.unsplash.com/photo-1588072432836-e10032774350" }} style={styles.bg} />
-
-      <Header 
-        title={language === "sw" ? "Hariri Daraja" : "Edit Grading"} 
-        subtitle={language === "sw" ? "Sasisha Daraja" : "Update Grade"} 
+      <Image
+        source={{ uri: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f" }}
+        style={[styles.bg, { opacity: 0.15 }]}
+        blurRadius={2}
       />
 
-      <ScrollView contentContainerStyle={{ padding: 10, paddingBottom: 200 }}>
+      <Header
+        title={language === "sw" ? "Hariri Somo" : "Edit Subject"}
+        subtitle={language === "sw" ? "Rekebisha Taarifa" : "Update Subject Details"}
+      />
+
+      <ScrollView contentContainerStyle={{ padding: 14, paddingBottom: 200 }}>
 
         <BlurView intensity={40} tint="dark" style={styles.blur}>
 
-          <Text style={styles.title}>{language === "sw" ? "Hariri Daraja" : "Edit Grading"}</Text>
+          <Text style={styles.title}>
+            {language === "sw" ? "Hariri Somo" : "Edit Subject"}
+          </Text>
 
           <View style={styles.form}>
 
-            <Text style={styles.label}>{language === "sw" ? "Daraja" : "Grade"}</Text>
-            <TextInput style={styles.input} value={grade} onChangeText={setGrade} />
+            {/* Input ya Jina la Somo (English) */}
+            <Text style={styles.label}>
+              {language === "sw" ? "Jina la Somo (Kiingereza)" : "Subject Name (English)"}
+            </Text>
+            <TextInput
+              style={styles.input}
+              value={name}
+              onChangeText={setName}
+              placeholder={language === "sw" ? "mfano: Mathematics" : "e.g. Mathematics"}
+              placeholderTextColor="#475569"
+            />
 
-            <Text style={styles.label}>{language === "sw" ? "Alama ya Chini" : "Minimum Score"}</Text>
-            <TextInput style={styles.input} value={minScore} onChangeText={setMinScore} keyboardType="numeric" />
+            {/* Input ya Jina la Somo (Swahili) */}
+            <Text style={styles.label}>
+              {language === "sw" ? "Jina la Somo (Kiswahili)" : "Subject Name (Swahili)"}
+            </Text>
+            <TextInput
+              style={styles.input}
+              value={nameSW}
+              onChangeText={setNameSW}
+              placeholder={language === "sw" ? "mfano: Hisabati" : "e.g. Hisabati"}
+              placeholderTextColor="#475569"
+            />
 
-            <Text style={styles.label}>{language === "sw" ? "Alama ya Juu" : "Maximum Score"}</Text>
-            <TextInput style={styles.input} value={maxScore} onChangeText={setMaxScore} keyboardType="numeric" />
-
-            <Text style={styles.label}>{language === "sw" ? "Maoni" : "Remark"}</Text>
-            <TextInput style={styles.input} value={remark} onChangeText={setRemark} />
-
-            <Animated.View style={{ transform: [{ scale: scaleAnim }], marginTop: 20 }}>
-              <TouchableOpacity onPressIn={pressIn} onPressOut={pressOut} onPress={updateGrading}>
+            <Animated.View style={{ transform: [{ scale: scaleAnim }], marginTop: 30 }}>
+              <TouchableOpacity onPressIn={pressIn} onPressOut={pressOut} onPress={updateSubject}>
                 <LinearGradient colors={["#2563eb", "#38bdf8"]} style={styles.button}>
                   <Text style={styles.buttonText}>
-                    {language === "sw" ? "Sasisha" : "Update"}
+                    {language === "sw" ? "Huisha Taarifa" : "Update"}
                   </Text>
                 </LinearGradient>
               </TouchableOpacity>

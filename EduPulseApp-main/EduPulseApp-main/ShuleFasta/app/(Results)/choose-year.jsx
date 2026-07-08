@@ -1,4 +1,4 @@
-import React,{useState,useEffect,useRef} from "react";
+import React,{useState,useEffect,useRef,useContext} from "react";
 
 import{
 View,
@@ -33,6 +33,8 @@ MaterialIcons,
 FontAwesome5
 } from "@expo/vector-icons";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function ChooseYear(){
 
 const router = useRouter();
@@ -43,6 +45,8 @@ className,
 examId,
 categoryName
 } = useLocalSearchParams();
+
+const { language } = useContext(LanguageContext);
 
 const [years,setYears] = useState([]);
 const [filteredYears,setFilteredYears] = useState([]);
@@ -140,7 +144,10 @@ setLoading(false);
 
 Toast.show({
 type:"error",
-text1:"Error fetching years",
+text1:
+language === "sw"
+? "Hitilafu kupata miaka"
+: "Error fetching years",
 text2:JSON.stringify(error.response?.data)
 });
 
@@ -209,8 +216,12 @@ style={styles.bg}
 />
 
 <Header
-title="Choose Year"
-subtitle={className || "Academic Years"}
+title={
+language === "sw"
+? "Chagua Mwaka"
+: "Choose Year"
+}
+subtitle={className || (language === "sw" ? "Miaka ya Masomo" : "Academic Years")}
 />
 
 <ScrollView
@@ -276,7 +287,7 @@ fontWeight:"700"
 }}
 numberOfLines={1}
 >
-{className || "Academic Years"}
+{className || (language === "sw" ? "Miaka ya Masomo" : "Academic Years")}
 </Text>
 
 <Text style={{
@@ -286,7 +297,7 @@ marginTop:4
 }}
 numberOfLines={1}
 >
-{categoryName || "Choose Academic Year"}
+{categoryName || (language === "sw" ? "Chagua Mwaka wa Masomo" : "Choose Academic Year")}
 </Text>
 
 </View>
@@ -307,7 +318,7 @@ color:"#38bdf8",
 fontWeight:"700",
 fontSize:13
 }}>
-{filteredYears.length} Years
+{filteredYears.length} {language === "sw" ? "Miaka" : "Years"}
 </Text>
 
 </View>
@@ -339,7 +350,11 @@ color="#94a3b8"
 <TextInput
 value={search}
 onChangeText={handleSearch}
-placeholder="Search academic year..."
+placeholder={
+language === "sw"
+? "Tafuta mwaka wa masomo..."
+: "Search academic year..."
+}
 placeholderTextColor="#94a3b8"
 style={{
 flex:1,
@@ -382,7 +397,11 @@ fontSize:17,
 fontWeight:"700",
 marginTop:15
 }}>
-No Years Found
+{
+language === "sw"
+? "Hakuna Miaka Iliyopatikana"
+: "No Years Found"
+}
 </Text>
 
 <Text style={{
@@ -391,7 +410,11 @@ marginTop:8,
 textAlign:"center",
 lineHeight:22
 }}>
-No academic years matched your current search
+{
+language === "sw"
+? "Hakuna mwaka wa masomo uliolingana na utafutaji wako"
+: "No academic years matched your current search"
+}
 </Text>
 
 </View>
@@ -492,7 +515,11 @@ color:"#94a3b8",
 fontSize:13,
 marginLeft:6
 }}>
-Academic Year
+{
+language === "sw"
+? "Mwaka wa Masomo"
+: "Academic Year"
+}
 </Text>
 
 </View>
@@ -516,7 +543,7 @@ marginLeft:6
 }}
 numberOfLines={1}
 >
-{categoryName || "Results Records"}
+{categoryName || (language === "sw" ? "Kumbukumbu za Matokeo" : "Results Records")}
 </Text>
 
 </View>
@@ -572,7 +599,11 @@ color:"#ffffff",
 fontWeight:"700",
 fontSize:14
 }}>
-View Results
+{
+language === "sw"
+? "Tazama Matokeo"
+: "View Results"
+}
 </Text>
 
 <Text style={{
@@ -580,7 +611,11 @@ color:"#94a3b8",
 fontSize:12,
 marginTop:2
 }}>
-Open student exam results
+{
+language === "sw"
+? "Fungua matokeo ya mitihani ya wanafunzi"
+: "Open student exam results"
+}
 </Text>
 
 </View>
@@ -609,7 +644,11 @@ fontWeight:"700",
 marginRight:8,
 fontSize:13
 }}>
-Open
+{
+language === "sw"
+? "Fungua"
+: "Open"
+}
 </Text>
 
 <Ionicons
@@ -662,7 +701,11 @@ marginTop:15,
 fontSize:15,
 fontWeight:"600"
 }}>
-Fetching years...
+{
+language === "sw"
+? "Inapakia miaka..."
+: "Fetching years..."
+}
 </Text>
 
 </View>

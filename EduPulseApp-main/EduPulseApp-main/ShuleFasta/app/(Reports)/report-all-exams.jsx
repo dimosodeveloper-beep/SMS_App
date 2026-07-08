@@ -1,4 +1,4 @@
-import React,{useState,useEffect,useRef} from "react";
+import React,{useState,useEffect,useRef,useContext} from "react";
 
 import{
 View,
@@ -28,10 +28,14 @@ import Header from "../../components/Header";
 import {useRouter,useLocalSearchParams} from "expo-router";
 import {Ionicons} from "@expo/vector-icons";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function ResultsAllExams(){
 
 const router = useRouter();
 const {categoryId,categoryName} = useLocalSearchParams();
+
+const { language } = useContext(LanguageContext);
 
 const [exams,setExams] = useState([]);
 const [filteredExams,setFilteredExams] = useState([]);
@@ -158,7 +162,10 @@ setLoading(false);
 
 Toast.show({
 type:"error",
-text1:"Error fetching exams",
+text1:
+language === "sw"
+? "Hitilafu ya kupata mitihani"
+: "Error fetching exams",
 text2:JSON.stringify(error.response?.data)
 });
 
@@ -237,8 +244,12 @@ backgroundColor:"rgba(14,165,233,0.12)"
 }}/>
 
 <Header
-title={categoryName || "Exams"}
-subtitle="Filtered by category"
+title={categoryName || (language === "sw" ? "Mitihani" : "Exams")}
+subtitle={
+language === "sw"
+? "Imechujwa kwa kundi"
+: "Filtered by category"
+}
 />
 
 <Animated.ScrollView
@@ -296,7 +307,11 @@ fontWeight:"900",
 color:"#ffffff",
 letterSpacing:0.5
 }}>
-All Exams
+{
+language === "sw"
+? "Mitihani Yote"
+: "All Exams"
+}
 </Text>
 
 <Text style={{
@@ -305,7 +320,11 @@ color:"#cbd5e1",
 marginTop:10,
 lineHeight:22
 }}>
-Showing exams filtered under {categoryName || "selected category"}.
+{
+language === "sw"
+? `Inaonesha mitihani iliyochujwa chini ya ${categoryName || "kundi lililochaguliwa"}.`
+: `Showing exams filtered under ${categoryName || "selected category"}.`
+}
 </Text>
 
 <View style={{
@@ -331,7 +350,7 @@ color:"#dbeafe",
 fontWeight:"700",
 fontSize:13
 }}>
-Total: {filteredExams.length}
+{language === "sw" ? "Jumla" : "Total"}: {filteredExams.length}
 </Text>
 
 </View>
@@ -420,7 +439,11 @@ style={{marginRight:10}}
 <TextInput
 value={search}
 onChangeText={handleSearch}
-placeholder="Search exam..."
+placeholder={
+language === "sw"
+? "Tafuta mtihani..."
+: "Search exam..."
+}
 placeholderTextColor="#94a3b8"
 style={{
 flex:1,
@@ -479,7 +502,11 @@ fontSize:18,
 fontWeight:"700",
 marginTop:15
 }}>
-No Exams Found
+{
+language === "sw"
+? "Hakuna Mitihani Iliyopatikana"
+: "No Exams Found"
+}
 </Text>
 
 <Text style={{
@@ -488,7 +515,11 @@ textAlign:"center",
 marginTop:8,
 lineHeight:22
 }}>
-Try searching using another keyword or create a new exam.
+{
+language === "sw"
+? "Jaribu kutafuta kwa neno lingine au tengeneza mtihani mpya."
+: "Try searching using another keyword or create a new exam."
+}
 </Text>
 
 </BlurView>
@@ -600,7 +631,11 @@ color:"#94a3b8",
 marginTop:6,
 fontSize:14
 }}>
-Exam Information
+{
+language === "sw"
+? "Taarifa za Mtihani"
+: "Exam Information"
+}
 </Text>
 
 <View style={{
@@ -625,7 +660,7 @@ color:"#cbd5e1",
 fontSize:14,
 flex:1
 }}>
-Date: {item.date}
+{language === "sw" ? "Tarehe" : "Date"}: {item.date}
 </Text>
 
 </View>
@@ -648,7 +683,7 @@ color:"#cbd5e1",
 fontSize:14,
 flex:1
 }}>
-Class: {item.classroom?.name || item.classroom}
+{language === "sw" ? "Darasa" : "Class"}: {item.classroom?.name || item.classroom}
 </Text>
 
 </View>
@@ -670,7 +705,7 @@ color:"#cbd5e1",
 fontSize:14,
 flex:1
 }}>
-Category: {item.category?.name || item.category}
+{language === "sw" ? "Kundi" : "Category"}: {item.category?.name || item.category}
 </Text>
 
 </View>
@@ -696,7 +731,7 @@ color:"#bbf7d0",
 fontSize:12,
 fontWeight:"700"
 }}>
-Available
+{language === "sw" ? "Inapatikana" : "Available"}
 </Text>
 
 </View>
@@ -802,7 +837,11 @@ fontSize:16,
 fontWeight:"700",
 marginTop:16
 }}>
-Fetching exams...
+{
+language === "sw"
+? "Inapakia mitihani..."
+: "Fetching exams..."
+}
 </Text>
 
 <Text style={{
@@ -810,7 +849,11 @@ color:"#94a3b8",
 marginTop:6,
 fontSize:13
 }}>
-Please wait a moment
+{
+language === "sw"
+? "Tafadhali subiri kidogo"
+: "Please wait a moment"
+}
 </Text>
 
 </BlurView>

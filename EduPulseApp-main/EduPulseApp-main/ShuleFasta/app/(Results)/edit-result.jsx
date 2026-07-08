@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useContext} from "react";
 
 import{
 View,
@@ -26,10 +26,14 @@ import Header from "../../components/Header";
 
 import {useLocalSearchParams,useRouter} from "expo-router";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function EditResult(){
 
 const router = useRouter();
 const {resultId,currentMarks} = useLocalSearchParams();
+
+const { language } = useContext(LanguageContext);
 
 const[marks,setMarks] = useState(currentMarks || "");
 
@@ -50,8 +54,14 @@ const savedToken = await AsyncStorage.getItem("userToken");
 if(!savedToken){
 Toast.show({
 type:"error",
-text1:"Authentication Error",
-text2:"Login again"
+text1:
+language === "sw"
+? "Hitilafu ya Kuthibitisha"
+: "Authentication Error",
+text2:
+language === "sw"
+? "Ingia tena akaunti yako"
+: "Login again"
 });
 return;
 }
@@ -65,12 +75,24 @@ loadToken();
 const updateResult = async()=>{
 
 if(!marks){
-Toast.show({type:"error",text1:"Enter marks"});
+Toast.show({
+type:"error",
+text1:
+language === "sw"
+? "Ingiza alama"
+: "Enter marks"
+});
 return;
 }
 
 if(!token){
-Toast.show({type:"error",text1:"Token missing"});
+Toast.show({
+type:"error",
+text1:
+language === "sw"
+? "Token imekosekana"
+: "Token missing"
+});
 return;
 }
 
@@ -101,7 +123,10 @@ Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
 Toast.show({
 type:"success",
-text1:"Result Updated"
+text1:
+language === "sw"
+? "Alama Zimesasishwa"
+: "Result Updated"
 });
 
 setLoading(false);
@@ -116,7 +141,10 @@ console.log("ERROR => ",error.response?.data || error.message);
 
 Toast.show({
 type:"error",
-text1:"Error",
+text1:
+language === "sw"
+? "Hitilafu"
+: "Error",
 text2:JSON.stringify(error.response?.data)
 });
 
@@ -132,18 +160,41 @@ source={{uri:"https://images.unsplash.com/photo-1588072432836-e10032774350"}}
 style={styles.bg}
 />
 
-<Header title="Edit Result" subtitle="Update student marks"/>
+<Header 
+title={
+language === "sw"
+? "Hariri Matokeo"
+: "Edit Result"
+} 
+subtitle={
+language === "sw"
+? "Sasisha alama za mwanafunzi"
+: "Update student marks"
+}
+/>
 
 <ScrollView contentContainerStyle={{padding:10,paddingBottom:300}}>
 
 <BlurView intensity={40} tint="dark" style={styles.blur}>
 
-<Text style={styles.title}>Edit Result</Text>
+<Text style={styles.title}>
+{
+language === "sw"
+? "Hariri Matokeo"
+: "Edit Result"
+}
+</Text>
 
 <View style={styles.form}>
 
 {/* MARKS */}
-<Text style={styles.label}>Marks</Text>
+<Text style={styles.label}>
+{
+language === "sw"
+? "Alama"
+: "Marks"
+}
+</Text>
 
 <TextInput
 style={styles.input}
@@ -161,7 +212,13 @@ onPress={updateResult}
 >
 
 <LinearGradient colors={["#22c55e","#16a34a"]} style={styles.button}>
-<Text style={styles.buttonText}>Update Result</Text>
+<Text style={styles.buttonText}>
+{
+language === "sw"
+? "Sasisha Matokeo"
+: "Update Result"
+}
+</Text>
 </LinearGradient>
 
 </TouchableOpacity>
@@ -178,7 +235,13 @@ onPress={updateResult}
 <View style={styles.loader}>
 <View style={styles.loaderCard}>
 <ActivityIndicator size="large" color="#2563eb"/>
-<Text style={styles.loadingText}>Updating...</Text>
+<Text style={styles.loadingText}>
+{
+language === "sw"
+? "Inasasisha..."
+: "Updating..."
+}
+</Text>
 </View>
 </View>
 )}

@@ -1,6 +1,6 @@
 // app/(Screens)/all-students-fee-summary.jsx
 
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useContext} from "react";
 import{
 View,
 Text,
@@ -23,6 +23,8 @@ import styles from "../../components/LoginStyles";
 import {EndPoint} from "../../components/links";
 import Header from "../../components/Header";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function AllStudentsFeeSummary(){
 
 const [students,setStudents] = useState([]);
@@ -30,6 +32,8 @@ const [filtered,setFiltered] = useState([]);
 const [search,setSearch] = useState("");
 const [loading,setLoading] = useState(false);
 const [token,setToken] = useState(null);
+
+const { language } = useContext(LanguageContext);
 
 const scaleAnim = new Animated.Value(1);
 
@@ -72,7 +76,10 @@ Haptics.NotificationFeedbackType.Success
 
 Toast.show({
 type:"error",
-text1:"Error",
+text1:
+language === "sw"
+? "Hitilafu"
+: "Error",
 text2:JSON.stringify(error.response?.data)
 });
 
@@ -110,8 +117,16 @@ style={styles.bg}
 />
 
 <Header
-title="School Dashboard"
-subtitle="Students Fees Summary"
+title={
+language === "sw"
+? "Dashibodi ya Shule"
+: "School Dashboard"
+}
+subtitle={
+language === "sw"
+? "Muhtasari wa Ada za Wanafunzi"
+: "Students Fees Summary"
+}
 />
 
 <ScrollView contentContainerStyle={{padding:10,paddingBottom:300}}>
@@ -119,11 +134,19 @@ subtitle="Students Fees Summary"
 <BlurView intensity={40} tint="dark" style={styles.blur}>
 
 <Text style={styles.title}>
-Fee Summary
+{
+language === "sw"
+? "Muhtasari wa Ada"
+: "Fee Summary"
+}
 </Text>
 
 <Text style={styles.subtitle}>
-All students financial status
+{
+language === "sw"
+? "Hali ya kifedha ya wanafunzi wote"
+: "All students financial status"
+}
 </Text>
 
 {filtered.map((item,index)=>(
@@ -155,30 +178,50 @@ fontWeight:"bold"
 </Text>
 
 <Text style={{color:"#94a3b8"}}>
-Class: {item.classroom_name}
+{
+language === "sw"
+? `Darasa: ${item.classroom_name_SW || item.classroom_name}`
+: `Class: ${item.classroom_name}`
+}
 </Text>
 
 <Text style={{color:"#94a3b8"}}>
-Stream: {item.stream_name}
+{
+language === "sw"
+? `Mkondo: ${item.stream_name_SW || item.stream_name}`
+: `Stream: ${item.stream_name}`
+}
 </Text>
 
 <Text style={{
 color:"#38bdf8",
 marginTop:10
 }}>
-Total Fee: {item.total_fee}
+{
+language === "sw"
+? `Jumla ya Ada: ${item.total_fee}`
+: `Total Fee: ${item.total_fee}`
+}
 </Text>
 
 <Text style={{
 color:"#22c55e"
 }}>
-Paid: {item.total_paid}
+{
+language === "sw"
+? `Iliyolipwa: ${item.total_paid}`
+: `Paid: ${item.total_paid}`
+}
 </Text>
 
 <Text style={{
 color:"#ef4444"
 }}>
-Balance: {item.balance}
+{
+language === "sw"
+? `Kiporo: ${item.balance}`
+: `Balance: ${item.balance}`
+}
 </Text>
 
 </LinearGradient>
@@ -195,7 +238,11 @@ Balance: {item.balance}
 <View style={styles.loaderCard}>
 <ActivityIndicator size="large" color="#2563eb"/>
 <Text style={styles.loadingText}>
-Loading students...
+{
+language === "sw"
+? "Inapakia wanafunzi..."
+: "Loading students..."
+}
 </Text>
 </View>
 </View>

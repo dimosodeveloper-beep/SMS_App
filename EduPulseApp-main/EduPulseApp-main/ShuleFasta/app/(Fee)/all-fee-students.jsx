@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
 View,
 Text,
@@ -25,6 +25,8 @@ import { EndPoint } from "../../components/links";
 import Header from "../../components/Header";
 import styles from "../../components/LoginStyles";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function AllFeeStudents() {
 
 const { year } = useLocalSearchParams();
@@ -37,6 +39,8 @@ const [loading, setLoading] = useState(false);
 const [token, setToken] = useState(null);
 
 const router = useRouter();
+
+const { language } = useContext(LanguageContext);
 
 /* LOAD TOKEN */
 useEffect(() => {
@@ -71,7 +75,10 @@ Haptics.NotificationFeedbackType.Success
 
 Toast.show({
 type: "error",
-text1: "Failed to load students"
+text1:
+language === "sw"
+? "Imeshindikana kupakia wanafunzi"
+: "Failed to load students"
 });
 
 }
@@ -110,8 +117,16 @@ style={styles.bg}
 
 {/* HEADER */}
 <Header
-title="Fee Management"
-subtitle={`Students - ${year}`}
+title={
+language === "sw"
+? "Usimamizi wa Ada"
+: "Fee Management"
+}
+subtitle={
+language === "sw"
+? `Wanafunzi - ${year}`
+: `Students - ${year}`
+}
 />
 
 <ScrollView
@@ -131,7 +146,11 @@ fontSize: 20,
 fontWeight: "bold",
 textAlign: "center"
 }}>
-Students List
+{
+language === "sw"
+? "Orodha ya Wanafunzi"
+: "Students List"
+}
 </Text>
 
 <Text style={{
@@ -140,14 +159,22 @@ textAlign: "center",
 marginTop: 5,
 marginBottom: 15
 }}>
-Search and select student
+{
+language === "sw"
+? "Tafuta na mchague mwanafunzi"
+: "Search and select student"
+}
 </Text>
 
 {/* SEARCH FIELD */}
 <TextInput
 value={search}
 onChangeText={handleSearch}
-placeholder="Search student name..."
+placeholder={
+language === "sw"
+? "Tafuta jina la mwanafunzi..."
+: "Search student name..."
+}
 placeholderTextColor="#94a3b8"
 style={{
 backgroundColor: "#0f172a",
@@ -215,7 +242,11 @@ fontWeight: "bold"
 color: "#94a3b8",
 marginTop: 3
 }}>
-{s.classroom} • {s.stream}
+{
+language === "sw"
+? `${s.classroom_SW || s.classroom} • ${s.stream_SW || s.stream}`
+: `${s.classroom} • ${s.stream}`
+}
 </Text>
 
 </View>
@@ -240,7 +271,11 @@ color: "#94a3b8",
 textAlign: "center",
 marginTop: 30
 }}>
-No students found
+{
+language === "sw"
+? "Hakuna wanafunzi waliopatikana"
+: "No students found"
+}
 </Text>
 )}
 
@@ -254,7 +289,11 @@ No students found
 <View style={styles.loaderCard}>
 <ActivityIndicator size="large" color="#2563eb" />
 <Text style={styles.loadingText}>
-Loading students...
+{
+language === "sw"
+? "Inapakia wanafunzi..."
+: "Loading students..."
+}
 </Text>
 </View>
 </View>

@@ -1,4 +1,4 @@
-import React,{useState,useEffect,useRef} from "react";
+import React,{useState,useEffect,useRef,useContext} from "react";
 
 import{
 View,
@@ -33,9 +33,13 @@ MaterialIcons,
 FontAwesome5
 } from "@expo/vector-icons";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function ResultsAllExamCategories(){
 
 const router = useRouter();
+
+const { language } = useContext(LanguageContext);
 
 const [categories,setCategories] = useState([]);
 const [filteredCategories,setFilteredCategories] = useState([]);
@@ -135,7 +139,10 @@ console.log("ERROR => ",error.response?.data);
 
 Toast.show({
 type:"error",
-text1:"Error fetching categories",
+text1:
+language === "sw"
+? "Hitilafu kupata makundi"
+: "Error fetching categories",
 text2:JSON.stringify(error.response?.data)
 });
 
@@ -196,8 +203,16 @@ style={styles.bg}
 />
 
 <Header
-title="School Dashboard"
-subtitle="Management System"
+title={
+language === "sw"
+? "Dashibodi ya Shule"
+: "School Dashboard"
+}
+subtitle={
+language === "sw"
+? "Mfumo wa Usimamizi"
+: "Management System"
+}
 />
 
 <ScrollView
@@ -263,7 +278,11 @@ fontWeight:"700"
 }}
 numberOfLines={1}
 >
-Exam Categories
+{
+language === "sw"
+? "Makundi ya Mitihani"
+: "Exam Categories"
+}
 </Text>
 
 <Text style={{
@@ -273,7 +292,11 @@ marginTop:4
 }}
 numberOfLines={1}
 >
-Manage all exam categories
+{
+language === "sw"
+? "Simamia makundi yote ya mitihani"
+: "Manage all exam categories"
+}
 </Text>
 
 </View>
@@ -294,7 +317,7 @@ color:"#38bdf8",
 fontWeight:"700",
 fontSize:13
 }}>
-{filteredCategories.length} Categories
+{filteredCategories.length} {language === "sw" ? "Makundi" : "Categories"}
 </Text>
 
 </View>
@@ -326,7 +349,11 @@ color="#94a3b8"
 <TextInput
 value={search}
 onChangeText={handleSearch}
-placeholder="Search category..."
+placeholder={
+language === "sw"
+? "Tafuta kundi..."
+: "Search category..."
+}
 placeholderTextColor="#94a3b8"
 style={{
 flex:1,
@@ -369,7 +396,11 @@ fontSize:17,
 fontWeight:"700",
 marginTop:15
 }}>
-No Categories Found
+{
+language === "sw"
+? "Hakuna Makundi Yaliyopatikana"
+: "No Categories Found"
+}
 </Text>
 
 <Text style={{
@@ -378,7 +409,11 @@ marginTop:8,
 textAlign:"center",
 lineHeight:22
 }}>
-No exam categories matched your current search
+{
+language === "sw"
+? "Hakuna makundi ya mitihani yaliyolingana na utafutaji wako"
+: "No exam categories matched your current search"
+}
 </Text>
 
 </View>
@@ -485,7 +520,11 @@ color:"#94a3b8",
 fontSize:13,
 marginLeft:6
 }}>
-Exam Category
+{
+language === "sw"
+? "Kundi la Mtihani"
+: "Exam Category"
+}
 </Text>
 
 </View>
@@ -507,7 +546,11 @@ color:"#94a3b8",
 fontSize:13,
 marginLeft:6
 }}>
-Open exams and results
+{
+language === "sw"
+? "Fungua mitihani na matokeo"
+: "Open exams and results"
+}
 </Text>
 
 </View>
@@ -563,7 +606,11 @@ color:"#ffffff",
 fontWeight:"700",
 fontSize:14
 }}>
-Exam Results
+{
+language === "sw"
+? "Matokeo ya Mitihani"
+: "Exam Results"
+}
 </Text>
 
 <Text style={{
@@ -571,7 +618,11 @@ color:"#94a3b8",
 fontSize:12,
 marginTop:2
 }}>
-View exams inside this category
+{
+language === "sw"
+? "Tazama mitihani iliyo kwenye kundi hili"
+: "View exams inside this category"
+}
 </Text>
 
 </View>
@@ -606,7 +657,11 @@ fontWeight:"700",
 marginRight:8,
 fontSize:13
 }}>
-Open
+{
+language === "sw"
+? "Fungua"
+: "Open"
+}
 </Text>
 
 <Ionicons
@@ -696,7 +751,11 @@ marginTop:15,
 fontSize:15,
 fontWeight:"600"
 }}>
-Fetching categories...
+{
+language === "sw"
+? "Inapakia makundi..."
+: "Fetching categories..."
+}
 </Text>
 
 </View>

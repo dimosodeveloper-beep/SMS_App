@@ -1,4 +1,4 @@
-import React,{useState,useEffect,useRef} from "react";
+import React,{useState,useEffect,useRef,useContext} from "react";
 import{
   View,
   Text,
@@ -27,9 +27,13 @@ import Header from "../../components/Header";
 import {useRouter} from "expo-router";
 import {Ionicons,MaterialCommunityIcons} from "@expo/vector-icons";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function getTimeTableClasses(){
 
   const router = useRouter();
+
+  const { language } = useContext(LanguageContext);
 
   const [classes,setClasses] = useState([]);
   const [filteredClasses,setFilteredClasses] = useState([]);
@@ -109,8 +113,14 @@ export default function getTimeTableClasses(){
 
       Toast.show({
         type:"error",
-        text1:"Error fetching classes",
-        text2:JSON.stringify(error.response?.data)
+        text1:
+          language === "sw"
+            ? "Hitilafu kupata madarasa"
+            : "Error fetching classes",
+        text2:
+          language === "sw"
+            ? "Imeshindikana kupakia orodha ya madarasa"
+            : "Failed to load classes list"
       });
 
     }
@@ -127,9 +137,10 @@ export default function getTimeTableClasses(){
       return;
     }
 
-    const filtered = classes.filter((item)=>
-      item.name.toLowerCase().includes(text.toLowerCase())
-    );
+    const filtered = classes.filter((item)=>{
+      const className = language === "sw" ? (item.name_SW || item.name) : item.name;
+      return className.toLowerCase().includes(text.toLowerCase());
+    });
 
     setFilteredClasses(filtered);
   }
@@ -147,7 +158,7 @@ export default function getTimeTableClasses(){
       pathname:"/(Timetable)/get-timetable",
       params:{
         classId:item.id,
-        className:item.name
+        className: item.name,
       }
     });
   }
@@ -171,8 +182,16 @@ export default function getTimeTableClasses(){
       />
 
       <Header
-        title="School Dashboard"
-        subtitle="Timetable Classes"
+        title={
+          language === "sw"
+            ? "Dashibodi ya Shule"
+            : "School Dashboard"
+        }
+        subtitle={
+          language === "sw"
+            ? "Madarasa ya Ratiba"
+            : "Timetable Classes"
+        }
       />
 
       <ScrollView
@@ -224,7 +243,11 @@ export default function getTimeTableClasses(){
                 fontSize:26,
                 fontWeight:"bold"
               }}>
-                Select Class
+                {
+                  language === "sw"
+                    ? "Chagua Darasa"
+                    : "Select Class"
+                }
               </Text>
 
               <Text style={{
@@ -233,7 +256,11 @@ export default function getTimeTableClasses(){
                 lineHeight:22,
                 fontSize:14
               }}>
-                Choose a classroom to view timetable schedules and daily sessions.
+                {
+                  language === "sw"
+                    ? "Chagua chumba cha darasa ili kuona ratiba za vipindi na vikao vya kila siku."
+                    : "Choose a classroom to view timetable schedules and daily sessions."
+                }
               </Text>
 
             </View>
@@ -284,7 +311,11 @@ export default function getTimeTableClasses(){
             <TextInput
               value={search}
               onChangeText={handleSearch}
-              placeholder="Search class..."
+              placeholder={
+                language === "sw"
+                  ? "Tafuta darasa..."
+                  : "Search class..."
+              }
               placeholderTextColor="#94a3b8"
               style={{
                 flex:1,
@@ -346,7 +377,11 @@ export default function getTimeTableClasses(){
               color:"#94a3b8",
               fontSize:13
             }}>
-              Total Classes
+              {
+                language === "sw"
+                  ? "Jumla ya Madarasa"
+                  : "Total Classes"
+              }
             </Text>
 
             <Text style={{
@@ -391,7 +426,11 @@ export default function getTimeTableClasses(){
               color:"#94a3b8",
               fontSize:13
             }}>
-              Available
+              {
+                language === "sw"
+                  ? "Yaliyopo"
+                  : "Available"
+              }
             </Text>
 
             <Text style={{
@@ -427,7 +466,11 @@ export default function getTimeTableClasses(){
               marginTop:15,
               fontSize:16
             }}>
-              No classes found
+              {
+                language === "sw"
+                  ? "Hakuna madarasa yaliyopatikana"
+                  : "No classes found"
+              }
             </Text>
 
           </View>
@@ -514,7 +557,7 @@ export default function getTimeTableClasses(){
                           fontSize:19,
                           fontWeight:"bold"
                         }}>
-                          {item.name}
+                          {language === "sw" ? (item.name_SW || item.name) : item.name}
                         </Text>
 
                         <Text style={{
@@ -522,7 +565,11 @@ export default function getTimeTableClasses(){
                           marginTop:5,
                           fontSize:13
                         }}>
-                          Classroom Timetable
+                          {
+                            language === "sw"
+                              ? "Ratiba ya Darasa"
+                              : "Classroom Timetable"
+                          }
                         </Text>
 
                       </View>
@@ -546,7 +593,11 @@ export default function getTimeTableClasses(){
                           fontWeight:"600",
                           fontSize:12
                         }}>
-                          CLASS ID {item.id}
+                          {
+                            language === "sw"
+                              ? `ID YA DARASA ${item.id}`
+                              : `CLASS ID ${item.id}`
+                          }
                         </Text>
                       </View>
 
@@ -561,7 +612,11 @@ export default function getTimeTableClasses(){
                           fontWeight:"600",
                           fontSize:12
                         }}>
-                          ACTIVE
+                          {
+                            language === "sw"
+                              ? "HAI"
+                              : "ACTIVE"
+                          }
                         </Text>
                       </View>
 
@@ -641,7 +696,11 @@ export default function getTimeTableClasses(){
                 fontSize:16,
                 fontWeight:"600"
               }}>
-                Fetching classes...
+                {
+                  language === "sw"
+                    ? "Tunapakia madarasa..."
+                    : "Fetching classes..."
+                }
               </Text>
 
               <Text style={{
@@ -649,7 +708,11 @@ export default function getTimeTableClasses(){
                 marginTop:6,
                 textAlign:"center"
               }}>
-                Please wait while loading timetable classrooms
+                {
+                  language === "sw"
+                    ? "Tafadhali subiri wakati tunapakia vyumba vya madarasa ya ratiba"
+                    : "Please wait while loading timetable classrooms"
+                }
               </Text>
 
             </LinearGradient>

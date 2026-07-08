@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useRef,useContext} from "react";
 import{
 View,
 Text,
@@ -26,9 +26,13 @@ import Header from "../../components/Header";
 
 import {useLocalSearchParams} from "expo-router";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function TakeAttendance(){
 
 const {streamId,streamName,classId,className} = useLocalSearchParams();
+
+const { language } = useContext(LanguageContext);
 
 const[students,setStudents] = useState([]);
 const[attendance,setAttendance] = useState([]);
@@ -51,7 +55,17 @@ const loadToken = async()=>{
 try{
 const savedToken = await AsyncStorage.getItem("userToken");
 if(!savedToken){
-Toast.show({type:"error",text1:"Authentication Error",text2:"Login again"});
+Toast.show({
+type:"error",
+text1:
+language === "sw"
+? "Hitilafu ya Uthibitisho"
+: "Authentication Error",
+text2:
+language === "sw"
+? "Ingia tena kwenye mfumo"
+: "Login again"
+});
 return;
 }
 console.log("TOKEN => ",savedToken);
@@ -94,7 +108,14 @@ setLoading(false);
 }catch(e){
 setLoading(false);
 console.log("FETCH ERROR => ",e.response?.data);
-Toast.show({type:"error",text1:"Error fetching students",text2:JSON.stringify(e.response?.data)});
+Toast.show({
+type:"error",
+text1:
+language === "sw"
+? "Hitilafu kupata wanafunzi"
+: "Error fetching students",
+text2:JSON.stringify(e.response?.data)
+});
 }
 };
 
@@ -125,11 +146,27 @@ setModalVisible(false);
 /* SUBMIT ATTENDANCE */
 const submitAttendance = async()=>{
 if(!token){
-Toast.show({type:"error",text1:"Authentication Error",text2:"Login again"});
+Toast.show({
+type:"error",
+text1:
+language === "sw"
+? "Hitilafu ya Uthibitisho"
+: "Authentication Error",
+text2:
+language === "sw"
+? "Ingia tena kwenye mfumo"
+: "Login again"
+});
 return;
 }
 if(attendance.length === 0){
-Toast.show({type:"error",text1:"No students found"});
+Toast.show({
+type:"error",
+text1:
+language === "sw"
+? "Hakuna wanafunzi waliopatikana"
+: "No students found"
+});
 return;
 }
 setLoading(true);
@@ -158,12 +195,29 @@ headers:{Authorization:`Token ${token}`,"Content-Type":"application/json"}
 
 console.log("SUCCESS => ",res.data);
 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-Toast.show({type:"success",text1:"Success",text2:"Attendance saved successfully"});
+Toast.show({
+type:"success",
+text1:
+language === "sw"
+? "Mafanikio"
+: "Success",
+text2:
+language === "sw"
+? "Mahudhurio yamehifadhiwa kikamilifu"
+: "Attendance saved successfully"
+});
 setLoading(false);
 }catch(e){
 setLoading(false);
 console.log("ERROR => ",e.response?.data);
-Toast.show({type:"error",text1:"Error",text2:JSON.stringify(e.response?.data)});
+Toast.show({
+type:"error",
+text1:
+language === "sw"
+? "Hitilafu"
+: "Error",
+text2:JSON.stringify(e.response?.data)
+});
 }
 };
 
@@ -176,13 +230,26 @@ return(
 
 <Image source={{uri:"https://images.unsplash.com/photo-1588072432836-e10032774350"}} style={styles.bg}/>
 
-<Header title="Take Attendance" subtitle={`${className} ${streamName}`}/>
+<Header 
+title={
+language === "sw"
+? "Chukua Mahudhurio"
+: "Take Attendance"
+} 
+subtitle={`${className} ${streamName}`}
+/>
 
 <ScrollView contentContainerStyle={{padding:10,paddingBottom:300}}>
 
 <BlurView intensity={40} tint="dark" style={styles.blur}>
 
-<Text style={styles.title}>Attendance</Text>
+<Text style={styles.title}>
+{
+language === "sw"
+? "Mahudhurio"
+: "Attendance"
+}
+</Text>
 
 {students.map((st,index)=>{
 
@@ -203,7 +270,11 @@ borderColor:"#334155"
 </Text>
 
 <Text style={{color:"#94a3b8"}}>
-Adm: {st.admission_number}
+{
+language === "sw"
+? "Namba ya Usajili"
+: "Adm"
+}: {st.admission_number}
 </Text>
 
 <View style={{flexDirection:"row",marginTop:10}}>
@@ -219,7 +290,13 @@ marginRight:5,
 alignItems:"center"
 }}
 >
-<Text style={{color:"#fff"}}>Present</Text>
+<Text style={{color:"#fff"}}>
+{
+language === "sw"
+? "Yupo"
+: "Present"
+}
+</Text>
 </TouchableOpacity>
 
 <TouchableOpacity
@@ -233,7 +310,13 @@ marginLeft:5,
 alignItems:"center"
 }}
 >
-<Text style={{color:"#fff"}}>Absent</Text>
+<Text style={{color:"#fff"}}>
+{
+language === "sw"
+? "Hapo"
+: "Absent"
+}
+</Text>
 </TouchableOpacity>
 
 </View>
@@ -249,7 +332,13 @@ borderRadius:8,
 alignSelf:"flex-start"
 }}
 >
-<Text style={{color:"#fff"}}>Add Reason / Note</Text>
+<Text style={{color:"#fff"}}>
+{
+language === "sw"
+? "Weka Sababu / Maelezo"
+: "Add Reason / Note"
+}
+</Text>
 </TouchableOpacity>
 
 </View>
@@ -263,7 +352,13 @@ onPressOut={pressOut}
 onPress={submitAttendance}
 >
 <LinearGradient colors={["#2563eb","#38bdf8"]} style={styles.button}>
-<Text style={styles.buttonText}>Submit Attendance</Text>
+<Text style={styles.buttonText}>
+{
+language === "sw"
+? "Wasilisha Mahudhurio"
+: "Submit Attendance"
+}
+</Text>
 </LinearGradient>
 </TouchableOpacity>
 </Animated.View>
@@ -277,13 +372,21 @@ onPress={submitAttendance}
 <View style={{width:"85%",backgroundColor:"#1e293b",borderRadius:15,padding:20}}>
 
 <Text style={{color:"#fff",fontSize:18,fontWeight:"bold",marginBottom:15,textAlign:"center"}}>
-Add Reason / Note
+{
+language === "sw"
+? "Weka Sababu / Maelezo"
+: "Add Reason / Note"
+}
 </Text>
 
 <TextInput
 value={noteText}
 onChangeText={setNoteText}
-placeholder="Type reason here..."
+placeholder={
+language === "sw"
+? "Andika sababu hapa..."
+: "Type reason here..."
+}
 placeholderTextColor="#94a3b8"
 style={{
 backgroundColor:"#0f172a",
@@ -298,12 +401,24 @@ multiline
 
 <TouchableOpacity onPress={saveNote} style={{marginTop:15}}>
 <LinearGradient colors={["#22c55e","#16a34a"]} style={{padding:12,borderRadius:10}}>
-<Text style={{color:"#fff",textAlign:"center"}}>Save Reason</Text>
+<Text style={{color:"#fff",textAlign:"center"}}>
+{
+language === "sw"
+? "Hifadhi Sababu"
+: "Save Reason"
+}
+</Text>
 </LinearGradient>
 </TouchableOpacity>
 
 <TouchableOpacity onPress={()=>setModalVisible(false)} style={{marginTop:10}}>
-<Text style={{color:"#ef4444",textAlign:"center"}}>Cancel</Text>
+<Text style={{color:"#ef4444",textAlign:"center"}}>
+{
+language === "sw"
+? "Ghairi"
+: "Cancel"
+}
+</Text>
 </TouchableOpacity>
 
 </View>
@@ -314,7 +429,13 @@ multiline
 <View style={styles.loader}>
 <View style={styles.loaderCard}>
 <ActivityIndicator size="large" color="#2563eb"/>
-<Text style={styles.loadingText}>Saving attendance...</Text>
+<Text style={styles.loadingText}>
+{
+language === "sw"
+? "Inahifadhi mahudhurio..."
+: "Saving attendance..."
+}
+</Text>
 </View>
 </View>
 )}

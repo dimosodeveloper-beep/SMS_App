@@ -102,7 +102,7 @@ export default function DashboardOptions() {
 
       icon: <MaterialIcons name="assignment" size={24} color="#fff" />,
 
-      route: "(Exams)/all-exams",
+      route: "/(Exams)/all-exams",
 
       colors: ["#8b5cf6", "#60a5fa", "#2563eb"],
 
@@ -117,7 +117,7 @@ export default function DashboardOptions() {
 
       icon: <MaterialIcons name="add" size={24} color="#fff" />,
 
-      route: "(Exams)/create-exam",
+      route: "/(Exams)/create-exam",
 
       colors: ["#ef4444", "#f97316", "#dc2626"],
 

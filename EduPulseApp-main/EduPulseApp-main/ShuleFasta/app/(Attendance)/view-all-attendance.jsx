@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   View,
   Text,
@@ -26,9 +26,13 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 
 import DateTimePicker from "@react-native-community/datetimepicker";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function AttendanceDashboard() {
 
   const router = useRouter();
+
+  const { language } = useContext(LanguageContext);
 
   const { classId, streamId, className, streamName } = useLocalSearchParams();
 
@@ -58,7 +62,13 @@ export default function AttendanceDashboard() {
         const t = await AsyncStorage.getItem("userToken");
 
         if (!t) {
-          Toast.show({ type: "error", text1: "Login required" });
+          Toast.show({ 
+            type: "error", 
+            text1: 
+              language === "sw" 
+              ? "Unatakiwa kuingia akaunti" 
+              : "Login required" 
+          });
           return;
         }
 
@@ -106,7 +116,10 @@ export default function AttendanceDashboard() {
       console.log("ERROR => ", e.response?.data);
       Toast.show({
         type: "error",
-        text1: "Error",
+        text1: 
+          language === "sw" 
+          ? "Hitilafu" 
+          : "Error",
         text2: JSON.stringify(e.response?.data)
       });
     }
@@ -138,16 +151,33 @@ export default function AttendanceDashboard() {
 
       <Image source={{ uri: "https://images.unsplash.com/photo-1588072432836-e10032774350" }} style={styles.bg} />
 
-      <Header title="Attendance" subtitle={`${className} ${streamName}`} />
+      <Header 
+        title={
+          language === "sw" 
+          ? "Mahudhurio" 
+          : "Attendance"
+        } 
+        subtitle={`${className} ${streamName}`} 
+      />
 
       <ScrollView contentContainerStyle={{ padding: 10, paddingBottom: 200 }}>
 
         <BlurView intensity={40} tint="dark" style={styles.blur}>
 
-          <Text style={styles.title}>Attendance List</Text>
+          <Text style={styles.title}>
+            {
+              language === "sw" 
+              ? "Orodha ya Mahudhurio" 
+              : "Attendance List"
+            }
+          </Text>
 
           <Text style={{ color: "#94a3b8", marginBottom: 10 }}>
-            Date: {formatDate(selectedDate)}
+            {
+              language === "sw" 
+              ? `Tarehe: ${formatDate(selectedDate)}` 
+              : `Date: ${formatDate(selectedDate)}`
+            }
           </Text>
 
           {/* TABS */}
@@ -161,7 +191,13 @@ export default function AttendanceDashboard() {
                 borderRadius: 10,
                 marginRight: 5
               }}>
-              <Text style={{ color: "#fff", textAlign: "center", fontWeight: "bold" }}>Present</Text>
+              <Text style={{ color: "#fff", textAlign: "center", fontWeight: "bold" }}>
+                {
+                  language === "sw" 
+                  ? "Wapo" 
+                  : "Present"
+                }
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -172,7 +208,13 @@ export default function AttendanceDashboard() {
                 backgroundColor: activeTab === "absent" ? "#dc2626" : "#0f172a",
                 borderRadius: 10
               }}>
-              <Text style={{ color: "#fff", textAlign: "center", fontWeight: "bold" }}>Absent</Text>
+              <Text style={{ color: "#fff", textAlign: "center", fontWeight: "bold" }}>
+                {
+                  language === "sw" 
+                  ? "Hawapo" 
+                  : "Absent"
+                }
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -188,7 +230,11 @@ export default function AttendanceDashboard() {
               marginBottom: 10
             }}>
             <Text style={{ color: "#fff" }}>
-              Select Date: {formatDate(selectedDate)}
+              {
+                language === "sw" 
+                ? `Chagua Tarehe: ${formatDate(selectedDate)}` 
+                : `Select Date: ${formatDate(selectedDate)}`
+              }
             </Text>
           </TouchableOpacity>
 
@@ -210,7 +256,13 @@ export default function AttendanceDashboard() {
               alignItems: "center",
               marginBottom: 10
             }}>
-              <Text style={{ color: "#fff", fontWeight: "bold" }}>Search Attendance</Text>
+              <Text style={{ color: "#fff", fontWeight: "bold" }}>
+                {
+                  language === "sw" 
+                  ? "Tafuta Mahudhurio" 
+                  : "Search Attendance"
+                }
+              </Text>
             </LinearGradient>
 
           </TouchableOpacity>
@@ -225,7 +277,11 @@ export default function AttendanceDashboard() {
                 fontSize: 16,
                 marginBottom: 5
               }}>
-                Session Time: {session.session_time}
+                {
+                  language === "sw" 
+                  ? `Muda wa Kipindi: ${session.session_time}` 
+                  : `Session Time: ${session.session_time}`
+                }
               </Text>
 
               {session.students.map(item => (
@@ -255,7 +311,11 @@ export default function AttendanceDashboard() {
                       marginTop: 5,
                       fontWeight: "bold"
                     }}>
-                      {item.status.toUpperCase()}
+                      {
+                        language === "sw" 
+                        ? (item.status === "present" ? "WAPO" : "HAWAPO") 
+                        : item.status.toUpperCase()
+                      }
                     </Text>
                   </View>
 
@@ -332,7 +392,11 @@ export default function AttendanceDashboard() {
               marginBottom: 15,
               textAlign: "center"
             }}>
-              Options
+              {
+                language === "sw" 
+                ? "Chaguzi" 
+                : "Options"
+              }
             </Text>
 
             <TouchableOpacity
@@ -350,7 +414,11 @@ export default function AttendanceDashboard() {
                 marginBottom: 10
               }}>
                 <Text style={{ color: "#fff", textAlign: "center" }}>
-                  📊 Attendance History
+                  {
+                    language === "sw" 
+                    ? "📊 Historia ya Mahudhurio" 
+                    : "📊 Attendance History"
+                  }
                 </Text>
               </LinearGradient>
 
@@ -358,7 +426,11 @@ export default function AttendanceDashboard() {
 
             <TouchableOpacity onPress={() => setModalVisible(false)}>
               <Text style={{ color: "#ef4444", textAlign: "center", marginTop: 10 }}>
-                Close
+                {
+                  language === "sw" 
+                  ? "Funga" 
+                  : "Close"
+                }
               </Text>
             </TouchableOpacity>
 
@@ -388,7 +460,11 @@ export default function AttendanceDashboard() {
               marginBottom: 15,
               textAlign: "center"
             }}>
-              Absence Reason
+              {
+                language === "sw" 
+                ? "Sababu ya Utoro" 
+                : "Absence Reason"
+              }
             </Text>
             <Text style={{ color: "#fff", fontSize: 16, textAlign: "center" }}>
               {currentReason}
@@ -396,7 +472,11 @@ export default function AttendanceDashboard() {
 
             <TouchableOpacity onPress={() => setReasonModalVisible(false)}>
               <Text style={{ color: "#ef4444", textAlign: "center", marginTop: 20 }}>
-                Close
+                {
+                  language === "sw" 
+                  ? "Funga" 
+                  : "Close"
+                }
               </Text>
             </TouchableOpacity>
 
@@ -409,7 +489,13 @@ export default function AttendanceDashboard() {
         <View style={styles.loader}>
           <View style={styles.loaderCard}>
             <ActivityIndicator size="large" color="#2563eb" />
-            <Text style={styles.loadingText}>Loading...</Text>
+            <Text style={styles.loadingText}>
+              {
+                language === "sw" 
+                ? "Inapakia..." 
+                : "Loading..."
+              }
+            </Text>
           </View>
         </View>
       )}

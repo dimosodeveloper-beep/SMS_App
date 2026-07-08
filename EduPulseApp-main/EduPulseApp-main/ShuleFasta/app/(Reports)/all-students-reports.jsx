@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
 View,
 Text,
@@ -28,6 +28,8 @@ import Header from "../../components/Header";
 
 import { useLocalSearchParams } from "expo-router";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function AllReportCards(){
 
 const {
@@ -36,6 +38,8 @@ examId,
 categoryName,
 year
 } = useLocalSearchParams();
+
+const { language } = useContext(LanguageContext);
 
 const[token,setToken] = useState(null);
 
@@ -116,8 +120,8 @@ console.log("FULL ERROR => ",e);
 console.log("ERROR RESPONSE => ",e.response?.data);
 
 Alert.alert(
-"Error",
-JSON.stringify(e.response?.data || "Failed to load reports")
+language === "sw" ? "Hitilafu" : "Error",
+JSON.stringify(e.response?.data || (language === "sw" ? "Imeshindikana kupakia ripoti" : "Failed to load reports"))
 );
 
 }
@@ -134,22 +138,22 @@ const downloadAllPDF = async()=>{
 try{
 
 let html = `
-<h1 style="text-align:center;">Report Cards</h1>
+<h1 style="text-align:center;">${language === "sw" ? "Kadi za Ripoti" : "Report Cards"}</h1>
 
-<h3>Class: ${categoryName}</h3>
+<h3>${language === "sw" ? "Darasa" : "Class"}: ${categoryName}</h3>
 
-<h3>Academic Year: ${year}</h3>
+<h3>${language === "sw" ? "Mwaka wa Masomo" : "Academic Year"}: ${year}</h3>
 
 <table border="1" style="width:100%;border-collapse:collapse;">
 
 <tr>
 <th>#</th>
-<th>Name</th>
-<th>Class</th>
-<th>Stream</th>
-<th>Average</th>
-<th>Grade</th>
-<th>Total Marks</th>
+<th>${language === "sw" ? "Jina" : "Name"}</th>
+<th>${language === "sw" ? "Darasa" : "Class"}</th>
+<th>${language === "sw" ? "Mkondo" : "Stream"}</th>
+<th>${language === "sw" ? "Wastani" : "Average"}</th>
+<th>${language === "sw" ? "Daraja" : "Grade"}</th>
+<th>${language === "sw" ? "Jumla ya Alama" : "Total Marks"}</th>
 </tr>
 `;
 
@@ -179,7 +183,11 @@ await Sharing.shareAsync(uri);
 
 console.log(e);
 
-Alert.alert("Error generating PDF");
+Alert.alert(
+language === "sw"
+? "Hitilafu ya kutengeneza PDF"
+: "Error generating PDF"
+);
 
 }
 
@@ -240,7 +248,10 @@ setTimeout(()=>{
 
 setSending(false);
 
-Alert.alert("Success",res.data.message);
+Alert.alert(
+language === "sw" ? "Imefanikiwa" : "Success",
+res.data.message
+);
 
 },500);
 
@@ -251,8 +262,8 @@ console.log(e);
 setSending(false);
 
 Alert.alert(
-"Error",
-JSON.stringify(e.response?.data || "Error sending reports")
+language === "sw" ? "Hitilafu" : "Error",
+JSON.stringify(e.response?.data || (language === "sw" ? "Hitilafu ya kutuma ripoti" : "Error sending reports"))
 );
 
 }
@@ -279,7 +290,11 @@ backgroundColor:"#020617"
 color:"#fff",
 marginTop:10
 }}>
-Loading Report Cards...
+{
+language === "sw"
+? "Inapakia Kadi za Ripoti..."
+: "Loading Report Cards..."
+}
 </Text>
 
 </View>
@@ -304,7 +319,11 @@ style={{flex:1}}
 >
 
 <Header
-title="Report Cards"
+title={
+language === "sw"
+? "Kadi za Ripoti"
+: "Report Cards"
+}
 subtitle={`${categoryName} - ${year}`}
 />
 
@@ -332,7 +351,11 @@ borderRadius:10
 color:"#fff",
 fontWeight:"bold"
 }}>
-Download PDF
+{
+language === "sw"
+? "Pakua PDF"
+: "Download PDF"
+}
 </Text>
 
 </LinearGradient>
@@ -356,7 +379,11 @@ color:"#fff",
 fontSize:18,
 fontWeight:"bold"
 }}>
-Class Performance Summary
+{
+language === "sw"
+? "Muhtasari wa Ufaulu wa Darasa"
+: "Class Performance Summary"
+}
 </Text>
 
 <View style={{
@@ -377,7 +404,11 @@ borderRadius:12
 }}>
 
 <Text style={{color:"#94a3b8"}}>
-Total Students
+{
+language === "sw"
+? "Jumla ya Wanafunzi"
+: "Total Students"
+}
 </Text>
 
 <Text style={{
@@ -410,7 +441,7 @@ borderRadius:12
 }}>
 
 <Text style={{color:"#94a3b8"}}>
-Grade {g}
+{language === "sw" ? "Daraja" : "Grade"} {g}
 </Text>
 
 <Text style={{
@@ -520,11 +551,11 @@ fontSize:16
 color:"#22c55e",
 fontWeight:"bold"
 }}>
-Avg {item.average}
+{language === "sw" ? "Wastani" : "Avg"} {item.average}
 </Text>
 
 <Text style={{color:"#facc15"}}>
-Grade {item.grade}
+{language === "sw" ? "Daraja" : "Grade"} {item.grade}
 </Text>
 
 </View>
@@ -545,7 +576,11 @@ justifyContent:"space-between"
 <View>
 
 <Text style={{color:"#94a3b8"}}>
-Total Marks
+{
+language === "sw"
+? "Jumla ya Alama"
+: "Total Marks"
+}
 </Text>
 
 <Text style={{
@@ -560,7 +595,11 @@ fontWeight:"bold"
 <View>
 
 <Text style={{color:"#94a3b8"}}>
-Subjects
+{
+language === "sw"
+? "Masomo"
+: "Subjects"
+}
 </Text>
 
 <Text style={{
@@ -575,7 +614,11 @@ fontWeight:"bold"
 <View>
 
 <Text style={{color:"#94a3b8"}}>
-Position
+{
+language === "sw"
+? "Nafasi"
+: "Position"
+}
 </Text>
 
 <Text style={{
@@ -621,7 +664,11 @@ borderRadius:50
 color:"#fff",
 fontWeight:"bold"
 }}>
-Send Reports
+{
+language === "sw"
+? "Tuma Ripoti"
+: "Send Reports"
+}
 </Text>
 </LinearGradient>
 
@@ -652,7 +699,11 @@ fontWeight:"bold",
 textAlign:"center",
 marginBottom:20
 }}>
-Send reports to {students.length} parents?
+{
+language === "sw"
+? `Utatuma ripoti kwa wazazi ${students.length}?`
+: `Send reports to ${students.length} parents?`
+}
 </Text>
 
 <TouchableOpacity onPress={sendReports}>
@@ -671,7 +722,11 @@ color:"#000",
 textAlign:"center",
 fontWeight:"bold"
 }}>
-Confirm Send
+{
+language === "sw"
+? "Thibitisha Tuma"
+: "Confirm Send"
+}
 </Text>
 
 </LinearGradient>
@@ -684,7 +739,11 @@ Confirm Send
 color:"#ef4444",
 textAlign:"center"
 }}>
-Cancel
+{
+language === "sw"
+? "Ghairi"
+: "Cancel"
+}
 </Text>
 
 </TouchableOpacity>
@@ -733,7 +792,11 @@ width:200
 color:"#fff",
 marginTop:10
 }}>
-Sending Reports...
+{
+language === "sw"
+? "Inatuma Ripoti..."
+: "Sending Reports..."
+}
 </Text>
 
 <View style={{

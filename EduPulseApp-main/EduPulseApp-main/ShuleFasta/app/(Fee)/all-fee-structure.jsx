@@ -1,6 +1,6 @@
 // app/(Screens)/all-fee-structure.jsx
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import {
 View,
 Text,
@@ -28,7 +28,11 @@ import styles from "../../components/LoginStyles";
 import { EndPoint } from "../../components/links";
 import Header from "../../components/Header";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function AllFeeStructure() {
+
+const { language } = useContext(LanguageContext);
 
 const [fees, setFees] = useState([]);
 const [filteredFees, setFilteredFees] = useState([]);
@@ -81,7 +85,10 @@ Haptics.NotificationFeedbackType.Success
 
 Toast.show({
 type: "error",
-text1: "Error fetching data"
+text1:
+language === "sw"
+? "Hitilafu kupata data"
+: "Error fetching data"
 });
 
 }
@@ -160,7 +167,10 @@ Haptics.NotificationFeedbackType.Success
 
 Toast.show({
 type: "success",
-text1: "Updated successfully"
+text1:
+language === "sw"
+? "Imesasishwa kikamilifu"
+: "Updated successfully"
 });
 
 setModalVisible(false);
@@ -171,7 +181,10 @@ fetchFeeStructures(token);
 
 Toast.show({
 type: "error",
-text1: "Update failed"
+text1:
+language === "sw"
+? "Ushonaji umeshindikana"
+: "Update failed"
 });
 
 }
@@ -197,7 +210,10 @@ Haptics.NotificationFeedbackType.Warning
 
 Toast.show({
 type: "success",
-text1: "Deleted successfully"
+text1:
+language === "sw"
+? "Imefutwa kikamilifu"
+: "Deleted successfully"
 });
 
 fetchFeeStructures(token);
@@ -206,7 +222,10 @@ fetchFeeStructures(token);
 
 Toast.show({
 type: "error",
-text1: "Delete failed"
+text1:
+language === "sw"
+? "Ufutaji umeshindikana"
+: "Delete failed"
 });
 
 }
@@ -236,8 +255,16 @@ backgroundColor:"rgba(2,6,23,0.72)"
 }}/>
 
 <Header
-title="Fee Admin Panel"
-subtitle="Manage Fee Structures"
+title={
+language === "sw"
+? "Panel ya Admin wa Ada"
+: "Fee Admin Panel"
+}
+subtitle={
+language === "sw"
+? "Simamia Muundo wa Ada"
+: "Manage Fee Structures"
+}
 />
 
 <ScrollView
@@ -292,7 +319,11 @@ fontSize:28,
 fontWeight:"900",
 letterSpacing:0.5
 }}>
-Fee Structures
+{
+language === "sw"
+? "Muundo wa Ada"
+: "Fee Structures"
+}
 </Text>
 
 <Text style={{
@@ -301,7 +332,11 @@ fontSize:14,
 marginTop:8,
 lineHeight:22
 }}>
-Manage classroom fee structures, update amounts and organize academic payments easily.
+{
+language === "sw"
+? "Simamia muundo wa ada za madarasa, sasisha kiasi na panga malipo ya kitaaluma kwa urahisi."
+: "Manage classroom fee structures, update amounts and organize academic payments easily."
+}
 </Text>
 
 </View>
@@ -341,7 +376,11 @@ fontSize:15,
 fontWeight:"700",
 marginBottom:12
 }}>
-Search Classroom
+{
+language === "sw"
+? "Tafuta Darasa"
+: "Search Classroom"
+}
 </Text>
 
 <View style={{
@@ -364,7 +403,11 @@ color="#94a3b8"
 <TextInput
 value={search}
 onChangeText={handleSearch}
-placeholder="Search classroom..."
+placeholder={
+language === "sw"
+? "Tafuta darasa..."
+: "Search classroom..."
+}
 placeholderTextColor="#94a3b8"
 style={{
 flex:1,
@@ -415,7 +458,11 @@ marginTop:15,
 fontSize:16,
 fontWeight:"600"
 }}>
-No fee structures found
+{
+language === "sw"
+? "Hakuna muundo wa ada uliopatikana"
+: "No fee structures found"
+}
 </Text>
 
 </View>
@@ -501,7 +548,7 @@ color:"#ffffff",
 fontSize:20,
 fontWeight:"800"
 }}>
-{item.classroom_name}
+{language === "sw" ? (item.classroom_name_SW || item.classroom_name) : item.classroom_name}
 </Text>
 
 <Text style={{
@@ -509,7 +556,11 @@ color:"#94a3b8",
 marginTop:4,
 fontSize:13
 }}>
-Fee Structure
+{
+language === "sw"
+? "Muundo wa Ada"
+: "Fee Structure"
+}
 </Text>
 
 </View>
@@ -573,7 +624,11 @@ color:"#cbd5e1",
 marginLeft:8,
 fontSize:14
 }}>
-Term: {item.term}
+{
+language === "sw"
+? `Muhula: ${item.term_SW || item.term}`
+: `Term: ${item.term}`
+}
 </Text>
 
 </View>
@@ -594,7 +649,11 @@ color:"#cbd5e1",
 marginLeft:8,
 fontSize:14
 }}>
-Year: {item.year}
+{
+language === "sw"
+? `Mwaka: ${item.year}`
+: `Year: ${item.year}`
+}
 </Text>
 
 </View>
@@ -631,7 +690,11 @@ color="#22c55e"
 color:"#94a3b8",
 fontSize:13
 }}>
-Amount
+{
+language === "sw"
+? "Kiasi"
+: "Amount"
+}
 </Text>
 
 <Text style={{
@@ -688,7 +751,11 @@ fontWeight:"800",
 marginLeft:8,
 fontSize:15
 }}>
-Edit
+{
+language === "sw"
+? "Hariri"
+: "Edit"
+}
 </Text>
 
 </LinearGradient>
@@ -726,7 +793,11 @@ fontWeight:"800",
 marginLeft:8,
 fontSize:15
 }}>
-Delete
+{
+language === "sw"
+? "Futa"
+: "Delete"
+}
 </Text>
 
 </LinearGradient>
@@ -791,7 +862,11 @@ color:"#ffffff",
 fontSize:24,
 fontWeight:"900"
 }}>
-Edit Fee
+{
+language === "sw"
+? "Hariri Ada"
+: "Edit Fee"
+}
 </Text>
 
 <TouchableOpacity
@@ -813,7 +888,11 @@ color:"#94a3b8",
 marginBottom:20,
 lineHeight:22
 }}>
-Update fee amount, term and academic year information.
+{
+language === "sw"
+? "Sasisha kiasi cha ada, muhula na taarifa za mwaka wa masomo."
+: "Update fee amount, term and academic year information."
+}
 </Text>
 
 {/* AMOUNT */}
@@ -822,13 +901,21 @@ color:"#e2e8f0",
 fontWeight:"700",
 marginBottom:8
 }}>
-Amount
+{
+language === "sw"
+? "Kiasi"
+: "Amount"
+}
 </Text>
 
 <TextInput
 value={editAmount}
 onChangeText={setEditAmount}
-placeholder="Amount"
+placeholder={
+language === "sw"
+? "Kiasi"
+: "Amount"
+}
 placeholderTextColor="#94a3b8"
 keyboardType="numeric"
 style={{
@@ -850,13 +937,21 @@ color:"#e2e8f0",
 fontWeight:"700",
 marginBottom:8
 }}>
-Term
+{
+language === "sw"
+? "Muhula"
+: "Term"
+}
 </Text>
 
 <TextInput
 value={editTerm}
 onChangeText={setEditTerm}
-placeholder="Term"
+placeholder={
+language === "sw"
+? "Muhula"
+: "Term"
+}
 placeholderTextColor="#94a3b8"
 style={{
 backgroundColor:"rgba(15,23,42,0.9)",
@@ -877,13 +972,21 @@ color:"#e2e8f0",
 fontWeight:"700",
 marginBottom:8
 }}>
-Year
+{
+language === "sw"
+? "Mwaka"
+: "Year"
+}
 </Text>
 
 <TextInput
 value={editYear}
 onChangeText={setEditYear}
-placeholder="Year"
+placeholder={
+language === "sw"
+? "Mwaka"
+: "Year"
+}
 placeholderTextColor="#94a3b8"
 keyboardType="numeric"
 style={{
@@ -921,7 +1024,11 @@ color:"#ffffff",
 fontSize:17,
 fontWeight:"900"
 }}>
-Update Fee Structure
+{
+language === "sw"
+? "Sasisha Muundo wa Ada"
+: "Update Fee Structure"
+}
 </Text>
 
 </LinearGradient>
@@ -947,7 +1054,11 @@ color:"#cbd5e1",
 fontWeight:"700",
 fontSize:15
 }}>
-Cancel
+{
+language === "sw"
+? "Ghairi"
+: "Cancel"
+}
 </Text>
 
 </TouchableOpacity>
@@ -988,7 +1099,11 @@ color:"#e2e8f0"
 }
 ]}
 >
-Loading fee structures...
+{
+language === "sw"
+? "Inapakia muundo wa ada..."
+: "Loading fee structures..."
+}
 </Text>
 
 </View>

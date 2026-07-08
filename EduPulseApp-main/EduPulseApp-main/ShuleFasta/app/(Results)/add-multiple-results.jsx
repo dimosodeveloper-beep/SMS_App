@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useContext} from "react";
 
 import{
 View,
@@ -24,7 +24,11 @@ import styles from "../../components/LoginStyles";
 import {EndPoint} from "../../components/links";
 import Header from "../../components/Header";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function BulkResultUpload(){
+
+const { language } = useContext(LanguageContext);
 
 const[students,setStudents] = useState([]);
 const[subjects,setSubjects] = useState([]);
@@ -91,7 +95,7 @@ return students.filter(x =>
 
 const filterSubjects = (text)=>{
 return subjects.filter(x =>
-x.name.toLowerCase().includes(text.toLowerCase())
+(language === "sw" ? (x.name_SW || x.name) : x.name).toLowerCase().includes(text.toLowerCase())
 );
 };
 
@@ -126,8 +130,8 @@ const row = results[i];
 if(!row.student){
 Toast.show({
 type:"error",
-text1:`Row ${i+1}`,
-text2:"Select student"
+text1: language === "sw" ? `Mstari wa ${i+1}` : `Row ${i+1}`,
+text2: language === "sw" ? "Mchague mwanafunzi" : "Select student"
 });
 return false;
 }
@@ -135,8 +139,8 @@ return false;
 if(!row.subject){
 Toast.show({
 type:"error",
-text1:`Row ${i+1}`,
-text2:"Select subject"
+text1: language === "sw" ? `Mstari wa ${i+1}` : `Row ${i+1}`,
+text2: language === "sw" ? "Chagua somo" : "Select subject"
 });
 return false;
 }
@@ -144,8 +148,8 @@ return false;
 if(!row.exam){
 Toast.show({
 type:"error",
-text1:`Row ${i+1}`,
-text2:"Select exam"
+text1: language === "sw" ? `Mstari wa ${i+1}` : `Row ${i+1}`,
+text2: language === "sw" ? "Chagua mtihani" : "Select exam"
 });
 return false;
 }
@@ -153,8 +157,8 @@ return false;
 if(!row.marks){
 Toast.show({
 type:"error",
-text1:`Row ${i+1}`,
-text2:"Enter marks"
+text1: language === "sw" ? `Mstari wa ${i+1}` : `Row ${i+1}`,
+text2: language === "sw" ? "Ingiza alama" : "Enter marks"
 });
 return false;
 }
@@ -162,8 +166,8 @@ return false;
 if(isNaN(row.marks)){
 Toast.show({
 type:"error",
-text1:`Row ${i+1}`,
-text2:"Marks must be number"
+text1: language === "sw" ? `Mstari wa ${i+1}` : `Row ${i+1}`,
+text2: language === "sw" ? "Alama lazima ziwe namba" : "Marks must be number"
 });
 return false;
 }
@@ -177,7 +181,10 @@ return true;
 const uploadResults = async()=>{
 
 if(!token){
-Toast.show({type:"error",text1:"Login required"});
+Toast.show({
+type:"error",
+text1: language === "sw" ? "Inahitajika kuingia kwenye mfumo" : "Login required"
+});
 return;
 }
 
@@ -217,8 +224,8 @@ Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
 Toast.show({
 type:"success",
-text1:"Success",
-text2:"All results saved"
+text1: language === "sw" ? "Mafanikio" : "Success",
+text2: language === "sw" ? "Alama zote zimehifadhiwa" : "All results saved"
 });
 
 setResults([
@@ -235,7 +242,7 @@ console.log("ERROR => ",error.response?.data);
 
 Toast.show({
 type:"error",
-text1:"Error",
+text1: language === "sw" ? "Hitilafu" : "Error",
 text2:JSON.stringify(error.response?.data)
 });
 }
@@ -247,13 +254,30 @@ return(
 
 <Image source={{uri:"https://images.unsplash.com/photo-1588072432836-e10032774350"}} style={styles.bg}/>
 
-<Header title="Bulk Results" subtitle="Upload Multiple"/>
+<Header 
+title={
+language === "sw"
+? "Alama za Pamoja"
+: "Bulk Results"
+} 
+subtitle={
+language === "sw"
+? "Pakia Nyingi"
+: "Upload Multiple"
+}
+/>
 
 <ScrollView contentContainerStyle={{padding:10,paddingBottom:500}}>
 
 <BlurView intensity={40} tint="dark" style={styles.blur}>
 
-<Text style={styles.title}>Bulk Upload</Text>
+<Text style={styles.title}>
+{
+language === "sw"
+? "Pakia kwa Pamoja"
+: "Bulk Upload"
+}
+</Text>
 
 {results.map((item,index)=>(
 
@@ -266,11 +290,21 @@ borderWidth:1,
 borderColor:"#334155"
 }}>
 
-<Text style={{color:"#38bdf8",marginBottom:5}}>Student</Text>
+<Text style={{color:"#38bdf8",marginBottom:5}}>
+{
+language === "sw"
+? "Mwanafunzi"
+: "Student"
+}
+</Text>
 
 <TextInput
 style={styles.input}
-placeholder="Search student..."
+placeholder={
+language === "sw"
+? "Tafuta mwanafunzi..."
+: "Search student..."
+}
 value={item.searchStudent}
 onFocus={()=>updateField(index,"showStudent",true)}
 onChangeText={(t)=>{
@@ -293,11 +327,21 @@ updateField(index,"showStudent",false);
 </TouchableOpacity>
 ))}
 
-<Text style={{color:"#38bdf8",marginTop:10}}>Subject</Text>
+<Text style={{color:"#38bdf8",marginTop:10}}>
+{
+language === "sw"
+? "Somo"
+: "Subject"
+}
+</Text>
 
 <TextInput
 style={styles.input}
-placeholder="Search subject..."
+placeholder={
+language === "sw"
+? "Tafuta somo..."
+: "Search subject..."
+}
 value={item.searchSubject}
 onFocus={()=>updateField(index,"showSubject",true)}
 onChangeText={(t)=>{
@@ -312,19 +356,29 @@ key={sub.id}
 style={{backgroundColor:"#020617",padding:10,marginVertical:3,borderRadius:8}}
 onPress={()=>{
 updateField(index,"subject",sub.id);
-updateField(index,"searchSubject",sub.name);
+updateField(index,"searchSubject", language === "sw" ? (sub.name_SW || sub.name) : sub.name);
 updateField(index,"showSubject",false);
 }}
 >
-<Text style={{color:"#fff"}}>{sub.name}</Text>
+<Text style={{color:"#fff"}}>{language === "sw" ? (sub.name_SW || sub.name) : sub.name}</Text>
 </TouchableOpacity>
 ))}
 
-<Text style={{color:"#38bdf8",marginTop:10}}>Exam</Text>
+<Text style={{color:"#38bdf8",marginTop:10}}>
+{
+language === "sw"
+? "Mtihani"
+: "Exam"
+}
+</Text>
 
 <TextInput
 style={styles.input}
-placeholder="Search exam..."
+placeholder={
+language === "sw"
+? "Tafuta mtihani..."
+: "Search exam..."
+}
 value={item.searchExam}
 onFocus={()=>updateField(index,"showExam",true)}
 onChangeText={(t)=>{
@@ -347,7 +401,13 @@ updateField(index,"showExam",false);
 </TouchableOpacity>
 ))}
 
-<Text style={{color:"#38bdf8",marginTop:10}}>Marks</Text>
+<Text style={{color:"#38bdf8",marginTop:10}}>
+{
+language === "sw"
+? "Alama"
+: "Marks"
+}
+</Text>
 
 <TextInput
 style={styles.input}
@@ -361,7 +421,13 @@ keyboardType="numeric"
 ))}
 
 <TouchableOpacity onPress={addRow}>
-<Text style={{color:"#38bdf8",marginBottom:15}}>+ Add Another Student</Text>
+<Text style={{color:"#38bdf8",marginBottom:15}}>
+{
+language === "sw"
+? "+ Ongeza Mwanafunzi Mwingine"
+: "+ Add Another Student"
+}
+</Text>
 </TouchableOpacity>
 
 <Animated.View style={{transform:[{scale:scaleAnim}]}}>
@@ -369,7 +435,13 @@ keyboardType="numeric"
 <TouchableOpacity onPressIn={pressIn} onPressOut={pressOut} onPress={uploadResults}>
 
 <LinearGradient colors={["#2563eb","#38bdf8"]} style={styles.button}>
-<Text style={styles.buttonText}>Upload Results</Text>
+<Text style={styles.buttonText}>
+{
+language === "sw"
+? "Pakia Alama"
+: "Upload Results"
+}
+</Text>
 </LinearGradient>
 
 </TouchableOpacity>
@@ -384,7 +456,13 @@ keyboardType="numeric"
 <View style={styles.loader}>
 <View style={styles.loaderCard}>
 <ActivityIndicator size="large" color="#2563eb"/>
-<Text style={styles.loadingText}>Uploading...</Text>
+<Text style={styles.loadingText}>
+{
+language === "sw"
+? "Inapakia..."
+: "Uploading..."
+}
+</Text>
 </View>
 </View>
 )}

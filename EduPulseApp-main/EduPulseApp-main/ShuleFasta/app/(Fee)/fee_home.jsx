@@ -59,7 +59,6 @@ export default function FeeDashboardOptions() {
   };
 
   const options = [
-
     /* ADMIN / STAFF FUNCTIONS */
     {
       title: language === "sw" ? "Tengeneza Mfumo wa Ada" : "Create Fee Structure",
@@ -68,7 +67,6 @@ export default function FeeDashboardOptions() {
       colors: ["#22c55e", "#4ade80", "#16a34a"],
       adminOnly: true
     },
-
     {
       title: language === "sw" ? "Tengeneza Malipo ya Ada" : "Create Fee Payment",
       icon: <MaterialIcons name="payment" size={24} color="#fff" />,
@@ -76,7 +74,6 @@ export default function FeeDashboardOptions() {
       colors: ["#3b82f6", "#60a5fa", "#2563eb"],
       adminOnly: true
     },
-
     /* ALL USERS */
     {
       title: language === "sw" ? "Mifumo Yote ya Ada" : "All Fee Structures",
@@ -85,7 +82,6 @@ export default function FeeDashboardOptions() {
       colors: ["#9333ea", "#c084fc", "#7e22ce"],
       adminOnly: false
     },
-
     {
       title: language === "sw" ? "Malipo Yote ya Ada" : "All Fee Payments",
       icon: <Ionicons name="cash" size={24} color="#fff" />,
@@ -93,7 +89,6 @@ export default function FeeDashboardOptions() {
       colors: ["#f59e0b", "#fbbf24", "#d97706"],
       adminOnly: false
     },
-
     /* ADMIN + TEACHER ONLY */
     {
       title: language === "sw" ? "Ripoti za Ada" : "Fee Reports",
@@ -102,18 +97,16 @@ export default function FeeDashboardOptions() {
       colors: ["#06b6d4", "#22d3ee", "#0891b2"],
       adminOnly: true
     }
-
   ];
 
   const filteredOptions = options.filter(item => {
-
     if (role === "admin") return true;
 
     if (role === "parent") {
       if (
-        item.title === "Create Fee Structure" ||
-        item.title === "Create Fee Payment" ||
-        item.title === "Fee Reports"
+        item.title === (language === "sw" ? "Tengeneza Mfumo wa Ada" : "Create Fee Structure") ||
+        item.title === (language === "sw" ? "Tengeneza Malipo ya Ada" : "Create Fee Payment") ||
+        item.title === (language === "sw" ? "Ripoti za Ada" : "Fee Reports")
       ) {
         return false;
       }
@@ -122,8 +115,8 @@ export default function FeeDashboardOptions() {
 
     if (role === "teacher") {
       if (
-        item.title === "Create Fee Structure" ||
-        item.title === "Create Fee Payment"
+        item.title === (language === "sw" ? "Tengeneza Mfumo wa Ada" : "Create Fee Structure") ||
+        item.title === (language === "sw" ? "Tengeneza Malipo ya Ada" : "Create Fee Payment")
       ) {
         return false;
       }
@@ -138,7 +131,6 @@ export default function FeeDashboardOptions() {
       colors={["#020617", "#0f172a", "#1e293b"]}
       style={styles.container}
     >
-
       <Image
         source={{
           uri: "https://images.unsplash.com/photo-1577896851231-70ef18881754"
@@ -155,7 +147,6 @@ export default function FeeDashboardOptions() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-
         <BlurView intensity={50} tint="dark" style={styles.greetingCard}>
           <Text style={styles.greetingTitle}>
             {getGreeting()}
@@ -169,7 +160,6 @@ export default function FeeDashboardOptions() {
         </BlurView>
 
         <View style={styles.optionsContainer}>
-
           {filteredOptions.map((item, index) => (
             <Animated.View
               key={index}
@@ -178,7 +168,6 @@ export default function FeeDashboardOptions() {
                 { transform: [{ scale: scaleAnim }] }
               ]}
             >
-
               <TouchableOpacity
                 activeOpacity={0.9}
                 onPressIn={pressIn}
@@ -188,43 +177,31 @@ export default function FeeDashboardOptions() {
                   router.push(item.route);
                 }}
               >
-
                 <LinearGradient
                   colors={item.colors}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                   style={styles.card}
                 >
-
                   <View style={styles.cardContent}>
-
                     <View style={styles.leftContent}>
-
                       <View style={styles.iconBox}>
                         {item.icon}
                       </View>
-
                       <Text style={styles.cardText}>
                         {item.title}
                       </Text>
-
                     </View>
-
                     <Ionicons
                       name="chevron-forward"
                       size={22}
                       color="#fff"
                     />
-
                   </View>
-
                 </LinearGradient>
-
               </TouchableOpacity>
-
             </Animated.View>
           ))}
-
         </View>
 
         <BlurView intensity={30} tint="dark" style={styles.footer}>
@@ -234,9 +211,7 @@ export default function FeeDashboardOptions() {
               : "Shule Fasta 🚀 | Fee Management System"}
           </Text>
         </BlurView>
-
       </ScrollView>
-
     </LinearGradient>
   );
 }

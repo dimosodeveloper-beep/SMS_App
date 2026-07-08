@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useContext} from "react";
 import{
 View,
 Text,
@@ -21,7 +21,11 @@ import {EndPoint} from "../../components/links";
 
 import {Ionicons} from "@expo/vector-icons";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function ParentComments(){
+
+const { language } = useContext(LanguageContext);
 
 const[data,setData] = useState([]);
 const[loading,setLoading] = useState(false);
@@ -70,8 +74,14 @@ setData(res.data);
 
 Toast.show({
 type:"error",
-text1:"Failed",
-text2:"Error loading comments"
+text1:
+language === "sw"
+? "Imeshindikana"
+: "Failed",
+text2:
+language === "sw"
+? "Hitilafu kupakia maoni"
+: "Error loading comments"
 });
 
 }
@@ -84,7 +94,10 @@ if(!replyMessage){
 
 Toast.show({
 type:"error",
-text1:"Write message first"
+text1:
+language === "sw"
+? "Andika ujumbe kwanza"
+: "Write message first"
 });
 
 return;
@@ -109,7 +122,10 @@ Authorization:`Token ${token}`
 
 Toast.show({
 type:"success",
-text1:"Email sent successfully"
+text1:
+language === "sw"
+? "Barua pepe imetumwa kwa mafanikio"
+: "Email sent successfully"
 });
 
 setReplyMessage("");
@@ -119,8 +135,14 @@ setModalVisible(false);
 
 Toast.show({
 type:"error",
-text1:"Failed",
-text2:"Unable to send email"
+text1:
+language === "sw"
+? "Imeshindikana"
+: "Failed",
+text2:
+language === "sw"
+? "Haikuweza kutuma barua pepe"
+: "Unable to send email"
 });
 
 }
@@ -144,7 +166,18 @@ return `${day}/${month}/${year}`;
 return(
 <LinearGradient colors={["#020617","#0f172a","#1e293b"]} style={{flex:1}}>
 
-<Header title="Parent Comments" subtitle="Feedback & Suggestions"/>
+<Header 
+title={
+language === "sw"
+? "Maoni ya Wazazi"
+: "Parent Comments"
+} 
+subtitle={
+language === "sw"
+? "Maoni na Mapendekezo"
+: "Feedback & Suggestions"
+}
+/>
 
 <ScrollView contentContainerStyle={{padding:15,paddingBottom:100}}>
 
@@ -153,7 +186,11 @@ color:"#94a3b8",
 marginBottom:15,
 fontSize:13
 }}>
-Parents Feedback List
+{
+language === "sw"
+? "Orodha ya Maoni ya Wazazi"
+: "Parents Feedback List"
+}
 </Text>
 
 {data.map((i,index)=>(
@@ -279,7 +316,11 @@ color:"#e2e8f0",
 lineHeight:22,
 fontSize:14
 }}>
-{i.comment}
+{
+language === "sw"
+? (i.comment_SW || i.comment)
+: i.comment
+}
 </Text>
 
 </View>
@@ -309,7 +350,11 @@ color:"#64748b",
 marginTop:10,
 fontSize:15
 }}>
-No comments available
+{
+language === "sw"
+? "Hakuna maoni yanayopatikana"
+: "No comments available"
+}
 </Text>
 
 </View>
@@ -362,7 +407,11 @@ color:"#fff",
 fontSize:18,
 fontWeight:"bold"
 }}>
-Reply To Parent
+{
+language === "sw"
+? "Mjibu Mzazi"
+: "Reply To Parent"
+}
 </Text>
 
 <TouchableOpacity
@@ -414,7 +463,11 @@ borderColor:"rgba(255,255,255,0.08)"
 }}>
 
 <TextInput
-placeholder="Write your reply message here..."
+placeholder={
+language === "sw"
+? "Andika ujumbe wako wa majibu hapa..."
+: "Write your reply message here..."
+}
 placeholderTextColor="#64748b"
 multiline={true}
 numberOfLines={7}
@@ -460,7 +513,11 @@ color:"#fff",
 fontWeight:"bold",
 fontSize:15
 }}>
-Send Email
+{
+language === "sw"
+? "Tuma Barua Pepe"
+: "Send Email"
+}
 </Text>
 
 </LinearGradient>
@@ -492,7 +549,11 @@ backgroundColor:"rgba(0,0,0,0.5)"
 color:"#fff",
 marginTop:10
 }}>
-Sending...
+{
+language === "sw"
+? "Inatuma..."
+: "Sending..."
+}
 </Text>
 
 </View>

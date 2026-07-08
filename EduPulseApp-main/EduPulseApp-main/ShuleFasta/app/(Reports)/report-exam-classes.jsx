@@ -1,4 +1,4 @@
-import React,{useState,useEffect,useRef} from "react";
+import React,{useState,useEffect,useRef,useContext} from "react";
 
 import{
 View,
@@ -28,10 +28,14 @@ import Header from "../../components/Header";
 import {useRouter,useLocalSearchParams} from "expo-router";
 import {Ionicons} from "@expo/vector-icons";
 
+import { LanguageContext } from "../../components/LanguageContext";
+
 export default function GetExamClasses(){
 
 const router = useRouter();
 const {examId,categoryId,categoryName} = useLocalSearchParams();
+
+const { language } = useContext(LanguageContext);
 
 const [classes,setClasses] = useState([]);
 const [filteredClasses,setFilteredClasses] = useState([]);
@@ -158,7 +162,10 @@ setLoading(false);
 
 Toast.show({
 type:"error",
-text1:"Error fetching classes",
+text1:
+language === "sw"
+? "Hitilafu ya kupata madarasa"
+: "Error fetching classes",
 text2:JSON.stringify(error.response?.data)
 });
 
@@ -244,8 +251,12 @@ backgroundColor:"rgba(14,165,233,0.12)"
 }}/>
 
 <Header
-title="Choose Class"
-subtitle={categoryName || "Exam Classes"}
+title={
+language === "sw"
+? "Chagua Darasa"
+: "Choose Class"
+}
+subtitle={categoryName || (language === "sw" ? "Madarasa ya Mtihani" : "Exam Classes")}
 />
 
 <Animated.ScrollView
@@ -303,7 +314,11 @@ fontWeight:"900",
 color:"#ffffff",
 letterSpacing:0.5
 }}>
-Select Class
+{
+language === "sw"
+? "Chagua Darasa"
+: "Select Class"
+}
 </Text>
 
 <Text style={{
@@ -312,7 +327,11 @@ color:"#cbd5e1",
 marginTop:10,
 lineHeight:22
 }}>
-Choose the classroom that participated in this examination category.
+{
+language === "sw"
+? "Chagua darasa lililoshiriki katika kundi hili la mtihani."
+: "Choose the classroom that participated in this examination category."
+}
 </Text>
 
 <View style={{
@@ -336,7 +355,7 @@ color:"#dbeafe",
 fontWeight:"700",
 fontSize:13
 }}>
-Total: {filteredClasses.length}
+{language === "sw" ? "Jumla" : "Total"}: {filteredClasses.length}
 </Text>
 
 </View>
@@ -355,7 +374,11 @@ color:"#bbf7d0",
 fontWeight:"700",
 fontSize:13
 }}>
-Exam Classes
+{
+language === "sw"
+? "Madarasa ya Mtihani"
+: "Exam Classes"
+}
 </Text>
 
 </View>
@@ -425,7 +448,11 @@ style={{marginRight:10}}
 <TextInput
 value={search}
 onChangeText={handleSearch}
-placeholder="Search class..."
+placeholder={
+language === "sw"
+? "Tafuta darasa..."
+: "Search class..."
+}
 placeholderTextColor="#94a3b8"
 style={{
 flex:1,
@@ -484,7 +511,11 @@ fontSize:18,
 fontWeight:"700",
 marginTop:15
 }}>
-No Classes Found
+{
+language === "sw"
+? "Hakuna Madarasa Yaliyopatikana"
+: "No Classes Found"
+}
 </Text>
 
 <Text style={{
@@ -493,7 +524,11 @@ textAlign:"center",
 marginTop:8,
 lineHeight:22
 }}>
-Try searching using another keyword or check your exam records.
+{
+language === "sw"
+? "Jaribu kutafuta kwa neno lingine au kagua kumbukumbu za mitihani yako."
+: "Try searching using another keyword or check your exam records."
+}
 </Text>
 
 </BlurView>
@@ -597,7 +632,11 @@ color:"#94a3b8",
 marginTop:6,
 fontSize:14
 }}>
-Classroom
+{
+language === "sw"
+? "Darasa"
+: "Classroom"
+}
 </Text>
 
 <View style={{
@@ -619,7 +658,11 @@ color:"#bbf7d0",
 fontSize:12,
 fontWeight:"700"
 }}>
-Available
+{
+language === "sw"
+? "Inapatikana"
+: "Available"
+}
 </Text>
 
 </View>
@@ -720,7 +763,11 @@ fontSize:16,
 fontWeight:"700",
 marginTop:16
 }}>
-Fetching classes...
+{
+language === "sw"
+? "Inapakia madarasa..."
+: "Fetching classes..."
+}
 </Text>
 
 <Text style={{
@@ -728,7 +775,11 @@ color:"#94a3b8",
 marginTop:6,
 fontSize:13
 }}>
-Please wait a moment
+{
+language === "sw"
+? "Tafadhali subiri kidogo"
+: "Please wait a moment"
+}
 </Text>
 
 </BlurView>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import {
   View,
   Text,
@@ -22,13 +22,16 @@ import * as Haptics from "expo-haptics";
 import { EndPoint } from "../../components/links";
 import Header from "../../components/Header";
 import styles from "../../components/LoginStyles";
+import { LanguageContext } from "../../components/LanguageContext";
 
 import {
   Ionicons,
   MaterialCommunityIcons
 } from "@expo/vector-icons";
-//route
+
 export default function CreateEvent() {
+  const { language } = useContext(LanguageContext);
+  
   const [token, setToken] = useState(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -115,8 +118,8 @@ export default function CreateEvent() {
     if (!title || !description || !startDate || !endDate) {
       Toast.show({
         type: "error",
-        text1: "Validation Error",
-        text2: "Please fill all fields",
+        text1: language === "sw" ? "Hitilafu ya uthibitishaji" : "Validation Error",
+        text2: language === "sw" ? "Tafadhali jaza sehemu zote" : "Please fill all fields",
       });
       return;
     }
@@ -140,8 +143,8 @@ export default function CreateEvent() {
 
       Toast.show({
         type: "success",
-        text1: "Success",
-        text2: "Event added",
+        text1: language === "sw" ? "Imefanikiwa" : "Success",
+        text2: language === "sw" ? "Tukio limeongezwa" : "Event added successfully",
       });
 
       setTitle("");
@@ -154,8 +157,8 @@ export default function CreateEvent() {
 
       Toast.show({
         type: "error",
-        text1: "Error",
-        text2: JSON.stringify(error.response?.data || "Failed"),
+        text1: language === "sw" ? "Hitilafu" : "Error",
+        text2: JSON.stringify(error.response?.data || (language === "sw" ? "Imeshindikana" : "Failed")),
       });
 
       setLoading(false);
@@ -194,7 +197,10 @@ export default function CreateEvent() {
         backgroundColor: "rgba(14,165,233,0.12)"
       }} />
 
-      <Header title="Create Event" subtitle="Event Management System" />
+      <Header 
+        title={language === "sw" ? "Unda Tukio" : "Create Event"} 
+        subtitle={language === "sw" ? "Mfumo wa Usimamizi wa Matukio" : "Event Management System"} 
+      />
 
       <Animated.ScrollView
         contentContainerStyle={{
@@ -258,7 +264,7 @@ export default function CreateEvent() {
               fontWeight: "bold",
               textAlign: "center"
             }}>
-              Create Event
+              {language === "sw" ? "Unda Tukio" : "Create Event"}
             </Text>
 
             <Text style={{
@@ -266,40 +272,40 @@ export default function CreateEvent() {
               textAlign: "center",
               marginTop: 6
             }}>
-              Event Management System
+              {language === "sw" ? "Mfumo wa Usimamizi wa Matukio" : "Event Management System"}
             </Text>
           </View>
 
           <View style={styles.form}>
 
             {/* TITLE */}
-            <Text style={styles.label}>Title</Text>
+            <Text style={styles.label}>{language === "sw" ? "Jina la Tukio" : "Title"}</Text>
             <TextInput
               style={styles.input}
               value={title}
               onChangeText={setTitle}
-              placeholder="Event title"
+              placeholder={language === "sw" ? "Ingiza jina la tukio" : "Event title"}
               placeholderTextColor="#94a3b8"
             />
 
             {/* DESCRIPTION */}
-            <Text style={styles.label}>Description</Text>
+            <Text style={styles.label}>{language === "sw" ? "Maelezo" : "Description"}</Text>
             <TextInput
               style={[styles.input, { minHeight: 90, textAlignVertical: "top" }]}
               value={description}
               onChangeText={setDescription}
               multiline
-              placeholder="Event description"
+              placeholder={language === "sw" ? "Elezea tukio hili" : "Event description"}
               placeholderTextColor="#94a3b8"
             />
 
             {/* START DATE */}
-            <Text style={styles.label}>Start Date</Text>
+            <Text style={styles.label}>{language === "sw" ? "Tarehe ya Kuanza" : "Start Date"}</Text>
             <TouchableOpacity onPress={() => setShowStartPicker(true)}>
               <TextInput
                 style={styles.input}
                 value={startDate}
-                placeholder="Select start date"
+                placeholder={language === "sw" ? "Chagua tarehe ya kuanza" : "Select start date"}
                 placeholderTextColor="#94a3b8"
                 editable={false}
               />
@@ -315,12 +321,12 @@ export default function CreateEvent() {
             )}
 
             {/* END DATE */}
-            <Text style={styles.label}>End Date</Text>
+            <Text style={styles.label}>{language === "sw" ? "Tarehe ya Kumaliza" : "End Date"}</Text>
             <TouchableOpacity onPress={() => setShowEndPicker(true)}>
               <TextInput
                 style={styles.input}
                 value={endDate}
-                placeholder="Select end date"
+                placeholder={language === "sw" ? "Chagua tarehe ya kumaliza" : "Select end date"}
                 placeholderTextColor="#94a3b8"
                 editable={false}
               />
@@ -357,7 +363,7 @@ export default function CreateEvent() {
                     fontWeight: "bold",
                     fontSize: 16
                   }}>
-                    Save Event
+                    {language === "sw" ? "Hifadhi Tukio" : "Save Event"}
                   </Text>
                 </LinearGradient>
               </TouchableOpacity>
@@ -381,7 +387,7 @@ export default function CreateEvent() {
               marginTop: 12,
               fontSize: 15
             }}>
-              Creating event...
+              {language === "sw" ? "Inaunda tukio..." : "Creating event..."}
             </Text>
           </View>
         </View>

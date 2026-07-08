@@ -37,7 +37,7 @@ import {Ionicons} from "@expo/vector-icons";
 
 export default function UploadResultsExcel(){
 
-const { t } = useContext(LanguageContext);
+const { language } = useContext(LanguageContext);
 
 const[file,setFile] = useState(null);
 
@@ -108,7 +108,10 @@ setFile(result.assets[0]);
 
 Toast.show({
 type:"success",
-text1:"Excel selected successfully"
+text1:
+language === "sw"
+? "Faili la Excel limechaguliwa kikamilifu"
+: "Excel selected successfully"
 });
 
 }
@@ -117,7 +120,10 @@ text1:"Excel selected successfully"
 
 Toast.show({
 type:"error",
-text1:"Failed to pick excel file"
+text1:
+language === "sw"
+? "Imeshindikana kuchagua faili la excel"
+: "Failed to pick excel file"
 });
 
 }
@@ -135,7 +141,10 @@ if(!file){
 
 Toast.show({
 type:"error",
-text1:"Please select excel file"
+text1:
+language === "sw"
+? "Tafadhali chagua faili la excel"
+: "Please select excel file"
 });
 
 return;
@@ -145,7 +154,10 @@ if(!token){
 
 Toast.show({
 type:"error",
-text1:"Authentication error"
+text1:
+language === "sw"
+? "Hitilafu ya uthibitisho"
+: "Authentication error"
 });
 
 return;
@@ -188,8 +200,14 @@ Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
 Toast.show({
 type:"success",
-text1:"Upload Successful",
-text2:`${response.data.saved_count} results saved`
+text1:
+language === "sw"
+? "Uwekaji Umefanikiwa"
+: "Upload Successful",
+text2:
+language === "sw"
+? `Matokeo ${response.data.saved_count} yamehifadhiwa`
+: `${response.data.saved_count} results saved`
 });
 
 }
@@ -200,8 +218,14 @@ Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
 
 Toast.show({
 type:"error",
-text1:"Partial Upload",
-text2:`Saved: ${response.data.saved_count} | Failed: ${response.data.error_count}`
+text1:
+language === "sw"
+? "Uwekaji wa Sehemu"
+: "Partial Upload",
+text2:
+language === "sw"
+? `Yaliyohifadhiwa: ${response.data.saved_count} | Yaliyofeli: ${response.data.error_count}`
+: `Saved: ${response.data.saved_count} | Failed: ${response.data.error_count}`
 });
 
 }
@@ -212,7 +236,10 @@ Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
 
 Toast.show({
 type:"error",
-text1:"Upload Failed",
+text1:
+language === "sw"
+? "Uwekaji Umefeli"
+: "Upload Failed",
 text2:response.data.message
 });
 
@@ -228,8 +255,11 @@ console.log("UPLOAD ERROR => ",error.response?.data);
 
 Toast.show({
 type:"error",
-text1:"Upload failed",
-text2: error.response?.data?.message || "Check file format"
+text1:
+language === "sw"
+? "Uwekaji umefeli"
+: "Upload failed",
+text2: response.data?.message || (language === "sw" ? "Angalia muundo wa faili" : "Check file format")
 });
 
 }
@@ -252,8 +282,16 @@ style={styles.bg}
 />
 
 <Header
-title="School Dashboard"
-subtitle="Management System"
+title={
+language === "sw"
+? "Dashibodi ya Shule"
+: "School Dashboard"
+}
+subtitle={
+language === "sw"
+? "Mfumo wa Usimamizi"
+: "Management System"
+}
 />
 
 <ScrollView
@@ -268,11 +306,19 @@ keyboardShouldPersistTaps="handled"
 <BlurView intensity={40} tint="dark" style={styles.blur}>
 
 <Text style={styles.title}>
-Upload Results Excel
+{
+language === "sw"
+? "Weka Matokeo ya Excel"
+: "Upload Results Excel"
+}
 </Text>
 
 <Text style={styles.subtitle}>
-Bulk upload students results using excel
+{
+language === "sw"
+? "Weka matokeo ya wanafunzi kwa wingi ukitumia excel"
+: "Bulk upload students results using excel"
+}
 </Text>
 
 <View style={styles.form}>
@@ -301,7 +347,11 @@ style={{marginRight:10}}
 />
 
 <Text style={styles.buttonText}>
-Choose Excel File
+{
+language === "sw"
+? "Chagua Faili la Excel"
+: "Choose Excel File"
+}
 </Text>
 
 </LinearGradient>
@@ -329,7 +379,11 @@ borderColor:"#334155"
 color:"#fff",
 fontWeight:"bold"
 }}>
-Selected File:
+{
+language === "sw"
+? "Faili Lililochaguliwa:"
+: "Selected File:"
+}
 </Text>
 
 <Text style={{
@@ -373,7 +427,11 @@ style={{marginRight:10}}
 />
 
 <Text style={styles.buttonText}>
-Upload Results
+{
+language === "sw"
+? "Weka Matokeo"
+: "Upload Results"
+}
 </Text>
 
 </LinearGradient>
@@ -401,7 +459,11 @@ color="#2563eb"
 />
 
 <Text style={styles.loadingText}>
-Uploading results excel...
+{
+language === "sw"
+? "Inapakia matokeo ya excel..."
+: "Uploading results excel..."
+}
 </Text>
 
 </View>
