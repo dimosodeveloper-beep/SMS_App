@@ -32,7 +32,7 @@ export default function DashboardOptions() {
   const { userData } = useContext(UserContext);
   const { language } = useContext(LanguageContext);
 
-  const role = userData?.role;
+  const role = userData?.role; // "admin", "teacher", au "parent"
 
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
@@ -67,40 +67,41 @@ export default function DashboardOptions() {
   /* ================= ROLE BASED OPTIONS ================= */
   const options = [
     {
+      id: "get_results",
       title: language === "sw" ? "Pata Matokeo" : "Get Results",
       icon: <Ionicons name="checkmark-done" size={24} color="#fff" />,
       route: "(Results)/get-exams-categories",
       colors: ["#22c55e", "#4ade80", "#16a34a"],
-      adminOnly: false
+      visibleTo: ["admin", "teacher", "parent"]
     },
     {
+      id: "add_single",
       title: language === "sw" ? "Ongeza Matokeo Mmoja" : "Add Single Results",
       icon: <MaterialIcons name="history" size={24} color="#fff" />,
       route: "(Results)/add-single-results",
       colors: ["#3b82f6", "#60a5fa", "#2563eb"],
-      adminOnly: true
+      visibleTo: ["admin", "teacher"]
     },
     {
+      id: "add_multiple",
       title: language === "sw" ? "Ongeza Matokeo Mengi" : "Add Multiple Results",
       icon: <Ionicons name="people" size={24} color="#fff" />,
       route: "(Results)/add-multiple-results",
       colors: ["#9333ea", "#c084fc", "#7e22ce"],
-      adminOnly: true
+      visibleTo: ["admin", "teacher"]
     },
     {
+      id: "upload_results",
       title: language === "sw" ? "Pakia Matokeo" : "Upload Results",
       icon: <FontAwesome5 name="file-alt" size={22} color="#fff" />,
       route: "(Results)/upload-results-excel",
       colors: ["#f59e0b", "#fbbf24", "#d97706"],
-      adminOnly: false
+      visibleTo: ["admin", "teacher"]
     }
   ];
 
   /* 🔥 FILTER BASED ON ROLE */
-  const filteredOptions =
-    role === "admin"
-      ? options
-      : options.filter(item => !item.adminOnly);
+  const filteredOptions = options.filter(item => item.visibleTo.includes(role));
 
   return (
     <LinearGradient
@@ -141,7 +142,7 @@ export default function DashboardOptions() {
 
           {filteredOptions.map((item, index) => (
             <Animated.View
-              key={index}
+              key={item.id}
               style={[
                 styles.cardWrapper,
                 { transform: [{ scale: scaleAnim }] }
