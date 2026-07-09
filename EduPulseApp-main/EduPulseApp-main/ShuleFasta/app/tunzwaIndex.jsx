@@ -1,385 +1,296 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
-  TextInput,
-  TouchableOpacity,
-  Image,
   Animated,
-  ActivityIndicator,
-  Modal,
-  KeyboardAvoidingView,
-  ScrollView,
-  TouchableWithoutFeedback,
-  Keyboard,
-  Platform
+  Easing,
+  Dimensions,
 } from "react-native";
-
-import { EventRegister } from "react-native-event-listeners";
-import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 import { useRouter } from "expo-router";
-
 import { LinearGradient } from "expo-linear-gradient";
-import { BlurView } from "expo-blur";
-import Toast from "react-native-toast-message";
-
-import * as LocalAuthentication from "expo-local-authentication";
-import * as Haptics from "expo-haptics";
-
-import { Ionicons } from "@expo/vector-icons";
-import styles from "../components/LoginStyles";
+import { Audio } from "expo-av";
 import { EndPoint } from "../components/links";
 
-import i18n from "../components/translations";
-import { LanguageContext } from "../components/LanguageContext";
+const { width, height } = Dimensions.get("window");
 
-export default function Login() {
+// 🌌 galaxy particles
+const createStars = (count = 40) =>
+  Array.from({ length: count }).map(() => ({
+    x: Math.random() * width,
+    y: Math.random() * height,
+    size: Math.random() * 3 + 1,
+    speed: Math.random() * 2 + 0.5,
+    angle: Math.random() * 360,
+  }));
 
-const router = useRouter();
-const { changeLanguage } = useContext(LanguageContext);
+export default function Index() {
+  const router = useRouter();
 
-const [username, setUsername] = useState("");
-const [password, setPassword] = useState("");
-const [loading, setLoading] = useState(false);
-const [showPassword, setShowPassword] = useState(false);
-const [langModalVisible, setLangModalVisible] = useState(false);
-const [selectedLang, setSelectedLang] = useState(null);
+  const [count, setCount] = useState(3);
+  const [progress, setProgress] = useState(0);
 
-// 🔥 FIX: prevent double click
-const isSubmitting = useRef(false);
+  const stars = useRef(createStars()).current;
 
-const shakeAnim = useRef(new Animated.Value(0)).current;
-const floatAnim = useRef(new Animated.Value(0)).current;
-const fadeAnim = useRef(new Animated.Value(0)).current;
-const buttonScale = useRef(new Animated.Value(1)).current;
-const glowAnim = useRef(new Animated.Value(0)).current;
+  const spin = useRef(new Animated.Value(0)).current;
+  const glow = useRef(new Animated.Value(0)).current;
+  const scan = useRef(new Animated.Value(0)).current;
+  const fade = useRef(new Animated.Value(1)).current;
+  const auroraShift = useRef(new Animated.Value(0)).current;
 
-/* =========================
-ANIMATIONS
-========================= */
+  const soundRef = useRef(null);
 
-useEffect(() => {
-Animated.loop(
-Animated.sequence([
-Animated.timing(floatAnim, {
-toValue: 1,
-duration: 3000,
-useNativeDriver: true,
-}),
-Animated.timing(floatAnim, {
-toValue: 0,
-duration: 3000,
-useNativeDriver: true,
-}),
-])
-).start();
+  useEffect(() => {
+    startAllAnimations();
+    startCountdown();
+    startProgress();
+    playSound();
+  }, []);
 
-Animated.timing(fadeAnim, {
-toValue: 1,
-duration: 1000,
-useNativeDriver: true,
-}).start();
+  // 🌈 AURORA BACKGROUND ANIMATION
+  const startAllAnimations = () => {
+    Animated.loop(
+      Animated.timing(auroraShift, {
+        toValue: 1,
+        duration: 8000,
+        easing: Easing.linear,
+        useNativeDriver: false,
+      })
+    ).start();
 
-Animated.loop(
-Animated.sequence([
-Animated.timing(glowAnim, {
-toValue: 1,
-duration: 1500,
-useNativeDriver: false,
-}),
-Animated.timing(glowAnim, {
-toValue: 0,
-duration: 1500,
-useNativeDriver: false,
-}),
-])
-).start();
-}, []);
+    // 3D LOGO SPIN
+    Animated.loop(
+      Animated.timing(spin, {
+        toValue: 1,
+        duration: 3000,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    ).start();
 
-const floatInterpolate = floatAnim.interpolate({
-inputRange: [0, 1],
-outputRange: [0, -10],
-});
+    // GLOW
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(glow, {
+          toValue: 1,
+          duration: 1200,
+          useNativeDriver: false,
+        }),
+        Animated.timing(glow, {
+          toValue: 0,
+          duration: 1200,
+          useNativeDriver: false,
+        }),
+      ])
+    ).start();
 
-/* =========================
-BUTTON ANIMATION
-========================= */
-const pressIn = () => {
-Animated.spring(buttonScale, {
-toValue: 0.96,
-useNativeDriver: true,
-}).start();
-};
+    // AI SCAN
+    Animated.loop(
+      Animated.timing(scan, {
+        toValue: 1,
+        duration: 1800,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    ).start();
+  };
 
-const pressOut = () => {
-Animated.spring(buttonScale, {
-toValue: 1,
-useNativeDriver: true,
-}).start();
-};
+  const startCountdown = () => {
+    let c = 3;
+    const interval = setInterval(() => {
+      c -= 1;
+      setCount(c);
+      if (c <= 0) clearInterval(interval);
+    }, 1000);
+  };
 
-/* =========================
-SHAKE
-========================= */
-const shake = () => {
-Animated.sequence([
-Animated.timing(shakeAnim, { toValue: 10, duration: 50, useNativeDriver: true }),
-Animated.timing(shakeAnim, { toValue: -10, duration: 50, useNativeDriver: true }),
-Animated.timing(shakeAnim, { toValue: 6, duration: 50, useNativeDriver: true }),
-Animated.timing(shakeAnim, { toValue: 0, duration: 50, useNativeDriver: true }),
-]).start();
-};
+  const startProgress = () => {
+    let p = 0;
+    const interval = setInterval(() => {
+      p += 33;
+      setProgress(p);
+      if (p >= 100) {
+        clearInterval(interval);
+        navigateNext();
+      }
+    }, 1000);
+  };
 
-/* =========================
-LOGIN (FIXED DOUBLE CLICK)
-========================= */
+  const playSound = async () => {
+    try {
+      const { sound } = await Audio.Sound.createAsync(
+        require("../assets/sounds/school-bell.mp3")
+      );
+      soundRef.current = sound;
+      await sound.playAsync();
+    } catch (e) {}
+  };
 
-const loginUser = async () => {
+  const navigateNext = async () => {
+    try {
+      const token = await AsyncStorage.getItem("userToken");
 
-// 🔥 prevent multiple taps
-if (loading || isSubmitting.current) return;
-isSubmitting.current = true;
+      if (!token) {
+        fadeOut(() => router.replace("/login"));
+        return;
+      }
 
-Keyboard.dismiss();
+      const res = await axios.get(EndPoint + "/Account/user_data/", {
+        headers: { Authorization: `Token ${token}` },
+      });
 
-if (!username || !password) {
-shake();
-Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      const user = res.data;
 
-Toast.show({
-type: "error",
-text1: i18n.t("missing_fields"),
-text2: i18n.t("fill_all_fields"),
-});
+      fadeOut(() => {
+        if (user.role === "parent") {
+          router.replace("/(Parents)/parent_home");
+        } else {
+          router.replace("/(main)/home");
+        }
+      });
+    } catch {
+      fadeOut(() => router.replace("/login"));
+    }
+  };
 
-isSubmitting.current = false;
-return;
-}
+  const fadeOut = (cb) => {
+    Animated.timing(fade, {
+      toValue: 0,
+      duration: 600,
+      useNativeDriver: true,
+    }).start(cb);
+  };
 
-setLoading(true);
+  // 🌌 SPIN 3D LOGO
+  const rotateY = spin.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "360deg"],
+  });
 
-try {
+  // 🌈 AURORA COLOR SHIFT
+  const aurora1 = auroraShift.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["#0f172a", "#1e1b4b"],
+  });
 
-const response = await axios.post(
-EndPoint + "/Account/login_user/",
-{ username, password }
-);
+  const aurora2 = auroraShift.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["#1e1b4b", "#0ea5e9"],
+  });
 
-const token = response.data.token;
+  const scanTranslate = scan.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-200, 200],
+  });
 
-await AsyncStorage.setItem("userToken", token);
+  return (
+    <Animated.View style={{ flex: 1, opacity: fade }}>
+      {/* 🌈 AURORA BACKGROUND */}
+      <LinearGradient
+        colors={["#0f172a", "#1e1b4b", "#0ea5e9"]}
+        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      >
+        {/* 🌌 GALAXY STARS */}
+        {stars.map((s, i) => (
+          <View
+            key={i}
+            style={{
+              position: "absolute",
+              left: s.x,
+              top: s.y,
+              width: s.size,
+              height: s.size,
+              borderRadius: 50,
+              backgroundColor: "white",
+              opacity: 0.4,
+            }}
+          />
+        ))}
 
-const userResponse = await axios.get(
-EndPoint + "/Account/user_data/",
-{
-headers: { Authorization: `Token ${token}` }
-}
-);
+        {/* 🤖 AI SCAN LINE */}
+        <Animated.View
+          style={{
+            position: "absolute",
+            width: "100%",
+            height: 2,
+            backgroundColor: "#38bdf8",
+            opacity: 0.5,
+            transform: [{ translateY: scanTranslate }],
+          }}
+        />
 
-const userData = userResponse.data;
+        {/* 🔵 GLOW ORB */}
+        <Animated.View
+          style={{
+            position: "absolute",
+            width: 250,
+            height: 250,
+            borderRadius: 150,
+            backgroundColor: glow.interpolate({
+              inputRange: [0, 1],
+              outputRange: ["rgba(56,189,248,0.1)", "rgba(14,165,233,0.5)"],
+            }),
+          }}
+        />
 
-await AsyncStorage.setItem("userData", JSON.stringify(userData));
+        {/* 🌀 3D LOGO */}
+        <Animated.View
+          style={{
+            transform: [{ rotateY }, { perspective: 800 }],
+            width: 120,
+            height: 120,
+            borderRadius: 25,
+            borderWidth: 2,
+            borderColor: "#38bdf8",
+            justifyContent: "center",
+            alignItems: "center",
+            marginBottom: 20,
+          }}
+        >
+          <Text style={{ color: "#38bdf8", fontSize: 30, fontWeight: "bold" }}>
+            SF
+          </Text>
+        </Animated.View>
 
-EventRegister.emit("updateUserToken", token);
+        {/* TEXT */}
+        <Text style={{ color: "#fff", fontSize: 22, fontWeight: "bold" }}>
+          Shule Fasta
+        </Text>
 
-Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        <Text style={{ color: "#94a3b8", marginTop: 6 }}>
+          AI Powered School System
+        </Text>
 
-Toast.show({
-type: "success",
-text1: i18n.t("login_success"),
-});
+        {/* COUNTDOWN */}
+        <Text style={{ color: "#38bdf8", fontSize: 28, marginTop: 20 }}>
+          {count > 0 ? count : "GO"}
+        </Text>
 
-if (userData.role === "parent") {
-router.replace("/(Parents)/parent_home");
-} else {
-router.replace("/(main)/home");
-}
+        {/* PROGRESS */}
+        <View
+          style={{
+            width: "80%",
+            height: 6,
+            backgroundColor: "#1e293b",
+            borderRadius: 10,
+            marginTop: 20,
+            overflow: "hidden",
+          }}
+        >
+          <View
+            style={{
+              width: `${progress}%`,
+              height: "100%",
+              backgroundColor: "#38bdf8",
+            }}
+          />
+        </View>
 
-} catch (error) {
-
-shake();
-Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-
-Toast.show({
-type: "error",
-text1: i18n.t("login_failed"),
-text2: i18n.t("invalid_credentials"),
-});
-
-} finally {
-setLoading(false);
-isSubmitting.current = false;
-}
-};
-
-/* =========================
-BIOMETRIC LOGIN
-========================= */
-const biometricLogin = async () => {
-const result = await LocalAuthentication.authenticateAsync({
-promptMessage: i18n.t("biometric_login"),
-});
-
-if (result.success) {
-const userData = await AsyncStorage.getItem("userData");
-
-if (userData) {
-const parsed = JSON.parse(userData);
-
-Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-
-if (parsed.role === "parent") {
-router.replace("/(Parents)/parent_home");
-} else {
-router.replace("/(main)/home");
-}
-}
-}
-};
-
-/* =========================
-LANGUAGE
-========================= */
-const openLanguageModal = (lang) => {
-setSelectedLang(lang);
-setLangModalVisible(true);
-};
-
-const confirmLanguage = async () => {
-await changeLanguage(selectedLang);
-setLangModalVisible(false);
-};
-
-/* =========================
-UI
-========================= */
-
-return (
-
-<LinearGradient
-colors={["#020617", "#0f172a", "#1e3a8a"]}
-style={{ flex: 1 }}
->
-
-{/* FIX: KEYBOARD HANDLING WRAPPER */}
-<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-<KeyboardAvoidingView
-style={{ flex: 1 }}
-behavior={Platform.OS === "ios" ? "padding" : "height"}
->
-
-<ScrollView
-keyboardShouldPersistTaps="handled"
-contentContainerStyle={{
-flexGrow: 1,
-justifyContent: "center",
-alignItems: "center",
-}}
->
-
-{/* BACKGROUND */}
-<Image
-source={{ uri: "https://images.unsplash.com/photo-1588072432836-e10032774350" }}
-style={{ position: "absolute", width: "100%", height: "100%" }}
-blurRadius={4}
-/>
-
-<View style={{
-position: "absolute",
-width: "100%",
-height: "100%",
-backgroundColor: "rgba(0,0,0,0.68)"
-}} />
-
-{/* LOGIN CARD */}
-<Animated.View
-style={{
-transform: [
-{ translateY: floatInterpolate },
-{ translateX: shakeAnim }
-],
-opacity: fadeAnim,
-width: "90%",
-}}
->
-
-<BlurView intensity={70} tint="dark" style={{
-borderRadius: 30,
-padding: 26,
-backgroundColor: "rgba(15,23,42,0.45)"
-}}>
-
-{/* USERNAME */}
-<TextInput
-placeholder={i18n.t("username")}
-placeholderTextColor="#94a3b8"
-value={username}
-onChangeText={setUsername}
-style={{
-backgroundColor: "rgba(255,255,255,0.08)",
-padding: 16,
-borderRadius: 14,
-color: "#fff",
-marginBottom: 15
-}}
-/>
-
-{/* PASSWORD */}
-<TextInput
-placeholder={i18n.t("password")}
-placeholderTextColor="#94a3b8"
-secureTextEntry={!showPassword}
-value={password}
-onChangeText={setPassword}
-style={{
-backgroundColor: "rgba(255,255,255,0.08)",
-padding: 16,
-borderRadius: 14,
-color: "#fff"
-}}
-/>
-
-{/* LOGIN BUTTON */}
-<TouchableOpacity
-onPress={loginUser}
-disabled={loading || isSubmitting.current}
-style={{
-marginTop: 25,
-opacity: loading ? 0.7 : 1
-}}
->
-<LinearGradient
-colors={["#2563eb", "#38bdf8"]}
-style={{
-padding: 16,
-borderRadius: 18,
-alignItems: "center"
-}}
->
-
-{loading ? (
-<ActivityIndicator color="#fff" />
-) : (
-<Text style={{ color: "#fff", fontWeight: "700" }}>
-{i18n.t("login")}
-</Text>
-)}
-
-</LinearGradient>
-</TouchableOpacity>
-
-</BlurView>
-
-</Animated.View>
-
-</ScrollView>
-
-</KeyboardAvoidingView>
-</TouchableWithoutFeedback>
-
-<Toast />
-
-</LinearGradient>
-);
+        <Text style={{ color: "#64748b", marginTop: 15 }}>
+          AI initializing... {progress}%
+        </Text>
+      </LinearGradient>
+    </Animated.View>
+  );
 }

@@ -5,6 +5,7 @@ import {
   Animated,
   Easing,
   Dimensions,
+  Image,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -22,7 +23,6 @@ const createStars = (count = 40) =>
     y: Math.random() * height,
     size: Math.random() * 3 + 1,
     speed: Math.random() * 2 + 0.5,
-    angle: Math.random() * 360,
   }));
 
 export default function Index() {
@@ -48,7 +48,7 @@ export default function Index() {
     playSound();
   }, []);
 
-  // 🌈 AURORA BACKGROUND ANIMATION
+  // 🌈 ANIMATIONS
   const startAllAnimations = () => {
     Animated.loop(
       Animated.timing(auroraShift, {
@@ -63,33 +63,33 @@ export default function Index() {
     Animated.loop(
       Animated.timing(spin, {
         toValue: 1,
-        duration: 3000,
+        duration: 4000,
         easing: Easing.linear,
         useNativeDriver: true,
       })
     ).start();
 
-    // GLOW
+    // GLOW EFFECT
     Animated.loop(
       Animated.sequence([
         Animated.timing(glow, {
           toValue: 1,
-          duration: 1200,
+          duration: 1500,
           useNativeDriver: false,
         }),
         Animated.timing(glow, {
           toValue: 0,
-          duration: 1200,
+          duration: 1500,
           useNativeDriver: false,
         }),
       ])
     ).start();
 
-    // AI SCAN
+    // AI SCAN LINE
     Animated.loop(
       Animated.timing(scan, {
         toValue: 1,
-        duration: 1800,
+        duration: 2000,
         easing: Easing.linear,
         useNativeDriver: true,
       })
@@ -130,7 +130,6 @@ export default function Index() {
   const navigateNext = async () => {
     try {
       const token = await AsyncStorage.getItem("userToken");
-
       if (!token) {
         fadeOut(() => router.replace("/login"));
         return;
@@ -141,7 +140,6 @@ export default function Index() {
       });
 
       const user = res.data;
-
       fadeOut(() => {
         if (user.role === "parent") {
           router.replace("/(Parents)/parent_home");
@@ -162,36 +160,22 @@ export default function Index() {
     }).start(cb);
   };
 
-  // 🌌 SPIN 3D LOGO
   const rotateY = spin.interpolate({
     inputRange: [0, 1],
     outputRange: ["0deg", "360deg"],
   });
 
-  // 🌈 AURORA COLOR SHIFT
-  const aurora1 = auroraShift.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["#0f172a", "#1e1b4b"],
-  });
-
-  const aurora2 = auroraShift.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["#1e1b4b", "#0ea5e9"],
-  });
-
   const scanTranslate = scan.interpolate({
     inputRange: [0, 1],
-    outputRange: [-200, 200],
+    outputRange: [-height / 2, height / 2],
   });
 
   return (
     <Animated.View style={{ flex: 1, opacity: fade }}>
-      {/* 🌈 AURORA BACKGROUND */}
       <LinearGradient
         colors={["#0f172a", "#1e1b4b", "#0ea5e9"]}
         style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
       >
-        {/* 🌌 GALAXY STARS */}
         {stars.map((s, i) => (
           <View
             key={i}
@@ -203,78 +187,77 @@ export default function Index() {
               height: s.size,
               borderRadius: 50,
               backgroundColor: "white",
-              opacity: 0.4,
+              opacity: 0.3,
             }}
           />
         ))}
 
-        {/* 🤖 AI SCAN LINE */}
         <Animated.View
           style={{
             position: "absolute",
             width: "100%",
             height: 2,
             backgroundColor: "#38bdf8",
-            opacity: 0.5,
+            opacity: 0.3,
             transform: [{ translateY: scanTranslate }],
           }}
         />
 
-        {/* 🔵 GLOW ORB */}
         <Animated.View
           style={{
             position: "absolute",
-            width: 250,
-            height: 250,
+            width: 280,
+            height: 280,
             borderRadius: 150,
             backgroundColor: glow.interpolate({
               inputRange: [0, 1],
-              outputRange: ["rgba(56,189,248,0.1)", "rgba(14,165,233,0.5)"],
+              outputRange: ["rgba(56,189,248,0.05)", "rgba(14,165,233,0.2)"],
             }),
           }}
         />
 
-        {/* 🌀 3D LOGO */}
+        {/* 🌀 LOGO CONTAINER NA IMAGE */}
         <Animated.View
           style={{
-            transform: [{ rotateY }, { perspective: 800 }],
-            width: 120,
-            height: 120,
-            borderRadius: 25,
+            transform: [{ rotateY }, { perspective: 1000 }],
+            width: 130,
+            height: 130,
+            borderRadius: 30,
             borderWidth: 2,
             borderColor: "#38bdf8",
             justifyContent: "center",
             alignItems: "center",
-            marginBottom: 20,
+            marginBottom: 25,
+            backgroundColor: "rgba(15, 23, 42, 0.8)",
+            overflow: "hidden",
           }}
         >
-          <Text style={{ color: "#38bdf8", fontSize: 30, fontWeight: "bold" }}>
-            SF
-          </Text>
+          <Image
+            source={require("../assets/icon.png")}
+            style={{ width: "80%", height: "80%", resizeMode: "contain" }}
+          />
         </Animated.View>
 
         {/* TEXT */}
-        <Text style={{ color: "#fff", fontSize: 22, fontWeight: "bold" }}>
-          Shule Fasta
+        <Text style={{ color: "#fff", fontSize: 26, fontWeight: "800", letterSpacing: 1 }}>
+          Welcome ShuleFasta App
         </Text>
 
-        <Text style={{ color: "#94a3b8", marginTop: 6 }}>
-          AI Powered School System
+        <Text style={{ color: "#94a3b8", marginTop: 8, fontSize: 14 }}>
+          Intelligence at your service
         </Text>
 
-        {/* COUNTDOWN */}
-        <Text style={{ color: "#38bdf8", fontSize: 28, marginTop: 20 }}>
-          {count > 0 ? count : "GO"}
+        <Text style={{ color: "#38bdf8", fontSize: 28, marginTop: 25, fontWeight: "bold" }}>
+          {count > 0 ? count : "INIT"}
         </Text>
 
-        {/* PROGRESS */}
         <View
           style={{
-            width: "80%",
-            height: 6,
+            width: "70%",
+            height: 4,
             backgroundColor: "#1e293b",
             borderRadius: 10,
-            marginTop: 20,
+            marginTop: 25,
             overflow: "hidden",
           }}
         >
@@ -283,12 +266,13 @@ export default function Index() {
               width: `${progress}%`,
               height: "100%",
               backgroundColor: "#38bdf8",
+              borderRadius: 10,
             }}
           />
         </View>
 
-        <Text style={{ color: "#64748b", marginTop: 15 }}>
-          AI initializing... {progress}%
+        <Text style={{ color: "#64748b", marginTop: 15, fontSize: 12 }}>
+          System initializing... {progress}%
         </Text>
       </LinearGradient>
     </Animated.View>
