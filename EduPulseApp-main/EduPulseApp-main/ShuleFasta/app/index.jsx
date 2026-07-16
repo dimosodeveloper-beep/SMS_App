@@ -13,7 +13,7 @@ import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Audio } from "expo-av";
 import { EndPoint } from "../components/links";
-
+//Shule
 const { width, height } = Dimensions.get("window");
 
 // 🌌 galaxy particles
@@ -240,7 +240,7 @@ export default function Index() {
 
         {/* TEXT */}
         <Text style={{ color: "#fff", fontSize: 26, fontWeight: "800", letterSpacing: 1 }}>
-          Welcome ShuleFasta App
+          Welcome ShuleFasta
         </Text>
 
         <Text style={{ color: "#94a3b8", marginTop: 8, fontSize: 14 }}>

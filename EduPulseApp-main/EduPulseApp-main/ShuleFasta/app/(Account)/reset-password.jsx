@@ -116,7 +116,7 @@ text1: "Success",
 text2: res.data.message
 });
 
-router.replace("/(Account)/login");
+router.replace("/login");
 
 } catch (error) {
 

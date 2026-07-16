@@ -84,7 +84,7 @@ text2:res.data.message
 });
 
 router.push({
-pathname:"/(Account)/verify_otp",
+pathname:"/(Account)/verify-otp",
 params:{email}
 });
 

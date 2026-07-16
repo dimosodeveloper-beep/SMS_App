@@ -2,7 +2,7 @@
   "expo": {
     "name": "Shule Fasta",
     "slug": "ShuleFasta",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "scheme": "shulefasta",
@@ -21,7 +21,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "versionCode": 4,
+      "versionCode": 5,
       "package": "com.ShuleFasta"
     },
     "web": {

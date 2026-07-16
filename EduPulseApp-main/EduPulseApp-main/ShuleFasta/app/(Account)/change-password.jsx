@@ -241,8 +241,11 @@ export default function ChangePasswordScreen() {
         </View>
       )}
 
-      <TouchableOpacity
-        onPress={() => Keyboard.dismiss()}
+   <TouchableOpacity
+        onPress={() => {
+          Keyboard.dismiss();
+          router.back(); // Hii itakurudisha kwenye page uliyotoka
+        }}
         style={{
           position: "absolute",
           top: 50,

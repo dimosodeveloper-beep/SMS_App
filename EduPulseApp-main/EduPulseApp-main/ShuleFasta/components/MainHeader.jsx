@@ -3,7 +3,7 @@ import {
   useNavigation,
   DrawerActions
 } from '@react-navigation/native';
-
+//account options
 import {
   StyleSheet,
   Text,
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.6)",
-    justifyContent: "flex-end"
+    justifyContent: "center"
   },
 
   modalBox: {

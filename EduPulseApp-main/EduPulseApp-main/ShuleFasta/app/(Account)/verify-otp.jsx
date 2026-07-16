@@ -95,7 +95,7 @@ text2: res.data.message
 
 /* go to reset password */
 router.push({
-pathname: "/(Account)/reset_password",
+pathname: "/(Account)/reset-password",
 params: { email }
 });
 
